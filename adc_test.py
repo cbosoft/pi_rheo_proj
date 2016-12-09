@@ -21,7 +21,6 @@ int_addr = 220				# Set the ADC internal; address
 # Read voltage level in from ADC (voltage accross pot (0-3.3v)
 # bus = SMBus(1)
 bus.write_byte_data(ext_addr, 0, int_addr)
-return_byte = []
 return_byte = bus.read_i2c_block_data(ext_addr, 0, 2)
 print (return_byte[0] << 8) + return_byte[1]
 bus.close()
