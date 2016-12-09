@@ -26,3 +26,4 @@ return_byte = bus.read_i2c_block_data(ext_addr, 0, 2)
 print (return_byte[0] << 8) + return_byte[1]
 bus.close()
 
+# words
