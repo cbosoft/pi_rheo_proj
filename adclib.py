@@ -20,24 +20,48 @@ class mpc3424(object):
 		self.channel = channel_
 		self.sample_rate = sample_rate_
 		self.gain = gain_
-		update_()
+		self.update_()
 	
 	def update_(self):
-		open_()
+		self.open_()
 		self.bus.write_byte_data(self.address, (self.channel << 5) + (1 << 4) + (self.sample_rate << 2) + (self.gain))
-		close_()
+		self.close_()
 		
 	def send_byte(self, byte):
-		open_()
+		self.open_()
 		self.bus.write_byte_data(self.address, byte)
-		close_()
+		self.close_()
 		
 	def read_data(self):
-		open_()
+		self.open_()
 		self.bus.write_byte_data(self.address, self.address)
-		byte = self.bus.read_byte_data(self.address, 0, 2)
-		close_()
-		return byte
+		b = self.output_bits()
+		if (b == 18):
+			b = 3
+		else:
+			b = 2
+		byte = self.bus.read_i2c_block_data(self.address, 0, b)
+		self.close_()
+		total = 0
+		for i in range(0, b - 1):
+			total += (byte[i] << ((b - i) * 8))
+		return total
+		
+	def output_bits(self):
+		if (self.sample_rate == 0):
+			#is 240 samples per second
+			return 12
+		elif (self.sample_rate == 1):
+			#60 SPS
+			return 14
+		elif (self.sample_rate == 2):
+			#15 SPS
+			return 16
+		elif (self.sample_rate == 3):
+			#3.75 SPS
+			return 18
+		else:
+			return 0
 		
 	def open_(self):
 		self.bus = SMBus(1)
