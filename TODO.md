@@ -1,3 +1,5 @@
-# TODO :: Things To Be Done
+## TODO
 
-> Write ADC Library (for chip MCP3424)
+~~Write ADC library (for chip MCP3424)~~
+
+Build + test motor speed controller
