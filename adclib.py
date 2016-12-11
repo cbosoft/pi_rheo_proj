@@ -68,3 +68,6 @@ class mpc3424(object):
 		
 	def close_(self):
 		self.bus.close()						#close bus
+
+		
+	#FIX
