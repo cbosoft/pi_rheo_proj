@@ -8,43 +8,48 @@ from smbus2 import SMBus
 
 
 class mpc3424(object):
-	bus = 0									#holds the bus connection
-	address = 0x6e								#address of the adc (in hex, set by setting pins on 
-										#the adc high or low
-	channel = 0								#(0-3) four different analogue inputs
-	sample_rate = 0								#(0-3) sets sample rate
-										#higher sample rate, lower resolution
-	gain = 0								#(0-3) for small voltages (<<VDD) use gain to increase resolution
-										#voltage gain = 2^gain => gain=2: x4
+	bus = 0													#holds the bus connection
+	address = 0x6e											#address of the adc (in hex, set by setting pins on 
+															#the adc high or low
+	channel = 0												#(0-3) four different analogue inputs
+	sample_rate = 0											#(0-3) sets sample rate
+															#higher sample rate, lower resolution
+	gain = 0												#(0-3) for small voltages (<<VDD) use gain to increase resolution
+															#voltage gain = 2^gain => gain=2: x4
+	useful_output_gain = 1.0								#the voltage output will be multiplied by this number in the "get_real" method
+															#to convert between "voltage" and whatever quantity the voltage represents
+															#e.g. if a 2048 (12bit) reading means 10rad/s, useful_output_gain = 10/VDD
+	Vmax_in = 3.3											#supply voltage
+	Vactual_in=0.1											#current voltage reading
 	
 	def __init__(self, address_, channel_, sample_rate_, gain_):
-		self.address = address_						#set the local variable values (software params)
+		self.address = address_								#set the local variable values (software params)
 		self.channel = channel_
 		self.sample_rate = sample_rate_
 		self.gain = gain_						
-		self.update_()							#sync params between software and adc
+		self.update_()										#sync params between software and adc
 	
 	def update_(self):
-		self.open_()							#open bus connections
+		self.open_()										#open bus connections
 		self.bus.write_byte_data(self.address, 0, (self.channel << 5) + (1 << 4) + (self.sample_rate << 2) + (self.gain))
-										#set the parameters on the adc
-		self.close_()							#close bus connection
+															#set the parameters on the adc
+		self.close_()										#close bus connection
 		
-	def write_byte(self, byte):						#NOT USED! WHY IS IT HERE?
-		self.open_()							#open bus connection
-		self.bus.write_byte_data(self.address, 0, byte)			#write specified byte data to adc
-		self.close_()							#close bus connection
+	def write_byte(self, byte):								#NOT USED! WHY IS IT HERE?
+		self.open_()										#open bus connection
+		self.bus.write_byte_data(self.address, 0, byte)		#write specified byte data to adc
+		self.close_()										#close bus connection
 		
 	def read_data(self):
-		self.open_()							#open bus connection
+		self.open_()										#open bus connection
 		self.bus.write_byte_data(self.address, 0, self.address)		#tell adc to expect the spanish inquisition
 		b = self.output_bits()
 		if (b == 18):
-			b = 3							#3 bytes to hold 18 bits
+			b = 3											#3 bytes to hold 18 bits
 		else:
-			b = 2							#2bytes to hold 12 to 16 bits
+			b = 2											#2bytes to hold 12 to 16 bits
 		byte = self.bus.read_i2c_block_data(self.address, 0, b)
-		self.close_()							#close the connection
+		self.close_()										#close the connection
 		total = 0
 		for i in range(0, b):
 			total += (byte[i] << ((b - i - 1) * 8))			#getting total
@@ -52,22 +57,29 @@ class mpc3424(object):
 		
 	def output_bits(self):
 		if (self.sample_rate == 0):
-			return 12						#240 samples per second (SPS)
+			return 12										#240 samples per second (SPS)
 		elif (self.sample_rate == 1):
-			return 14						#60 SPS
+			return 14										#60 SPS
 		elif (self.sample_rate == 2):
-			return 16						#15 SPS
+			return 16										#15 SPS
 		elif (self.sample_rate == 3):
-			return 18						#3.75 SPS
+			return 18										#3.75 SPS
 		else:
-			self.sample_rate = 0					#sample rate wasn't set correctly, reset to default (0)
+			self.sample_rate = 0							#sample rate wasn't set correctly, reset to default (0)
 			self.update_()
 		
 	def open_(self):
-		self.bus = SMBus(1)						#get bus
+		self.bus = SMBus(1)									#get bus
 		
 	def close_(self):
-		self.bus.close()						#close bus
-
+		self.bus.close()									#close bus
 		
-	#FIX
+	def get_volts(self):
+		d = self.read_data()
+		b = self.output_bits()
+		self.Vactual_in = (d / (2^(b - 1)) * self.Vmax_in
+		return self.Vactual_in
+		
+	def get_real(self):
+		real_val = self.Vactual_in * self.useful_output_gain
+		return real_val
