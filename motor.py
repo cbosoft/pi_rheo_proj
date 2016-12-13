@@ -15,7 +15,8 @@ class Motor(object):
 	
 	def set_speed(self, speed_):
 		self.speed = speed_
-		#not done, haven't decided how to control the motor's speed yet
+		#Provisionally using a DC:DC regulator with digital control via two momentary push switches jerry rigged to be pi-controllable via two optocouplers
+		#Other programmable DC-DC regulators are being looked into, but few have the right specs for the 0-12v >1A operation required.
 		
 	def get_speed(self):
 		return self.ADC.get_real()
