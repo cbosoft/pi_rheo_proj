@@ -14,7 +14,7 @@ class PIDcontroller:
 	ca = [0,0,0]
 	e = [0,0,0]
 	
-#	time_of_last = 0
+	time_of_last = 0
 	sample_time = 0.1
 	
 	def __init__(self, KP_, KI_, KD_, sample_time_):
@@ -48,16 +48,33 @@ class PIDcontroller:
 	def get_control_action(self, u_val):
 		# Control action is a function of the k parameters, the previous control actions, the previous errors, and the sample time
 		
-		# Get actual time between samples (will vary, use an average?) NOPE
-#		if (time_of_last == 0):
-#			time_of_last = int(round(time.time() * 1000))
-#			sample_time = 0.1
-#		else:
-#			sample_time = (int(round(time.time() * 1000))) - time_of_last
-#			time_of_last = int(round(time.time() * 1000))
+		# Get actual time between samples (will vary, use an average?)
+		if (self.time_of_last == 0):
+			self.time_of_last = int(round(time.time()))
+			self.sample_time = 0.1 #rough initial sample time
+		else:
+			self.sample_time = int(round(time.time())) - time_of_last #set sample time to actual time between samples
+			self.time_of_last = int(round(time.time()))
 		
-		# move stored values down
+		# move stored values down, making space for next set
 		self.shift_arrs()
+		
+		#get new error
 		self.e[2] = self.set_point - u_val
-		self.ca[2] = self.ca[1] + self.KP * (self.e[2] - self.e[1]) + self.KI * self.sample_time * self.e[2]
-		return ca[2]
+		
+		#use velocity discrete time algorithm to obtain the required control action
+		self.ca[2] = self.ca[1] + self.KP * (self.e[2] - self.e[1]) + self.KI * self.sample_time * self.e[2] + (self.KD / self.sample_time) * (self.e[2] - (2 * self.e[1]) + self.e[0])
+		return self.ca[2]
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
