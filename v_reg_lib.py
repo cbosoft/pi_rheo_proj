@@ -1,6 +1,7 @@
 #
 # Voltage regulator jerry rig
 #
+# Do not use.
 
 import RPi.GPIO as GPIO
 from time import sleep

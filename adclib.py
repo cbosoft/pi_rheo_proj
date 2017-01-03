@@ -9,17 +9,24 @@ from smbus2 import SMBus
 
 class mpc3424(object):
 	bus = 0													#holds the bus connection
+	
 	address = 0x6e											#address of the adc (in hex, set by setting pins on 
 															#the adc high or low
+															
 	channel = 0												#(0-3) four different analogue inputs
+	
 	sample_rate = 0											#(0-3) sets sample rate
 															#higher sample rate, lower resolution
+															
 	gain = 0												#(0-3) for small voltages (<<VDD) use gain to increase resolution
 															#voltage gain = 2^gain => gain=2: x4
+															
 	useful_output_gain = 1.0								#the voltage output will be multiplied by this number in the "get_real" method
 															#to convert between "voltage" and whatever quantity the voltage represents
 															#e.g. if a 2048 (12bit) reading means 10rad/s, useful_output_gain = 10/VDD
+															
 	Vmax_in = 3.3											#supply voltage
+	
 	Vactual_in=0.1											#current voltage reading
 	
 	def __init__(self, address_, channel_, sample_rate_, gain_):

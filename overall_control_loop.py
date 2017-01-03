@@ -1,3 +1,7 @@
+#
+# Master program
+# Uses the other libraries to control the experiment and record the data
+
 # Imports
 
 # def loop:
@@ -5,6 +9,5 @@
 	# get motor control action (delta speed)
 	# apply new motor speed
 	# get pend value
-	# image recog do?
 	# record motor speed
 	# record pend value

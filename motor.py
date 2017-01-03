@@ -1,6 +1,8 @@
 #
 # Motor class allows you to control a motor using adclib and daclib
 #
+# Needs re-writing.
+# 
 import RPi.GPIO as GPIO
 import adclib
 import daclib
