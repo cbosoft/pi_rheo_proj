@@ -38,7 +38,7 @@ class Image_Processor(object):
 		self.crack_found = False
 	
 	# apply edge detection algorithm
-	def edge_det(self, image=self.img, BGT=245, crack_thresh=15):
+	def edge_det(self, image=self.img, BGT=245, crack_thresh=5):
 															# set up working variables
 		pixels = image.load()								# get image pixel data
 		image_edge = image									# create edge image the same size as the working image
@@ -110,7 +110,7 @@ class Image_Processor(object):
 			self.img_edge = image_edge
 			self.pix_edge = pixels_edge
 			
-			if (((crack_px * 100) / total_px) > crack_thresh): # If more than threshhold amount of black (edges), set cracks fround to True
+			if (((crack_px * 1000) / total_px) >= crack_thresh): # If more than threshhold amount of black (edges), set cracks fround to True
 				self.crack_found = True
 		
 		return pixels_edge
