@@ -16,6 +16,7 @@ from PIL import Image # uses python imaging library (PIL v1.1.7 for python 2.7)
 def crack_det(path, BGT=245, crack_thresh=5, verbose=False):
 	if (verbose):
 		print("Edge detection begninning...")
+	
 	image = Image.open(path)							# set up working variables
 	pixels = image.load()								# get image pixel data
 	image_edge = Image.new("RGB",image.size)			# create edge image the same size as the working image
@@ -83,11 +84,8 @@ def crack_det(path, BGT=245, crack_thresh=5, verbose=False):
 			Gx += intensity
 			Gy += intensity
 			
-			length = math.sqrt((Gy * Gy) + (Gx * Gx))	# calculate the length of the gradient
-
-			length = (length * 255) / 4328				# normalise the length of gradient to the range 0 to 255
-
-			length = 255 - int(length)					# convert the length to an integer and invert
+														# calculate the length of the gradient, normalise the length of gradient to the range 0 to 255 convert the length to an integer and invert
+			length = 255 - int((math.sqrt((Gy * Gy) + (Gx * Gx)) * 255) / 4328)
 			
 			if (length <= BGT):							# if the intensity is below a threshhold, set to black and update number of crack pixels
 				length = 0
