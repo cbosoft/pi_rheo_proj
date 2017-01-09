@@ -6,3 +6,6 @@ lib/img_recog/working_frames/*
 **/*.pyc
 write_up/*.gz
 write_up/*.pdf
+write_up/*.aux
+write_up/*.log
+write_up/*.toc
