@@ -24,8 +24,8 @@ frame_counter = 0
 for start in starts:
     frames = sorted(glob.glob(start + "/*.jpg"))
     for frame in frames:
-        frame_time = (int(start[15:]) + frame_counter * 0.033) - first_start
+        frame_time = (int(start[15:]) + frame_counter * 33) - first_start
         frame_index = frame_counter
         os.rename(frame, "frames/" + str(frame_index).zfill(6) +
-        str(round(int(frame_time))) + ".jpg")
+        str(round(int(frame_time)))[:-2] + ".jpg")
         frame_counter += 1

@@ -2,8 +2,16 @@ import subprocess as sp
 import glob
 import time
 
-end_time = 60000
-vid_length = 10
+# TODO: edit for multiple runs
+
+end_time = int(600 * 1000)  # milliseconds
+max_time = int(55 * 60 * 1000)  # max recording length the program can deal with
+
+if (end_time > max_time):
+    print("The run time is too long, the max allowable is 55 minutes. Please reduce.")
+    exit()
+
+vid_length = 10  # seconds
 start_time = int(round(time.time() * 1000))
 
 if (len(glob.glob("videos/*")) > 0):
@@ -13,7 +21,7 @@ if (len(glob.glob("videos/*")) > 0):
 
 finished = False
 while (not finished):
-    vid_start = round(int(time.time() * 1000)) - start_time
+    vid_start = int(round(time.time() * 1000)) - start_time
     sp.call(["avconv -f video4linux2 -t " + str(vid_length) + " -i /dev/video0 "
     + "videos/" + str(round(int(vid_start))) + ".avi"], shell=True)
     #time.sleep(3)
