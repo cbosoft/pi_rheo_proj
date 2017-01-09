@@ -3,3 +3,4 @@ lib/img_recog/old_frames
 lib/img_recog/outp/*
 lib/img_recog/videos/*
 lib/img_recog/working_frames/*
+**/*.pyc
