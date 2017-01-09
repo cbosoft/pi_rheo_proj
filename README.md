@@ -22,8 +22,8 @@ overall_loop.py                 uses the other libs to achieve the main task
 /../frames_record.py            used for debugging. captures frames from a webcam and saves the frames
 /../outp/dat.csv                csv with the output from the crack detection script:
                                 [cracks found (0 or 1)],[time, ms],[crack probability],[frame]
-/../vid_get.py			repeatedly records 10 minutes of video from the main video device attached (usb webcam etc) 
-				and saves with the timestamp as the filename.
-/../frames_get.py		converts the recorded video files to individual frames to enable the image recognition to be run
+/../vid_get.py                  repeatedly records 10 minutes of video from the main video device attached (usb webcam etc) 
+                                and saves with the timestamp as the filename.
+/../frames_get.py               converts the recorded video files to individual frames to enable the image recognition to be run
 ```
 *You can use this as much as you like, share it as you like, whatever. There's no warranty or guarantee that it will actually work.*
