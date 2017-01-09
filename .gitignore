@@ -4,3 +4,5 @@ lib/img_recog/outp/*
 lib/img_recog/videos/*
 lib/img_recog/working_frames/*
 **/*.pyc
+write_up/*.gz
+write_up/*.pdf
