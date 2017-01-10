@@ -1,5 +1,3 @@
-# custom_libs
-
 I'm using a Raspberry Pi to control an experiment, using the scripts posted here. WIP.
 
 ```
