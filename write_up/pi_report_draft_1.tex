@@ -8,7 +8,7 @@
 \usepackage{fancyhdr}
 \usepackage[english]{babel}
 \usepackage{etoolbox}
-\usepackage{titlesec}
+%\usepackage{titlesec}
 
 % Unused packages
 %\usepackage{placeins}
@@ -70,7 +70,8 @@
 	
 	% Summary Page
 	\thispagestyle{plain}
-	\section{Summary}
+	\chapter*{Summary}
+	\addcontentsline{toc}{chapter}{Summary}
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
 	
 	% Contents Page
@@ -78,29 +79,37 @@
 	
 	% Acknowledgements
 	\newpage
-	\section{Acknowledgements}
+	%\setcounter{chapter}{-1}
+	\chapter*{Acknowledgements}
+	\addcontentsline{toc}{chapter}{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
 	
 	\newpage
 	\pagenumbering{arabic}
 	\setcounter{page}{1}
 	
-	\chapter{Introduction}
+	\chapter*{Introduction}
+	\addcontentsline{toc}{chapter}{Introduction}
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
 
-	\chapter{Description of the Organisation}
+	\chapter*{Description of the Organisation}
+	\addcontentsline{toc}{chapter}{Description of the Organisation}
 	%In this section, you should show a good understanding of the organisation. Details may include the type of organisation, management structure, products, and markets catered for. Mention your position in the organisation.
 	
-	\chapter{Description of the Work}
+	\chapter*{Description of the Work}
+	\addcontentsline{toc}{chapter}{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially (see templates document).
 	
-	\chapter{Conclusions}
+	\chapter*{Conclusions}
+	\addcontentsline{toc}{chapter}{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
 	
-	\chapter{Review}
+	\chapter*{Review}
+	\addcontentsline{toc}{chapter}{Review}
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	
-	\chapter{Nomenclature}
+	\chapter*{Nomenclature}
+	\addcontentsline{toc}{chapter}{Nomenclature}
 	%List all the symbols in alphabetical order, with Greek symbols at the end.
 	\begin{center}
 		\begin{tabular}{|c|c|}
@@ -125,8 +134,15 @@
 			\hline
 		\end{tabular}
 	\end{center}
-	\bibliography{biblio}
 	
-	\bibliographystyle{apalike}
+	%Bibliography
+	%\bibliography{biblio}
+	%\bibliographystyle{apalike}
 	
+	%Appendix
+	\chapter*{Appendix}
+	\addcontentsline{toc}{chapter}{Appendix}
+	\pagenumbering{alph}
+	\setcounter{page}{1}
+		
 \end{document}
