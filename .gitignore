@@ -9,3 +9,6 @@ write_up/*.pdf
 write_up/*.aux
 write_up/*.log
 write_up/*.toc
+write_up/*.bak
+write_up/*.bbl
+write_up/*.blg
