@@ -1,0 +1,7 @@
+Component,Size,Link
+Motor Speed Controller,,
+Digital Potentiometer,10k,http://uk.rs-online.com/web/p/digital-potentiometers/6878458/
+Digital Pot Surface Mount to Through Hole,MSOP,http://uk.rs-online.com/web/p/surface-mount-smt-to-through-hole-adapter-boards/6564897/
+Capacitor 1,10uF,http://uk.rs-online.com/web/p/aluminium-capacitors/0117035/
+Capacitor 2,470uF,http://uk.rs-online.com/web/p/aluminium-capacitors/5261884/
+Transistor,max 65w and 6A,http://uk.rs-online.com/web/p/bipolar-transistors/7905292/
