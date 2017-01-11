@@ -8,4 +8,4 @@ write_up/*
 !write_up/*.tex
 !write_up/*.bib
 !write_up/lit/*
-!write_up/images/*
+!write_up/images/*.png
