@@ -13,7 +13,7 @@ runs_to_do = True
 
 #loop:
 while (runs_to_do):
-	runs = glob.glob("run_data/*.nd")
+	runs = sorted(glob.glob("run_data/*.nd"))
 	if (len(runs) > 0):
 		run_data = open(runs[0],"r")  # open run data
 		#TODO  # get run data
@@ -24,3 +24,7 @@ while (runs_to_do):
 		run_.start_run()  # begin th experiment
 		
 		os.rename(runs[0],runs[0][:-2] + "d")  # set run as done
+	else:
+		runs_to_do = False
+
+print("All runs completed!")
