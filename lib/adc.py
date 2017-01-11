@@ -1,4 +1,6 @@
 #
+# adc.py
+#
 # Class library, gives support for using the MCP3424 4-channel 16bit ADC
 # Written by trial and error and extensive reading of the datasheet (see "MCP342xx.pdf")
 # (Also great help from: https://www.youtube.com/watch?v=OPC5lXCKp_w)
@@ -11,7 +13,7 @@ class mpc3424(object):
 	bus = 0													#holds the bus connection
 	
 	address = 0x6e											#address of the adc (in hex, set by setting pins on 
-															#the adc high or low
+															#the adc high or low)
 															
 	channel = 0												#(0-3) four different analogue inputs
 	
@@ -20,16 +22,8 @@ class mpc3424(object):
 															
 	gain = 0												#(0-3) for small voltages (<<VDD) use gain to increase resolution
 															#voltage gain = 2^gain => gain=2: x4
-															
-	useful_output_gain = 1.0								#the voltage output will be multiplied by this number in the "get_real" method
-															#to convert between "voltage" and whatever quantity the voltage represents
-															#e.g. if a 2048 (12bit) reading means 10rad/s, useful_output_gain = 10/VDD
-															
-	Vmax_in = 3.3											#supply voltage
 	
-	Vactual_in=0.1											#current voltage reading
-	
-	def __init__(self, address_, channel_, sample_rate_, gain_):
+	def __init__(self, address_=0x6e, channel_=0, sample_rate_=0, gain_=0):
 		self.address = address_								#set the local variable values (software params)
 		self.channel = channel_
 		self.sample_rate = sample_rate_
@@ -74,6 +68,7 @@ class mpc3424(object):
 		else:
 			self.sample_rate = 0							#sample rate wasn't set correctly, reset to default (0)
 			self.update_()
+			return 12
 		
 	def open_(self):
 		self.bus = SMBus(1)									#get bus
@@ -83,10 +78,15 @@ class mpc3424(object):
 		
 	def get_volts(self):
 		d = self.read_data()
-		b = self.output_bits()
-		self.Vactual_in = (d / (2^(b - 1)) * self.Vmax_in
-		return self.Vactual_in
-		
-	def get_real(self):
-		real_val = self.Vactual_in * self.useful_output_gain
-		return real_val
+		v_mult = long(0)
+		v_out = long(0)
+		if (self.sample_rate == 0):
+			v_mult = 0.001
+		elif (self.sample_rate == 1):
+			v_mult = 0.00025
+		elif (self.sample_rate == 2):
+			v_mult = 0.0000625
+		elif (self.sample_rate == 3):
+			v_mult = 0.000015625
+		v_out = d * v_mult(0)
+		return v_out

@@ -9,9 +9,8 @@ overall_loop.py                 uses the other libs to achieve the main task
 
 /lib/adc.py                     py class for using the MCP2434 adc chip
 /lib/control.py                 py class for creating a simple PID controller
-/lib/dac.py                     (blank) will hold a py class for using a DAC with the raspberry pi
-/lib/motor.py                   (incomplete) py class for using a motor with the raspberry pi
-/lib/v_reg.py                   (incomplete) py class to control the voltage supplied to a motor
+/lib/dig_pot.py                 py class for using an MCP4531 digital potentiometer with the raspberry pi (to control motor speed)
+/lib/motor.py                   py class for using a motor with the raspberry pi (uses dig_pot.py)
 
 /lib/img_recog                  contains scripts and files used and output by the crack detection script
 /../do*.py                      used to start crack detection script in different threads, for faster processing

@@ -1,4 +1,6 @@
 #
+# control.py
+#
 # Controller class. Provides support for controling a process using python.
 # Simply gets a control action based upon a set point and an input value.
 # 
@@ -28,7 +30,7 @@ class PIDcontroller(object):
 	sample_time = 0.1										# time between runs, in seconds
 	
 	# class initialisation method
-	def __init__(self, KP_, KI_, KD_, sample_time_):
+	def __init__(self, KP_=0, KI_=0, KD_=0, sample_time_=0.1, set_point=0):
 		
 		self.sample_time = sample_time_						# initial sample time
 		
