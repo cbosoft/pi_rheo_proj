@@ -1,5 +1,5 @@
 \documentclass{report}
-\def\atitle{Rheometer Control System Using a Raspberry Pi}
+\def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
 
 % Imports
@@ -8,6 +8,8 @@
 \usepackage{fancyhdr}
 \usepackage[english]{babel}
 \usepackage{etoolbox}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
 %\usepackage{titlesec}
 
 % Unused packages
@@ -21,7 +23,7 @@
 \patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
 \setcounter{secnumdepth}{0}
 \renewcommand{\theequation}{\thetitle.\arabic{equation}}
-
+\renewcommand\UrlFont{\rmfamily\itshape}
 % Header/footer preamble
 \fancyhf{}
 \fancypagestyle{plain}{
@@ -37,30 +39,29 @@
 		\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 		\makebox[\textwidth][c]{\includegraphics[scale=1]{images/titleheader.png}}
 		\centering
-		\vfill
+		\vskip4cm
 		{
 			\bfseries\Large
 			Department of Chemical \& Process Engineering\\
 			\vskip1cm
 			MEng in Chemical \& Process Engineering\\
 			18530
-			\vskip2cm
-			\atitle
+			\vskip3cm
+			\LARGE\atitle
 		}
-		\vskip2cm
-		[WORD COUNT]
+		\vskip3cm
+		{\small Word Count: 10,000}
 		\vskip1cm
 		\begin{flushleft}
 			This project is submitted in partial fulfilment of the regulations governing the award of \\
 			Degree of MEng in Chemical Engineering at the University of Strathclyde
-			\vfill
+			\vskip2cm
 			Your name: Christopher Boyle \hfill Date: \today
 			\vskip1cm
-			Organisation: University of Strathclyde, Department of Chemical \& Process Engineering\\
-			In-house Supervisor: Dr. Leo Lue\\
-			Academic Supervisor: Dr. Leo Lue\\
+			Organisation: University of Strathclyde, Department of Chemical \& Process Engineering\newline% \newline
+			In-house Supervisor: Dr. Leo Lue \newline% \newline
+			Academic Supervisor: Dr. Leo Lue
 		\end{flushleft}
-		\vfill
 	\end{titlepage}
 	
 	% Main Content Settings
@@ -69,7 +70,6 @@
 	\pagenumbering{roman}
 	
 	% Summary Page
-	\thispagestyle{plain}
 	\chapter*{Summary}
 	\addcontentsline{toc}{chapter}{Summary}
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
@@ -78,11 +78,10 @@
 	\tableofcontents
 	
 	% Acknowledgements
-	\newpage
-	%\setcounter{chapter}{-1}
 	\chapter*{Acknowledgements}
 	\addcontentsline{toc}{chapter}{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
+	%Dr. Lue
 	
 	\newpage
 	\pagenumbering{arabic}
@@ -91,9 +90,34 @@
 	\chapter*{Introduction}
 	\addcontentsline{toc}{chapter}{Introduction}
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
+	%History of what is being done, what is used to do it, how it is done.
+	\section{Laboratory Automation}
+	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai} \cite{backbaconauto} \cite{backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 200,000 measurements a day (moreover, it can make over 1,000,000 other observations and hypothoses per day)  \cite{backontorobsci}.\newline \newline
+	Laboratory automation is similar in concept to process control. Electronic process controllers make use of small computers called microcontrollers to calculate their response to changing process conditions \cite{backprocautotheory}. A microcontroller chip is a small user-programmable "computer" which reads input from, and outputs data to an electronic circuit in order to achieve the overall objective \cite{backwhatismc}. A desktop computer consists, basically, of a processor, memory, and storage, microcontrollers are composed of the same components but contained within a single package (see Figure \ref{mcudia}). Microcontrollers are commonly used in education to teach computer programming \cite{backmcedu1} \cite{backmcedu2} \cite{backmcedu3}. However, it was noticed that people were not fully learning about how computers work in schools and universities and so the Raspberry Pi Foundation was founded, and the Raspberry Pi Model A was developed \cite{pihistory}.
+	\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.4]{images/mcudia.png}
+	\caption{Microcontroller Block Diagram (taken from  \cite{mcudia})}
+	\label{mcudia}
+	\end{figure}
+	\section{The Raspberry Pi}
+	The Raspberry Pi is a small (85mm x56mm) \cite{pi3mechdraw} computer running a version ("flavour") of GNU/Linux called "Raspian" (although it is able to run a number of other operating systems depending on the situation (CITE). The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RMA \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. The quad core processor enables better multithreaded operation for software running on the Raspberry Pi, meaning that big cumbersome programs can run much more efficiently than before. In addition, the increase in memory and CPU clock frequency means there is overall a massive performance boost. Operations like compiling a large program (for example OpenCV, the Open Source Computer Vision Library) which would take over 9 hours \cite{pipowercompold} on the Raspberry Pi 1, take little over an hour and a half \cite{pipowercompnew} on the lastest model.\newline 
+	\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.5]{images/pi3modelb.png}
+	\caption{Raspberry Pi 3 Model B (taken from  \cite{pi3info})}
+	\label{pidia}
+	\footnotesize Clockwise from top left: GPIO pins, USB ports, Ethernet port, audio jack, camera module port, HDMI port, micro-USB power port, and LCD display port.
+	\end{figure}
+	\newline What makes the Raspberry Pi interesting, are the GPIO (General Purpose Input/Output, see Figure \ref{pidia}) pins made available on the main board. These pins allow electronic circuits to interface with the Raspberry Pi, and allows software to interact with the real world in a way that is not as easy to accomplish with a tradition computer. This marriage of PLC and PC allows for incredibly easy development and testing in a single package.
+	%History
+	%what is
+	%what for
+	\section{This Thesis}
+	%Why use the Pi/What makes it suitable/How will it be used
 
-	\chapter*{Description of the Organisation}
-	\addcontentsline{toc}{chapter}{Description of the Organisation}
+	%\chapter*{Description of the Organisation}
+	%\addcontentsline{toc}{chapter}{Description of the Organisation}
 	%In this section, you should show a good understanding of the organisation. Details may include the type of organisation, management structure, products, and markets catered for. Mention your position in the organisation.
 	
 	\chapter*{Description of the Work}
@@ -136,8 +160,9 @@
 	\end{center}
 	
 	%Bibliography
-	%\bibliography{biblio}
-	%\bibliographystyle{apalike}
+	\bibliography{biblio}
+%	\bibliographystyle{apalike}
+	\bibliographystyle{unsrt}
 	
 	%Appendix
 	\chapter*{Appendix}
