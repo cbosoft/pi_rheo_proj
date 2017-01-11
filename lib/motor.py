@@ -19,7 +19,7 @@ class motor(object):
     rot_count = 0
 
     max_speed = 0  # RPM, at voltage = 11v
-    min_speed = 0  # RPM, at voltage = ~4v
+    min_speed = 0  # RPM, at voltage = ~3v
 
     # GPIO pins
     hall_pin = 0
