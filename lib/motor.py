@@ -43,22 +43,12 @@ class motor(object):
             td.start_new_thread(self.poll, tuple())
 
     def poll(self):
-        time_start = 0
-        delta_time = 0
 
         self.poll_running = True
 
         while (self.poll_running):
-            if (time_start == 0):
-                time_start = int(round(time.time() * 1000))  # in milliseconds
-
-            delta_time = int(round(time.time() * 1000)) - time_start  # delta time in milliseconds
-
-            if (delta_time >= 100):
-                self.cur_speed = float(self.rot_count / (self.mag_count * delta_time * 60))  # rotational speed in RPM
-                time_start = 0
-                self.rot_count = 0
-
+            self.cur_speed = float(self.rot_count / (self.mag_count * 6))  # rotational speed in RPM
+            self.rot_count = 0
             time.sleep(0.1)
 
         print("Motor speed polling has halted!")
