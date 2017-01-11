@@ -7,3 +7,5 @@ lib/img_recog/working_frames/*
 write_up/*
 !write_up/*.tex
 !write_up/*.bib
+!write_up/lit/*
+!write_up/images/*
