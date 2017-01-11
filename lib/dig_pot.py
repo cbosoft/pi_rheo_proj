@@ -15,6 +15,8 @@ class MCP4531(object):
 
     def __init__(self, addr=0x5C):
         self.address = addr
+        #need to send TCON reg set up data
+        self.reg_setup()
 
     def set_reg(self, value):
         #set the value of the wiper register on the pot
