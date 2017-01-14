@@ -8,14 +8,18 @@ y1 = [3800, 2900, 2600, 2200, 1900, 1400, 1050, 780, 550, 400, 280, 195, 45]
 x2 = [0.0015, 0.02, 0.15, 0.45, 1.5, 11, 250, 1000, 4000, 10000, 20000]
 y2 = [0.12, 0.12, 0.1, 0.05, 0.02, 0.018, 0.018, 0.02, 0.03, 0.03, 0.03]
 
-f, (ax1, ax2) = plt.subplots(2)
-#plt.suptitle('Shear Stress (Pa) vs Viscosity (Pa.s)')
+#f, (ax1, ax2) = plt.subplots(2)
+#f.set_size_inches(20, 10)
+f = plt.figure(figsize=(15, 7))
+ax1 = f.add_subplot(121)
+ax2 = f.add_subplot(122)
 
 #plot 1
 ax1.set_title("Shear Thinning")
 ax1.plot(x1, y1)
 ax1.set_xscale("log")
 ax1.set_yscale("log")
+
 #plot 2
 ax2.set_title("Shear Thickening")
 ax2.plot(x2, y2)
@@ -25,5 +29,5 @@ ax2.set_yscale("log")
 # Set common labels
 f.text(0.5, 0.04, 'Shear Stress (Pa)', ha='center', va='center')
 f.text(0.06, 0.5, 'Viscosity (Pa.s)', ha='center', va='center', rotation='vertical')
-plt.savefig("foo.png")
+plt.savefig("./figures/fig_shear_behav.png")
 
