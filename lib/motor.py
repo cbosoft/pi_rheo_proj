@@ -65,14 +65,14 @@ class motor(object):
         value = speed
         if (value > self.max_speed):
             # value too big! warn + set to max speed
-            print("Desired speed too high! setting to max speed.")
+            print("Warning! Desired speed too high, setting to max speed.")
             value = self.max_speed
         elif (value < self.min_speed):
             # value too small! want + set to min speed
-            print("Desired speed too low! setting to min speed.")
+            print("Warning! Desired speed too low, setting to min speed.")
             value = self.min_speed
         value = int(((value - self.min_speed) / (self.max_speed - self.min_speed)) * 127)
-        dp.set_reg(value)
+        dp.set_resistance(value)
 
     def incr(self):
         self.rot_count += 1
