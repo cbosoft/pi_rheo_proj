@@ -24,16 +24,58 @@ class run(object):
 
     run_length = 0
 
-    def __init__(self, Kp, Ki, Kd, sample_tim, setpnt, max_spd, min_spd, hall_pin, pot_address, magnet_count, ad_c, length):
-
-        self.controller = PIDcontroller(Kp, Ki, Kd, sample_tim, setpnt)
-
-        self.mot_r = motor(max_spd, min_spd, hall_pin, pot_address, magnet_count)
-
-        self.pend_read = ADC(0x6e, 0, 0, 0)
+    def __init__(self, length, **kwargs):
+        #set defaults
+        self.controller = PIDcontroller()
+        self.mot_r = motor()
+        self.pend_read = ADC()
+        
+        #process args
+        for name, value in kwargs:
+            if name == "control_Kp":
+                self.controller.KP = value
+            elif name == "control_Ki":
+                self.controller.KI = value
+            elif name == "control_Kd":
+                self.controller.KD = value
+            elif name == "control_sample_time":
+                self.controller.sample_time = value
+            elif name == "control_set_point":
+                self.controller.set_point = value
+            elif name == "motor_max_speed":
+                self.mot_r.max_speed = value
+            elif name == "motor_min_speed":
+                self.mot_r.min_speed = value
+            elif name == "motor_hall_pin":
+                self.mot_r.hall_pin = value
+            elif name == "motor_pot_addr":
+                self.mot_r.pot.address = value
+            elif name == "pend_address":
+                self.pend_read.address = value
+            elif name == "run_data_path":
+                from_file(value)
 
         self.run_length = length
-
+    
+    def from_file(self, path):
+        #dat file is a csv, path is [file_path]#[line_number]
+        file_path = path[:(path.index('#'))]
+        line_number = int(path[(path.index('#')) + 1 :])
+        f = open(file_path, "r")
+        line = f.readlines()[line_number]
+        f.close()
+        vals = line.split(',')
+        self.controller.KP = int(vals[0])
+        self.controller.KI = int(vals[1])
+        self.controller.KD = int(vals[2])
+        self.controller.sample_time = int(vals[3])
+        self.controller.set_point = int(vals[4])
+        self.mot_r.max_speed = int(vals[5])
+        self.mot_r.min_speed = int(vals[6])
+        self.mot_r.hall_pin = int(vals[7])
+        self.mot_r.pot.address = int(vals[8])
+        self.pend_read.address = int(vals[9])
+    
     def start_run(self):
 
         self.mot_r.start_poll()

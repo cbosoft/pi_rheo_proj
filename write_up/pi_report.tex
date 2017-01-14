@@ -51,6 +51,10 @@
 		\label{FIGURE REF}
 	\end{figure} \newline  \noindent
 
+%%%BULLET POINT LIST
+	\begin{itemize}
+	\item
+	\end{itemize}
 
 \fi
 %%%%
@@ -158,7 +162,7 @@
 	\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
 	\label{gpiopinout}
 	\end{figure} \newline  \noindent
-	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire \cite{backwhatisserpar}. Another wire is used to synchronise the communication beteween devices. The \(I^2 C\) protocol allows multiple devices to be connected together (termed "daisy-chaining") using the same wires, significantly saving space (CITE I2C DAISY CHAIN). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. Serial communication makes inter device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires.\newline \newline  \noindent
+	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire \cite{backwhatisserpar}. Another wire is used to synchronise the communication beteween devices. The \(I^2 C\) protocol allows multiple devices to be connected together (termed "daisy-chaining") using the same wires, significantly saving space (CITE I2C DAISY CHAIN). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \newline \newline  \noindent
 	The high level languages used to create programs on desktop computers can be similarly used to write programs on the Raspberry Pi (it is running a desktop operating system). There are a number of libraries (collections of software) available for facilitating the communication between the software and the GPIO pins. Built in to the Raspberry Pi are some basic libraries offering simple functionality, but there are third-party libraries available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language, making it well suited to quickly developing clean, and easy to use object-oriented software. Due to its popularity, Python has a vast number of packages available to perform any number of functions. \newline \newline \noindent
 
 
@@ -236,26 +240,44 @@
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_1 + R_2 + R_{AW} + R_{WB}}
 		\label{eqnvoldiv}
-	\end{equation}
+	\end{equation}\newline \noindent
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor (HOW DO THESE RELATE TO MAX MIN?). \newline
+	\begin{figure}[!h]
+		\centering
+		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
+		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
+		\label{circdigpotclose}
+	\end{figure} \newline  \noindent
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Control}
 		\label{circspeedcontr}
 	\end{figure} \newline  \noindent
-	\begin{figure}[!h]
-		\centering
-		\fbox{\includegraphics[scale=0.8]{images/circdigpotclose.png}}
-		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
-		\label{circdigpotclose}
-	\end{figure} \newline  \noindent
+
 
 	\subsection{\textit{PEND Signal Processing}}
 
 
 
 	\section{Software}
+	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: 
+	
+	\begin{itemize}
+	\item exp\_run.py
+	\item control.py
+	\item motor.py
+	\item adc.py
+	\item dig\_pot.py
+	\end{itemize}
 
+	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline \newline \noindent
+	
+	\subsection{exp\_run.py}
+	\subsection{control.py}
+	\subsection{motor.py}
+	\subsection{adc.py}
+	\subsection{dig\_pot.py}
 
 
 

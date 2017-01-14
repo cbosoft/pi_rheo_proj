@@ -26,7 +26,7 @@ class motor(object):
 
     pot = dp()
 
-    def __init__(self, max_speed_, min_speed_, hall_pin_, pot_addr=0x5C, mag_count_=1, startnow=False):
+    def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, pot_addr=0x5C, mag_count_=1, startnow=False):
         self.max_speed = max_speed_
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_

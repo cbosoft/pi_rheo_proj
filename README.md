@@ -23,4 +23,8 @@ overall_loop.py                 uses the other libs to achieve the main task
                                 and saves with the timestamp as the filename.
 /../frames_get.py               converts the recorded video files to individual frames to enable the image recognition to be run
 ```
-*You can use this as much as you like, share it as you like, whatever. There's no warranty or guarantee that it will actually work.*
+*Distributed under Gnu General Public License (GPL). 
+
+You can use this as much as you like, share it as you like, whatever. 
+
+However, there is no warranty or guarantee that it will actually work.*
