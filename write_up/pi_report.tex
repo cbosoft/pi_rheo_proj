@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{1435}
+\def\thewords{2305}
 
 
 % Imports
@@ -71,7 +71,7 @@
 }
 \pagestyle{plain}
 \begin{document}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
+%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
 	\begin{titlepage}
 		\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 		\makebox[\textwidth][c]{\includegraphics[scale=1]{images/titleheader.png}}
@@ -133,7 +133,7 @@
 
 
 	\section{Laboratory Automation}
-	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 200,000 measurements a day (moreover, it can make over 1,000,000 other observations and hypotheses per day)  \cite{backontorobsci}.\newline \newline \noindent
+	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 200,000 measurements a day (moreover, it can make over 1,000,000 other observations and hypotheses per day)  \cite{backontorobsci}. \newline \newline \noindent
 	%More history?
 	Laboratory automation is similar in concept to process control, both using computers to manage the running of a process. Electronic process controllers make use of small computers called microcontrollers to calculate their response to changing process conditions \cite{backprocautotheory}. A microcontroller chip is a small user-programmable "computer" which reads input from, and outputs data to an electronic circuit in order to achieve the overall objective \cite{backwhatismc}. A desktop computer consists, basically, of a processor, memory, and storage, microcontrollers are composed of the same components but contained within a single package (see Figure \ref{mcudia}). Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions (like saving a value to memory). For further discussion on programming languages see Appendix 1.
 	\begin{figure}[h!]
@@ -183,7 +183,7 @@
 	This project aims to design, build, and test a control system for an experimental set up revolving around gathering more information about the occurrence of the "jamming" phenomenon in a colloidal suspension undergoing shear. The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. A piezoelectric crystal with a needle (the PiezoElectric Needle Device, PEND) attached will be held above the cylinders such that the tip of the needle is just touching the surface of the fluid. See Figure \ref{expdia} for a diagram of the apparatus.\newline
 	\begin{figure}[!h]
 	\centering
-%	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
+	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
 	\caption{Diagram of the Experimental Apparatus (from )}
 	\label{expdia}
 	\end{figure} \newline  \noindent
@@ -222,7 +222,7 @@
 	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. (How hall effect sensors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
-%		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
+		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circhall}
 	\end{figure} \newline  \noindent
@@ -231,7 +231,7 @@
 	The rotational speed of the motor is detected by aiming a laser (SERNO) at the rotating cylinder and also putting a line of reflective tape on the cylinder such that laser light reflecting off the cylinder enters a light sensor (SERNO). The value of rotational speed is discovered by detecting the number of times the cylinder makes a complete rotation in a given time span. (How photodetectors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
-%		\fbox{\includegraphics[scale=1]{images/blank.png}}
+		\fbox{\includegraphics[scale=1]{images/blank.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circoptical}
 	\end{figure} \newline  \noindent
