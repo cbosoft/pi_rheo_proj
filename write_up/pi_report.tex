@@ -71,7 +71,7 @@
 }
 \pagestyle{plain}
 \begin{document}
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
 	\begin{titlepage}
 		\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 		\makebox[\textwidth][c]{\includegraphics[scale=1]{images/titleheader.png}}
@@ -101,11 +101,12 @@
 		\end{flushleft}
 	\end{titlepage}
 
-	% Main Content Settings
+	%%%%%%%%%%%%%%%%%%% Main Content Settings
 	\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 	\pagenumbering{roman}
 	
-	% Summary Page
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY PREAMBLE
+	%%%%%%%%%% Summary Page
 	\chapter*{Summary}
 	\addcontentsline{toc}{chapter}{Summary}
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
@@ -123,6 +124,7 @@
 	\pagenumbering{arabic}
 	\setcounter{page}{1}
 	
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY BEGIN PROPER
 	\chapter*{Introduction}
 	\addcontentsline{toc}{chapter}{Introduction}
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
@@ -181,7 +183,7 @@
 	This project aims to design, build, and test a control system for an experimental set up revolving around gathering more information about the occurrence of the "jamming" phenomenon in a colloidal suspension undergoing shear. The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. A piezoelectric crystal with a needle (the PiezoElectric Needle Device, PEND) attached will be held above the cylinders such that the tip of the needle is just touching the surface of the fluid. See Figure \ref{expdia} for a diagram of the apparatus.\newline
 	\begin{figure}[!h]
 	\centering
-	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
+%	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
 	\caption{Diagram of the Experimental Apparatus (from )}
 	\label{expdia}
 	\end{figure} \newline  \noindent
@@ -220,7 +222,7 @@
 	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. (How hall effect sensors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
+%		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circhall}
 	\end{figure} \newline  \noindent
@@ -229,7 +231,7 @@
 	The rotational speed of the motor is detected by aiming a laser (SERNO) at the rotating cylinder and also putting a line of reflective tape on the cylinder such that laser light reflecting off the cylinder enters a light sensor (SERNO). The value of rotational speed is discovered by detecting the number of times the cylinder makes a complete rotation in a given time span. (How photodetectors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=1]{images/blank.png}}
+%		\fbox{\includegraphics[scale=1]{images/blank.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circoptical}
 	\end{figure} \newline  \noindent
@@ -244,13 +246,13 @@
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor (HOW DO THESE RELATE TO MAX MIN?). \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
+%		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
 		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
 		\label{circdigpotclose}
 	\end{figure} \newline  \noindent
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
+%		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Control}
 		\label{circspeedcontr}
 	\end{figure} \newline  \noindent
