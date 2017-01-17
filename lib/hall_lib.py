@@ -11,13 +11,21 @@ import RPi.GPIO as gpio
 
 hall_pin = 16  # GPIO23
 
+def incr():
+    global counter
+    counter += 1
+
 # set up pins
 gpio.setmode(gpio.BOARD)
 gpio.setup(hall_pin, gpio.IN, pull_up_down = gpio.PUD_UP)
+counter = 0
+gpio.add_event_detect(hall_pin, gpio.RISING, callback=incr)
+
 
 try:
 	while (True):
-	        print str(gpio.input(hall_pin)) 
-        	time.sleep(0.5)
+	        print "Speed:" + str(float(counter / 6)) 
+            counter = 0
+        	time.sleep(0.1)
 except KeyboardInterrupt:
 	gpio.cleanup()
