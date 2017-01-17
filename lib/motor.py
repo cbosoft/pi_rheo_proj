@@ -38,7 +38,7 @@ class motor(object):
             self.start_poll()
 
     def start_poll(self):
-        gpio.add_event_detect(self.hall_pin, gpio.FALLING, callback=self.incr)
+        gpio.add_event_detect(self.hall_pin, gpio.RISING, callback=self.incr)
         if (not self.poll_running):
             td.start_new_thread(self.poll, tuple())
 
@@ -47,7 +47,7 @@ class motor(object):
         self.poll_running = True
 
         while (self.poll_running):
-            self.cur_speed = float(self.rot_count / (self.mag_count * 6))  # rotational speed in RPM
+            self.cur_speed = float(self.rot_count) * float(60 / (0.1 * self.mag_count))  # rotational speed in RPM
             self.rot_count = 0
             time.sleep(0.1)
 
