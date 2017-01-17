@@ -64,7 +64,7 @@
 		\item Discovered a simple electronic circuit using a potentiometer/voltage-divider and a transistor to control the voltage being supplied to the motor (to control the speed)
 		\item Implemented a scaled-down prototype version of the speed control circuit, it seemed to work well.
 		\subsection*{Saturday}
-		\item Attempted to implement a full scale version of the speed control circuit, but was unable to accurately solder the components required. Different components were sought.
+		\item Attempted to implement a full scale version of the speed control circuit, but was unable to accurately solder the digital potentiometer due to its size (around 3mm x 1mm). Alternative component sought.
 	\end{itemize}
 	\newpage
 	\section{Week beginning 16 January 2016 (Week 1)}
@@ -75,9 +75,12 @@
 		\item  To do this week: fill out risk assessment, find out more about the Hall Effect sensor as a means to detect speed, set up speed control and speed detection circuit, and get it working with the pi.
 		\subsection*{Tuesday}
 		\item Found problem with the hall effect sensor: magnetic field in single small magnet not enough to trigger it. Two magnets required, possible creating problems when fitting later on?
-		\item hall effect sensor not working properly with the raspberry pi - it is pulling down the pin voltage too far: the RPi cannot sense the signal.
+		\item Hall effect sensor not working properly with the raspberry pi - it is pulling down the pin voltage too far: the RPi cannot sense the signal.
 		\item Dr. Lue gave me some smaller magnets, will test these with the hall effect sensor.
 		\item Drew up draft risk assessment for working in the lab.
+		\item Fixed problem with hall effect sensor circuit (by adding a transistor)
+		\item Hall sensor is triggered when a magnet's south pole comes within 10mm of the sensor.
+		\item To do tomorrow: go into lab and test speed sensor with the actual motor, check motor class is working properly
 	\end{itemize}
 	
 \end{document}
