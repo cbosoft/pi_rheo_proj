@@ -33,7 +33,9 @@ class motor(object):
         self.pot = dp()
         self.pot.address = pot_addr
         self.mag_count = mag_count_
-
+        gpio.setmode(gpio.Board)
+        gpio.setup(self.hall_pin, gpio.IN, pull_up_down = gpio.PUD_UP)
+        
         if (startnow):
             self.start_poll()
 
@@ -76,3 +78,16 @@ class motor(object):
 
     def incr(self):
         self.rot_count += 1
+    
+    def clean_exit(self):
+        gpio.cleanup()
+        
+if __name__ == "__main__":
+    motr = motor(self, 0, 0, 16, 0x5C, 1, startnow=False)
+    try:
+        while (True):
+            print "Speed (RPM) : " + str(motr.cur_speed)
+            time.sleep(1)
+    except KeyboardInterrupt:
+        motr.clean_exit()
+
