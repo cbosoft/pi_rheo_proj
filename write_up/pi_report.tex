@@ -70,6 +70,7 @@
 	\fancyfoot[R]{\thepage}
 }
 \pagestyle{plain}
+
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
 	\begin{titlepage}
@@ -90,7 +91,7 @@
 		{\small Word Count: \thewords}
 		\vskip1cm
 		\begin{flushleft}
-			This project is submitted in partial fulfillment of the regulations governing the award of \\
+			This project is submitted in partial fulfilment of the regulations governing the award of \\
 			Degree of MEng in Chemical Engineering at the University of Strathclyde
 			\vskip2cm
 			Your name: Christopher Boyle \hfill Date: \today
@@ -219,14 +220,15 @@
 
 	\subsection{\textit{Motor Speed Detection}}
 	%Hall Effect
-	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. (How hall effect sensors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
+	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. This means that every time a magnet triggers the sensor, it will correspond to a quarter turn of the motor. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin (pin 2 on the diagram) will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low. To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and was connected through a transistor to ground. When the hall effect sensor detects a magnet, the high signal on its output will end, and so the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circhall}
 	\end{figure} \newline  \noindent
-	(Advantages and disadvantages of this circuit) \newline \newline \noindent
+	This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
+	\iffalse
 	%Optical Sensor
 	The rotational speed of the motor is detected by aiming a laser (SERNO) at the rotating cylinder and also putting a line of reflective tape on the cylinder such that laser light reflecting off the cylinder enters a light sensor (SERNO). The value of rotational speed is discovered by detecting the number of times the cylinder makes a complete rotation in a given time span. (How photodetectors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
@@ -236,9 +238,9 @@
 		\label{circoptical}
 	\end{figure} \newline  \noindent
 	(Advantages and disadvantages of this circuit) \newline \newline \noindent
-
+	\fi
 	\subsection{\textit{Motor Speed Control}}
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the \(I^2C\) protocol). The data is sent to a digital potentiometer (MCP4531), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (10,000\(\Omega \) in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. A transistor (BD243C) is used to reduce the power load through the divider, protecting the digital potentiometer. \newline
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol). The data is sent to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (10,000\(\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. A transistor (BD243C) is used to reduce the power load through the divider, protecting the digital potentiometer. \newline
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_1 + R_2 + R_{AW} + R_{WB}}
 		\label{eqnvoldiv}
@@ -334,6 +336,7 @@
 	\addcontentsline{toc}{chapter}{Bibliography}
 	\bibliography{biblio}
 	\bibliographystyle{unsrt}
+	%\bibliographystyle{apalike}
 
 %Appendix
 
