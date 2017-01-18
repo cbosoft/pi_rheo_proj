@@ -97,14 +97,16 @@ class MCP4131(object):
     def __init__(self, chipselect=0):
         self.bus = spi.SpiDev()
         self.chip_select = chipselect
-        self.open()
 
     def set_resistance(self, value):
         # convert between value and a 7bit number?
-        self.write_bytes([value])
+        self.write_byte(value)
        
-    def write_bytes(self, bytes):
-        self.bus.writebytes(bytes)
+    def write_byte(self, byte):
+        self.open()
+        command = [0, byte]
+        self.bus.writebytes(command)
+        self.close()
 
     def read(self):
         print "Warning! Trying to read from the pot, this is not supported."
