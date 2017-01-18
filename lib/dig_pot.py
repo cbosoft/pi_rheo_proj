@@ -100,6 +100,7 @@ class MCP4131(object):
         self.open()
 
     def set_resistance(self, value):
+        # convert between value and a 7bit number?
         self.write_bytes([value])
        
     def write_bytes(self, bytes):
