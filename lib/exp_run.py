@@ -123,7 +123,7 @@ class run(object):
             #if run is over:
             if (time() >= start_time + self.run_length):
                 run_ongoing = False
-            self.exit_clean()
+        self.exit_clean()
 
     def exit_clean():
-        pass
+        self.mot_r.clean_exit()

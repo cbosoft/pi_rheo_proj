@@ -8,7 +8,7 @@
 import time
 import thread as td
 import RPi.GPIO as gpio
-from dig_pot import mcp4531 as dp
+from dig_pot import mcp4131 as dp
 
 
 class motor(object):
@@ -26,12 +26,11 @@ class motor(object):
 
     pot = dp()
 
-    def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, pot_addr=0x5C, mag_count_=1, startnow=False):
+    def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, mag_count_=1, startnow=False):
         self.max_speed = max_speed_
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_
         self.pot = dp()
-        self.pot.address = pot_addr
         self.mag_count = mag_count_
         gpio.setmode(gpio.Board)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down = gpio.PUD_UP)
@@ -81,9 +80,10 @@ class motor(object):
     
     def clean_exit(self):
         gpio.cleanup()
+        # self.pot.close()
         
 if __name__ == "__main__":
-    motr = motor(self, 0, 0, 16, 0x5C, 1, startnow=False)
+    motr = motor(self, 0, 0, 16, 1, startnow=True)
     try:
         while (True):
             print "Speed (RPM) : " + str(motr.cur_speed)

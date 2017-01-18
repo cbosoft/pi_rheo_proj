@@ -5,10 +5,11 @@
 
 # imports
 from smbus2 import SMBus
+import spidev as spi
 
-
+# 
 class MCP4531(object):
-
+    """I2C 10K SMT Digital potentiometer"""
     bus = 0  # holds the bus connection to the digital pot (empty when not in use)
 
     address = 0x5C  # 01011100
@@ -83,6 +84,34 @@ class MCP4531(object):
 
     def open(self):
         self.bus = SMBus(1)
+
+    def close(self):
+        self.bus.close()
+        
+class MCP4131(object):
+    """SPI 10K TH Digital potentiometer"""
+    bus = 0  # holds the bus connection to the digital pot
+    
+    chip_select = 0
+    
+    def __init__(self, chipselect=0):
+        self.bus = spi.SpiDev()
+        self.chip_select = chipselect
+        self.open()
+
+    def set_resistance(self, value):
+        self.write_bytes([value])
+       
+    def write_bytes(self, bytes):
+        self.bus.writebytes(bytes)
+
+    def read(self):
+        print "Warning! Trying to read from the pot, this is not supported."
+        return 0
+
+    def open(self):
+        self.bus.open(0, self.chip_select)
+        self.bus.max_speed_hz = 10000000
 
     def close(self):
         self.bus.close()
