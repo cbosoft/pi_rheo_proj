@@ -4,8 +4,9 @@ lib/img_recog/outp/*
 lib/img_recog/videos/*
 lib/img_recog/working_frames/*
 **/*.pyc
-write_up/*
-!write_up/*.tex
-!write_up/*.bib
-!write_up/lit/*
-!write_up/images/*.png
+write_up/*.BACKUP
+write_up/*.NOAPPENDIX
+write_up/*.log
+write_up/*.pdf
+write_up/*.gz
+write_up/figures/*.png
