@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{2305}
+\def\thewords{2731}
 
 
 % Imports
@@ -174,14 +174,15 @@
 	Colloidal suspensions are a multiphase mixture consisting of solid particles of a particular size (between \(1nm\) and \(1 \mu m\)) dispersed in a liquid \cite[p.~72]{schadict}. These mixtures exhibit interesting rheological properties.    \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.5]{figures/fig_shear_behav.png}}
+		\fbox{\includegraphics[scale=0.3]{figures/fig_shear_behav.png}}
 		\caption{Graphs Showing Non-Newtonian Behaviour (adapted from \cite{figshearthin, figshearthick})}
 		\label{nonnewtgraphs}
 	\end{figure} \newline  \noindent
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. Similarly, the surface of a shear suspension has been found to alter texture, which is evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. It is possible that these are the same phenomenon, exhibiting different characteristics in different situations. [CITATION NEEDED] \newline \newline \noindent
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
+		\fbox{\includegraphics[scale=0.4]{images/blank.png}}
+		% \fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
@@ -254,13 +255,13 @@
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor (HOW DO THESE RELATE TO MAX MIN?). \newline
 	\begin{figure}[!h]
 		\centering
-%		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
+		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
 		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
 		\label{circdigpotclose}
 	\end{figure} \newline  \noindent
 	\begin{figure}[!h]
 		\centering
-%		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
+		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Control}
 		\label{circspeedcontr}
 	\end{figure} \newline  \noindent
