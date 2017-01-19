@@ -11,8 +11,8 @@ x2 = [0.0015, 0.02, 0.15, 0.45, 1.5, 11, 250, 1000, 4000, 10000, 20000]
 y2 = [0.12, 0.12, 0.1, 0.05, 0.02, 0.018, 0.018, 0.02, 0.03, 0.03, 0.03]
 
 #f, (ax1, ax2) = plt.subplots(2)
-#f.set_size_inches(20, 10)
-f = plt.figure(figsize=(15, 7))
+#f.set_size_inches(16, 8)
+f = plt.figure(figsize=(8, 6))
 ax1 = f.add_subplot(121)
 ax2 = f.add_subplot(122)
 
