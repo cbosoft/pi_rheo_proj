@@ -29,7 +29,7 @@ class run(object):
         self.controller = PIDcontroller()
         self.mot_r = motor()
         self.pend_read = ADC()
-        
+
         #process args
         for name, value in kwargs:
             if name == "control_Kp":
@@ -53,14 +53,14 @@ class run(object):
             elif name == "pend_address":
                 self.pend_read.address = value
             elif name == "run_data_path":
-                from_file(value)
+                self.from_file(value)
 
         self.run_length = length
-    
+
     def from_file(self, path):
         #dat file is a csv, path is [file_path]#[line_number]
         file_path = path[:(path.index('#'))]
-        line_number = int(path[(path.index('#')) + 1 :])
+        line_number = int(path[((path.index('#')) + 1):])
         f = open(file_path, "r")
         line = f.readlines()[line_number]
         f.close()
@@ -75,7 +75,7 @@ class run(object):
         self.mot_r.hall_pin = int(vals[7])
         self.mot_r.pot.address = int(vals[8])
         self.pend_read.address = int(vals[9])
-    
+
     def start_run(self):
 
         self.mot_r.start_poll()
@@ -112,12 +112,15 @@ class run(object):
 
             # append csv with time, motor speed, pend value
             try:
-                outp = open(self.outp_path + "/rundat" + self.run_id + ".csv", "a")
+                outp = open(self.outp_path + "/rundat" + self.run_id +
+                ".csv", "a")
             except IOError:
                 os.mkdir(self.outp_path)
             outp = open(self.outp_path + "/rundat" + self.run_id + ".csv", "a")
 
-            outp.write(str(time() * 1000) + "," + str(motor_speed) + "," + str(pend_value))
+            outp.write(str(time() * 1000) + "," + str(motor_speed) + ","
+            + str(pend_value))
+
             outp.close()
 
             #if run is over:
@@ -125,5 +128,5 @@ class run(object):
                 run_ongoing = False
         self.exit_clean()
 
-    def exit_clean():
+    def exit_clean(self):
         self.mot_r.clean_exit()

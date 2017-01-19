@@ -26,15 +26,16 @@ class motor(object):
 
     pot = dp()
 
-    def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, mag_count_=1, startnow=False):
+    def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, mag_count_=1,
+    startnow=False):
         self.max_speed = max_speed_
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_
         self.pot = dp()
         self.mag_count = mag_count_
         gpio.setmode(gpio.Board)
-        gpio.setup(self.hall_pin, gpio.IN, pull_up_down = gpio.PUD_UP)
-        
+        gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+
         if (startnow):
             self.start_poll()
 
@@ -48,7 +49,8 @@ class motor(object):
         self.poll_running = True
 
         while (self.poll_running):
-            self.cur_speed = float(self.rot_count) * float(60 / (0.1 * self.mag_count))  # rotational speed in RPM
+            self.cur_speed = (float(self.rot_count)
+            * float(60 / (0.1 * self.mag_count)))  # rotational speed in RPM
             self.rot_count = 0
             time.sleep(0.1)
 
@@ -72,22 +74,22 @@ class motor(object):
             # value too small! want + set to min speed
             print("Warning! Desired speed too low, setting to min speed.")
             value = self.min_speed
-        value = int(((value - self.min_speed) / (self.max_speed - self.min_speed)) * 127)
+        value = int(((value - self.min_speed) /
+        (self.max_speed - self.min_speed)) * 127)
         dp.set_resistance(value)
 
     def incr(self):
         self.rot_count += 1
-    
+
     def clean_exit(self):
         gpio.cleanup()
         # self.pot.close()
-        
+
 if __name__ == "__main__":
-    motr = motor(self, 0, 0, 16, 1, startnow=True)
+    motr = motor(0, 0, 16, 1, startnow=True)
     try:
         while (True):
             print "Speed (RPM) : " + str(motr.cur_speed)
             time.sleep(1)
     except KeyboardInterrupt:
         motr.clean_exit()
-
