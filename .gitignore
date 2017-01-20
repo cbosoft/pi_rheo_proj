@@ -11,6 +11,7 @@ write_up/*.pdf
 write_up/*.gz
 write_up/*.bak
 write_up/*.aux
+write_up/*.sav
 write_up/*.toc
 write_up/*.out
 write_up/*.bbl

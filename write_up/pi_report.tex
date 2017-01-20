@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{2759}
+\def\thewords{2761}
 
 
 % Imports
@@ -29,7 +29,7 @@
 \renewcommand{\theequation}{\arabic{equation}}
 \renewcommand\UrlFont{\rmfamily\itshape}
 \setlength{\fboxsep}{0pt}
-\setlength{\fboxrule}{1pt}
+\setlength{\fboxrule}{0pt}
 
 %%%% TEMPLATES
 \iffalse
@@ -137,14 +137,15 @@
 	\section{Laboratory Automation}
 	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 200,000 measurements a day (moreover, it can make over 1,000,000 other observations and hypotheses per day)  \cite{backontorobsci}. \newline \newline \noindent
 	%More history?
-	Laboratory automation is similar in concept to process control, both using computers to manage the running of a process. Electronic process controllers make use of small computers called microcontrollers to calculate their response to changing process conditions \cite{backprocautotheory}. A microcontroller chip is a small user-programmable "computer" which reads input from, and outputs data to an electronic circuit in order to achieve the overall objective \cite{backwhatismc}. A desktop computer consists, basically, of a processor, memory, and storage, microcontrollers are composed of the same components but contained within a single package (see Figure \ref{mcudia}). Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions (like saving a value to memory). For further discussion on programming languages see Appendix 1.
-	\begin{figure}[h!]
-	\centering
-	\fbox{\includegraphics[scale=0.5]{images/mcudia.png}}
-	\caption{Microcontroller Block Diagram (taken from  \cite{mcudia})}
-	\label{mcudia}
-	\end{figure}
+	Laboratory automation is similar in concept to process control, both using computers to manage the running of a process. Electronic process controllers make use of small computers called microcontrollers to calculate their response to changing process conditions \cite{backprocautotheory}. A microcontroller chip is a small user-programmable "computer" which reads input from, and outputs data to an electronic circuit in order to achieve the overall objective \cite{backwhatismc}. Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions (like saving a value to memory). For further discussion on programming languages see Appendix 1.
+%	\begin{figure}[h!]
+%	\centering
+%	\fbox{\includegraphics[scale=0.5]{images/mcudia.png}}	\caption{Microcontroller Block Diagram (taken from  \cite{mcudia})}
+%	\label{mcudia}
+%	\end{figure}
 
+
+%	more info on lab automation
 
 
 	\section{Raspberry Pi}
@@ -166,42 +167,43 @@
 	\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
 	\label{gpiopinout}
 	\end{figure} \newline  \noindent
-	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire \cite{backwhatisserpar}. Another wire is used to synchronise the communication beteween devices. The \(I^2 C\) protocol allows multiple devices to be connected together (termed "daisy-chaining") using the same wires, significantly saving space (CITE I2C DAISY CHAIN). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \newline \newline  \noindent
+	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \newline \newline  \noindent
 	The high level languages used to create programs on desktop computers can be similarly used to write programs on the Raspberry Pi (it is running a desktop operating system). There are a number of libraries (collections of software) available for facilitating the communication between the software and the GPIO pins. Built in to the Raspberry Pi are some basic libraries offering simple functionality, but there are third-party libraries available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language, making it well suited to quickly developing clean, and easy to use object-oriented software. Due to its popularity, Python has a vast number of packages available to perform any number of functions. \newline \newline \noindent
 
 
 	\section{Colloidal Suspensions and Jamming}
-	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figure \ref{figshearthinthick} gives an example of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening is shown in Figure \ref{figshearthick}, it is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system
-	into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in process like inefficient flow, (MORE, WHAT, REALLY?). \newline \newline \noindent
-	Colloidal suspensions are a multiphase mixture consisting of solid particles of a particular size (between \(1nm\) and \(1 \mu m\)) dispersed in a liquid \cite[p.~72]{schadict}. These mixtures exhibit interesting rheological properties.    \newline
+	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \newline %\newline \noindent
+	%Colloidal suspensions are a multiphase mixture consisting of solid particles of a particular size (between \(1nm\) and \(1 \mu m\)) dispersed in a liquid \cite[p.~72]{schadict}. These mixtures exhibit interesting rheological properties.    \newline
 	\begin{figure}[!h]
 		\centering
 		\fbox{
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
-			\includegraphics[scale=0.25]{figures/fig_shear_behav_thin.png}
+			\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
 			\caption{Shear Thinning}
 			\label{figshearthin}
 		\end{subfigure}
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
-			\includegraphics[scale=0.25]{figures/fig_shear_behav_thick.png}
+			\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
 			\caption{Shear Thickening}
 			\label{figshearthick}
 		\end{subfigure}
-		\label{figshearthinthick}
 		%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
 		}
+		\label{figshearthinthick}
 		\caption{Graphs Showing Non-Newtonian Behaviour (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure} \newline  \noindent
-	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. Similarly, the surface of a shear suspension has been found to alter texture, which is evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. It is possible that these are the same phenomenon, exhibiting different characteristics in different situations. [CITATION NEEDED] \newline \newline \noindent
+	%flow, shear, jam frequency %TODO
+	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
+\newline \newline \noindent
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
-	%Jamming has been found to follow a power-law frequency distribution, regardless of whether it is the jamming of colloidal particles or the jamming of cars on a motorway (CITE). This is an interesting phenomenon in itself and is not well understood. The drawback of previously undertaken research is that well populated histogram bins were not able to be created as experiments were conducted manually. This is an experiment that could benefit from laboratory automation. This will allow researchers to run the experiment dozens (hundreds) of times with little input on their part to obtain large amounts of data for statistical analysis.
+	
 	\section{This Project}
 	This project aims to design, build, and test a control system for an experimental set up revolving around gathering more information about the occurrence of the "jamming" phenomenon in a colloidal suspension undergoing shear. The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to a constant shear force/constant shear rate. The torque output from the motor , as well as its rotational speed, will be recorded to give an indication of the rheology of the suspension. A needle strain gauge (The PiezoElectric Needle Device) will be mounted above the surface of the shearing suspension in order to measure the stress directly experienced by the fluid (rather than the applied stress which is being controlled). See Figure \ref{expdia} for a diagram of the apparatus.\newline
 	\begin{figure}[!h]
@@ -424,12 +426,7 @@ An example of a machine code (in hexadecimal)\cite{proglangmachex}:
 	Another, less common, type of programming language is the procedural language. This language is simply one instruction following another\cite{proglangwhatisoopl}. The procedural program starts at the start and continues down the list of instructions until it finishes. This language requires writing out the same code multiple times to achieve the same effect as an OOPL, which is a reason for its reduced popularity.\newline \newline  \noindent
 	As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason.\newline \newline  \noindent
 	To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.\newline \newline  \noindent
-\section{Appendix 2 -  Alternative Programming Language}
-\section{Appendix 3 -  Alternative Controller}
-\section{Appendix 4 -  Alternative Operating System}
-\section{Appendix 5 -  Alternative Speed Detection Circuit: \newline Hall Effect Sensor}
-\section{Appendix 6 -  Alternative Speed Detection Circuit: \newline Dynamo}
-\section{Appendix 7 -  Alternative Speed Control Circuit: \newline Digitally Programmable Voltage Regulator}
+5Other appendices, alternative circuits etc
 %Appendix Bibliography
 
 \end{document}

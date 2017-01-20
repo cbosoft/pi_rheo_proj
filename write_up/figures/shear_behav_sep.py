@@ -50,32 +50,32 @@ y2 = [237.13737056616552, 71.04974114426787, 35.22694651473103, 12.6346291765446
 1.1547819846894594, 1.0746078283213196]
 
 #plot 1
-f = plt.figure(figsize=(8, 8))
+f = plt.figure(figsize=(5, 5))
 ax1 = f.add_subplot(111)
 # ax2 = f.add_subplot(122)
-f.suptitle(r"$\mathrm{Shear\ Thinning}$", fontsize=20)
+#f.suptitle(r"$\mathrm{Shear\ Thinning}$", fontsize=20)
 ax1.plot(x1, y1)
 ax1.set_xscale("log")
 ax1.set_yscale("log")
-f.text(0.5, 0.03, r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
-va='center', fontsize=20)
-f.text(0.05, 0.5, r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
-va='center', rotation='vertical', fontsize=20)
-#plt.savefig("./figures/fig_shear_behav_thin.png")
-plt.savefig("./fig_shear_behav_thin.png")
+ax1.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
+va='center', fontsize=12)
+ax1.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
+va='center', fontsize=12)
+plt.savefig("./figures/fig_shear_behav_thin.png")
+#plt.savefig("./fig_shear_behav_thin.png")
 
 #plt.clf()
 #plot 2
-f = plt.figure(figsize=(8, 8))
+f = plt.figure(figsize=(5, 5))
 ax2 = f.add_subplot(111)
-ax2.set_title(r"$\mathrm{Shear\ Thickening}$", fontsize=20)
+#f.suptitle(r"$\mathrm{Shear\ Thickening}$", fontsize=20)
 ax2.plot(x2, y2)
 ax2.set_xscale("log")
 ax2.set_yscale("log")
-f.text(0.5, 0.03, r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
-va='center', fontsize=20)
-f.text(0.05, 0.5, r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
-va='center', rotation='vertical', fontsize=20)
-#plt.savefig("./figures/fig_shear_behav_thick.png")
-plt.savefig("./fig_shear_behav_thick.png")
+ax2.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
+va='center', fontsize=12)
+ax2.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
+va='center', rotation='vertical', fontsize=12)
+plt.savefig("./figures/fig_shear_behav_thick.png")
+#plt.savefig("./fig_shear_behav_thick.png")
 
