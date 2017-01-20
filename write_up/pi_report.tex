@@ -12,6 +12,7 @@
 \usepackage{etoolbox}
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
+\usepackage{subcaption}
 
 % Unused packages
 %\usepackage{placeins}
@@ -170,19 +171,32 @@
 
 
 	\section{Colloidal Suspensions and Jamming}
-	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figure \ref{nonnewtgraphs} shows how shear rate varies with shear stress for non-newtonian fluids. This shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening is what is shown in Figure \ref{nonnewtgraphs}, it is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is also known as "jamming". Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in process like inefficient flow, (MORE, WHAT, REALLY?). \newline \newline \noindent
+	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figure \ref{figshearthinthick} gives an example of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening is shown in Figure \ref{figshearthick}, it is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is also known as "jamming". Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in process like inefficient flow, (MORE, WHAT, REALLY?). \newline \newline \noindent
 	Colloidal suspensions are a multiphase mixture consisting of solid particles of a particular size (between \(1nm\) and \(1 \mu m\)) dispersed in a liquid \cite[p.~72]{schadict}. These mixtures exhibit interesting rheological properties.    \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.3]{figures/fig_shear_behav.png}}
+		\fbox{
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{figures/fig_shear_behav_thin.png}
+			\caption{Shear Thinning}
+			\label{figshearthin}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{figures/fig_shear_behav_thick.png}
+			\caption{Shear Thickening}
+			\label{figshearthick}
+		\end{subfigure}
+		\label{figshearthinthick}
+		%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
+		}
 		\caption{Graphs Showing Non-Newtonian Behaviour (adapted from \cite{figshearthin, figshearthick})}
-		\label{nonnewtgraphs}
 	\end{figure} \newline  \noindent
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. Similarly, the surface of a shear suspension has been found to alter texture, which is evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. It is possible that these are the same phenomenon, exhibiting different characteristics in different situations. [CITATION NEEDED] \newline \newline \noindent
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.4]{images/blank.png}}
-		% \fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
+		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
@@ -247,12 +261,20 @@
 	(Advantages and disadvantages of this circuit) \newline \newline \noindent
 	\fi
 	\subsection{\textit{Motor Speed Control}}
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol). The data is sent to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (10,000\(\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. A transistor (BD243C) is used to reduce the power load through the divider, protecting the digital potentiometer. \newline
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol). The data is sent to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. A transistor (BD243C) is used to reduce the power load through the divider, protecting the digital potentiometer. \newline
 	\begin{equation}
-		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_1 + R_2 + R_{AW} + R_{WB}}
+		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_1 + R_2 + R_{pot}}
 		\label{eqnvoldiv}
+	\end{equation}\newline
+	\begin{equation}
+		V_{min} = V_{in}\times \frac{R_2}{R_1 + R_2 + R_{pot}}
+		\label{eqnminvol}
+	\end{equation}\newline
+	\begin{equation}
+		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_1 + R_2 + R_{pot}}
+		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor (HOW DO THESE RELATE TO MAX MIN?). \newline
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
@@ -315,11 +337,23 @@
 	\addcontentsline{toc}{chapter}{Nomenclature}
 	%List all the symbols in alphabetical order, with Greek symbols at the end.
 	\begin{center}
-		\begin{tabular}{|c|c|}
+		\begin{tabular}{|c|l|}
 			\hline
-			\rule{3cm}{0pt}\textbf{Symbol}\rule{3cm}{0pt} & \rule{3cm}{0pt}\textbf{Description}\rule{3cm}{0pt} \\
+			\rule{1cm}{0pt}\textbf{Symbol}\rule{1cm}{0pt} & \rule{4cm}{0pt}\textbf{Description}\rule{4cm}{0pt} \\
 			\hline
-			 & \\
+			\( R_{1} \) & Voltage divider resistor 1 resistance, ohms \\
+			\hline
+			\( R_{2} \) & Voltage divider resistor 2 resistance, ohms \\
+			\hline
+			\( R_{AW} \) & Potentiometer resistance between the wiper and the "A" terminal, ohms \\
+			\hline
+			\( R_{pot} \) & Potentiometer resistance, ohms \\
+			\hline
+			\( R_{WB} \) & Potentiometer resistance between the wiper and the "B" terminal, ohms \\
+			\hline
+			\( V_{out} \) & Voltage output from the potentiometer voltage divider, volts\\
+			\hline
+			\( V_{in} \) & Voltage input to the potentiometer voltage divider, volts\\
 			\hline
 			& \\
 			\hline
@@ -331,9 +365,9 @@
 			\hline
 			& \\
 			\hline
-			& \\
+			\( \mu \) & Viscosity, in Pa.s\\
 			\hline
-			& \\
+			\( \sigma \) & Shear Stress, in Pa\\
 			\hline
 		\end{tabular}
 	\end{center}
