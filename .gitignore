@@ -9,4 +9,10 @@ write_up/*.NOAPPENDIX
 write_up/*.log
 write_up/*.pdf
 write_up/*.gz
+write_up/*.bak
+write_up/*.aux
+write_up/*.toc
+write_up/*.out
+write_up/*.bbl
+write_up/*.blg
 write_up/figures/*.png
