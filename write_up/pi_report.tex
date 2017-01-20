@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{2761}
+\def\thewords{2891}
 
 
 % Imports
@@ -21,7 +21,7 @@
 %\usepackage{lipsum}
 
 % Settings
-\geometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
+\geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}
 \patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
 \patchcmd{\section}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
 \patchcmd{\subsection}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
@@ -30,7 +30,7 @@
 \renewcommand\UrlFont{\rmfamily\itshape}
 \setlength{\fboxsep}{0pt}
 \setlength{\fboxrule}{0pt}
-
+\def\achapter{preamble}
 %%%% TEMPLATES
 \iffalse
 
@@ -65,7 +65,8 @@
 \fancypagestyle{plain}{
 	\renewcommand{\headrulewidth}{0.4pt}
 	\renewcommand{\footrulewidth}{0.4pt}
-	\fancyhead[L]{\atitle}
+%	\fancyhead[L]{\atitle}
+	\fancyhead[L]{\achapter}
 	\fancyhead[R]{\theauthor}
 	\fancyfoot[L]{\today}
 	\fancyfoot[R]{\thepage}
@@ -75,10 +76,9 @@
 \begin{document}
 %%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
 	\begin{titlepage}
-		\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 		\makebox[\textwidth][c]{\includegraphics[scale=1]{images/titleheader.png}}
 		\centering
-		\vskip4cm
+		\vskip3cm
 		{
 			\bfseries\Large
 			Department of Chemical \& Process Engineering\\
@@ -104,21 +104,23 @@
 	\end{titlepage}
 
 	%%%%%%%%%%%%%%%%%%% Main Content Settings
-	\newgeometry{top=2cm, bottom=2cm, left=3cm, right=3cm}
 	\pagenumbering{roman}
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY PREAMBLE
 	%%%%%%%%%% Summary Page
 	\chapter*{Summary}
 	\addcontentsline{toc}{chapter}{Summary}
+	\def\achapter{Summary}
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
 	
 	% Contents Page
+	\def\achapter{Contents}
 	\tableofcontents
 	
 	% Acknowledgements
 	\chapter*{Acknowledgements}
 	\addcontentsline{toc}{chapter}{Acknowledgements}
+	\def\achapter{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
 	%Dr. Lue
 	
@@ -129,6 +131,7 @@
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY BEGIN PROPER
 	\chapter*{Introduction}
 	\addcontentsline{toc}{chapter}{Introduction}
+	\def\achapter{Introduction}
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
 	%History of what is being done, what is used to do it, how it is done.
 
@@ -157,10 +160,9 @@
 	\caption{Raspberry Pi 3 Model B (taken from  \cite{pi3info})}
 	\label{pidia}
 	\footnotesize Clockwise from top left: GPIO pins, USB ports, Ethernet port, audio jack, Camera Serial Interface (CSI), HDMI port, micro-USB power port, and Display Serial Interface (DSI).
-	\end{figure} \newline \noindent
+	\end{figure} \newline% \noindent
 	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. The quad core processor enables better multithreaded operation for software running on the Raspberry Pi, meaning that big cumbersome programs can run much more efficiently than before. In addition, the increase in memory and CPU clock frequency means there is overall a massive performance boost. Operations like compiling a large program (for example OpenCV, the Open Source Computer Vision Library) which would take over 9 hours \cite{pipowercompold} on the Raspberry Pi 1, takes little over an hour and a half \cite{pipowercompnew} on the lastest model.\newline \newline  \noindent
-	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}.\newline \newline  \noindent
-	What makes the Raspberry Pi attractive in process control are the GPIO (General Purpose Input/Output, see Figure \ref{pidia}) pins made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for incredibly easy development and testing in a single package. In addition to this, the Raspberry Pi retails (at the time of writing) for £30.00 \cite{picost} making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). Each of the GPIO pins is numbered so that they can be referenced, and some have specific purposes other than general purpose input/output (see Figure \ref{gpiopinout})\newline
+	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. What makes the Raspberry Pi attractive in process control are the GPIO (General Purpose Input/Output, see Figure \ref{pidia}) pins made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for incredibly easy development and testing in a single package. In addition to this, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost} making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). Each of the GPIO pins is numbered so that they can be referenced, see Figure \ref{gpiopinout} for the layout.\newline
 	\begin{figure}[!h]
 	\centering
 	\fbox{\includegraphics[scale=0.2]{images/gpiopinout.png}}
@@ -172,8 +174,9 @@
 
 
 	\section{Colloidal Suspensions and Jamming}
-	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \newline %\newline \noindent
-	%Colloidal suspensions are a multiphase mixture consisting of solid particles of a particular size (between \(1nm\) and \(1 \mu m\)) dispersed in a liquid \cite[p.~72]{schadict}. These mixtures exhibit interesting rheological properties.    \newline
+	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \newline \newline \noindent
+	Particles in a suspension can be of different shapes. The shape most often considered is the Hard Sphere (HS). HS particles are spherical and do not interact (WHAT) \newline
+	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE).
 	\begin{figure}[!h]
 		\centering
 		\fbox{
@@ -205,14 +208,8 @@
 	\end{figure} \newline  \noindent
 	
 	\section{This Project}
-	This project aims to design, build, and test a control system for an experimental set up revolving around gathering more information about the occurrence of the "jamming" phenomenon in a colloidal suspension undergoing shear. The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to a constant shear force/constant shear rate. The torque output from the motor , as well as its rotational speed, will be recorded to give an indication of the rheology of the suspension. A needle strain gauge (The PiezoElectric Needle Device) will be mounted above the surface of the shearing suspension in order to measure the stress directly experienced by the fluid (rather than the applied stress which is being controlled). See Figure \ref{expdia} for a diagram of the apparatus.\newline
-	\begin{figure}[!h]
-	\centering
-	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
-	\caption{Diagram of the Experimental Apparatus (from )}
-	\label{expdia}
-	\end{figure} \newline  \noindent
-	To find out if the formation of the cracks on the fluid's surface during shear correlates with the occurrence of discontinuous shear thickening, a camera will be aimed at the surface of the shearing fluid throughout the course of the experiment. The camera will be optically magnified using lenses placed in front of the aperture. The camera will record images during the course of the experiment, which can later be processed automatically using image recognition software to detect the formation of the cracks and attempt to find a correlation between the crack formation and the jamming. \newline \newline \noindent
+	This project aims to design, build, and test a control system for an experimental set up revolving around gathering more information about the occurrence of the "jamming" phenomenon in a colloidal suspension undergoing shear. The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to a constant shear force/constant shear rate. The torque output from the motor , as well as its rotational speed, will be recorded to give an indication of the rheology of the suspension. A needle strain gauge (The PiezoElectric Needle Device) will be mounted above the surface of the shearing suspension in order to measure the stress directly experienced by the fluid (rather than the applied stress which is being controlled). \newline \newline \noindent
+	To find out how the formation of the cracks on the fluid's surface during shear correlate with the occurrence of discontinuous shear thickening, a camera will be aimed at the surface of the shearing fluid throughout the course of the experiment. The camera will be optically magnified using lenses placed in front of the aperture and will record images, which can later be processed using image recognition software to detect the formation of the cracks. \newline \newline \noindent
 %	The motor's rotational speed will be set at different values and will be controlled to ensure the speed is maintained. The PEND can be used to detect the torque imposed upon the fluid (and thus the shear stress) by recording the potential difference across the crystal as the needle is deflected by the moving fluid and thus distorts the piezoelectric crystal.  \newline \newline \noindent
 	The experimental set-up will be controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice for the controller to this process. Software will be developed for the Raspberry Pi to read in the motor's speed and the PEND's voltage reading, record it accurately and to control the rotational speed of the motor. In addition, the Raspberry Pi can be used to automate the experimental process by automatically altering experimental parameters in-between runs while logging all the relevant data during runs. The Pi can also be set up with a web interface, allowing monitoring of the experiment from remote locations, further reducing the manual workload on lab technicians.
 
@@ -227,12 +224,19 @@
 
 	\chapter*{Description of the Work}
 	\addcontentsline{toc}{chapter}{Description of the Work}
+	\def\achapter{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially.
 
 
 
 	\section{Experimental Setup}
-	(more in depth description of experimental set up including model numbers, diagrams)
+	As mentioned previously, the experimental setup consists of two concentric cylinders. The outer cylinder is fixed in place and the inner cylinder is rotated by a DC electric motor (SERNO). A needle attached to a piezo is inserted into the gap between the cylinders such that when the gap is filled with liquid, the needle will be in contact with the surface but will not hinder flow. A camera (SERNO) is held in place above the gap between the cylinders and a lens (SERNO) is attached to allow the closer observation of the experiment by the camera. See Figure \ref{expdia} for a diagram.\newline
+	\begin{figure}[!h]
+	\centering
+	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
+	\caption{Diagram of the Experimental Apparatus (from )}
+	\label{expdia}
+	\end{figure} \newline  \noindent
 
 
 
@@ -307,7 +311,13 @@
 	\item dig\_pot.py
 	\end{itemize}
 
-	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline \newline \noindent
+	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
+	\begin{figure}[!h]
+		\centering
+		\fbox{\includegraphics[scale=0.3]{images/codemap.png}}
+		\caption{Code Map Diagram}
+		\label{codemap}
+	\end{figure} \newline  \noindent
 	
 	\subsection{exp\_run.py}
 	\subsection{control.py}
@@ -324,6 +334,7 @@
 
 	\chapter*{Conclusions}
 	\addcontentsline{toc}{chapter}{Conclusions}
+	\def\achapter{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
 	
 
@@ -331,6 +342,7 @@
 
 	\chapter*{Review}
 	\addcontentsline{toc}{chapter}{Review}
+	\def\achapter{Review}
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	
 
@@ -338,6 +350,7 @@
 
 	\chapter*{Nomenclature}
 	\addcontentsline{toc}{chapter}{Nomenclature}
+	\def\achapter{Nomenclature}
 	%List all the symbols in alphabetical order, with Greek symbols at the end.
 	\begin{center}
 		\begin{tabular}{|c|l|}
@@ -378,6 +391,7 @@
 	%Main Bibliography
 	\newpage
 	\addcontentsline{toc}{chapter}{Bibliography}
+	\def\achapter{Bibliography}
 	\bibliography{biblio}
 	\bibliographystyle{unsrt}
 	%\bibliographystyle{apalike}
@@ -390,6 +404,7 @@
 
 \chapter*{Appendices}
 \addcontentsline{toc}{chapter}{Appendices}
+\def\achapter{Appendices}
 \pagenumbering{alph}
 \setcounter{page}{1}
 \setcounter{section}{1}
@@ -426,7 +441,7 @@ An example of a machine code (in hexadecimal)\cite{proglangmachex}:
 	Another, less common, type of programming language is the procedural language. This language is simply one instruction following another\cite{proglangwhatisoopl}. The procedural program starts at the start and continues down the list of instructions until it finishes. This language requires writing out the same code multiple times to achieve the same effect as an OOPL, which is a reason for its reduced popularity.\newline \newline  \noindent
 	As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason.\newline \newline  \noindent
 	To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.\newline \newline  \noindent
-5Other appendices, alternative circuits etc
+%Other appendices, alternative circuits etc
 %Appendix Bibliography
 
 \end{document}
