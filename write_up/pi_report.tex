@@ -251,7 +251,7 @@
 	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. This means that every time a magnet triggers the sensor, it will correspond to a quarter turn of the motor. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin (pin 2 on the diagram) will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low. To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and was connected through a transistor to ground. When the hall effect sensor detects a magnet, the high signal on its output will end, and so the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=1]{images/circspeeddet.png}}
+		\fbox{\includegraphics[scale=0.4]{images/circspeeddet.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circhall}
 	\end{figure} \newline  \noindent
@@ -284,13 +284,13 @@
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.6]{images/circdigpotclose.png}}
+		\fbox{\includegraphics[scale=0.2]{images/circdigpotclose.png}}
 		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
 		\label{circdigpotclose}
 	\end{figure} \newline  \noindent
 	\begin{figure}[!h]
 		\centering
-		\fbox{\includegraphics[scale=0.8]{images/circspeedcontr.png}}
+		\fbox{\includegraphics[width=\textwidth]{images/circspeedcontr.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Control}
 		\label{circspeedcontr}
 	\end{figure} \newline  \noindent
@@ -301,7 +301,7 @@
 
 
 	\section{Software}
-	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: 
+	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: \newline
 	
 	\begin{itemize}
 	\item exp\_run.py
@@ -309,7 +309,7 @@
 	\item motor.py
 	\item adc.py
 	\item dig\_pot.py
-	\end{itemize}
+	\end{itemize} \noindent
 
 	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
 	\begin{figure}[!h]
@@ -320,8 +320,16 @@
 	\end{figure} \newline  \noindent
 	
 	\subsection{exp\_run.py}
+	The main control loop creates a new instance of the exp\_run class to manage the running of an experimental run. The run begins by reading in the run parameters from file dictating the length of the run, and the motor rotational speed. Also, new instances of the control, motor, and adc classes are created. The main loop managing the run begins by getting the current motor speed, using the control class to obtain a new motor voltage value, and setting this new value. The adc class is used to read in the PEND value, which is recorded along with the motor speed and the current time.
 	\subsection{control.py}
+	The control class is an implementation of a discrete PID control algorithm (Equation \ref{eqnvelocityalgo} \cite[p.~14]{PIDcontroldiscr}). This algorithm uses three parameters (\( K_P, K_I, and K_D\)), and the error between the current valueand the set point (\(e(n) = SP - y(n)\)) to obtain a value which should be output in order to maintain the output at the set point, defending against disturbances in the process.\newline
+	\begin{equation}
+		y(n) = y(n-1) + K_P (e(n) - e(n-1)) + K_I  e(n) + K_D (e(n) -2 e(n-1) + e(n-2))
+		\label{eqnvelocityalgo}
+	\end{equation}\newline \noindent
+	Before it can be used, the PID algorithm parameters need to be tuned. This is done using an auto tuning script (AUTOTUNE SCRIPT DO).
 	\subsection{motor.py}
+	
 	\subsection{adc.py}
 	\subsection{dig\_pot.py}
 
