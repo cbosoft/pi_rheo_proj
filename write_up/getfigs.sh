@@ -1,4 +1,4 @@
-for f in "./figures/*.py"
+for f in "./figures/*"
 do
  echo "Processing $f"
  python $f
