@@ -200,14 +200,6 @@
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 \newline \newline \noindent
-	Our
-	results imply that the rheology of concentrated suspen-
-	sions, i.e. how bulk quantities such as apparent viscosity
-	and time-averaged shear rate depend on volume fraction,
-	is determined in the thickening regime by the statistics
-	of these intermittent jamming/dilation events, i.e. the
-	dynamic formation of jammed networks and their subse-
-	quent breakup by dilatancy. (CANNOT INCLUDE, BUT REMEMBER ITS SIGNIFICANCE) \newline \newline \noindent
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
@@ -309,23 +301,14 @@
 
 
 	\section{Software}
-	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: \newline
-	
-	\begin{itemize}
-	\item exp\_run.py
-	\item control.py
-	\item motor.py
-	\item adc.py
-	\item dig\_pot.py
-	\end{itemize} \noindent
-
+	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: exp\_run.py, control.py, motor.py, dig\_pot.py, and adc.py. \newline \newline \noindent
 	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
 	\begin{figure}[!h]
 		\centering
 		\fbox{\includegraphics[scale=0.3]{images/codemap.png}}
 		\caption{Code Map Diagram}
 		\label{codemap}
-	\end{figure} \newline  \noindent
+	\end{figure}
 	
 	\subsection{exp\_run.py}
 	The main control loop creates a new instance of the exp\_run class to manage the running of an experimental run. The run begins by reading in the run parameters from file dictating the length of the run, and the motor rotational speed. Also, new instances of the control, motor, and adc classes are created. The main loop managing the run begins by getting the current motor speed, using the control class to obtain a new motor voltage value, and setting this new value. The adc class is used to read in the PEND value, which is recorded along with the motor speed and the current time.
@@ -337,9 +320,19 @@
 	\end{equation}\newline \noindent
 	Before it can be used, the PID algorithm parameters need to be tuned. This is done using an auto tuning script (AUTOTUNE SCRIPT DO).
 	\subsection{motor.py}
+	The motor class is used to manage the DC motor. It uses the dig\_pot class to control the speed and sets up a GPIO pin to read in information from the Hall Effect speed detection circuit. The motor class, when instantiated in the exp\_run script, will create a thread which will update the motor's speed value to the current value (every XX seconds). The program counts the number of times a magnet has passed the hall effect sensor (thus the number of rotations, or partial rotations, in a known time-frame). When the motor's speed is calculated, this count is reset to 0.
+	\subsection{dig\_pot.py}
+	This class is used to communicate with the digital potentiometer, setting the motor's supply voltage and thus its rotational speed. The digital potentiometer is communicated with using the SPI protocol. The resistance is set by sending it two bytes: the first byte is a command sequence, and the second is the value (see Figure \ref{mcp4131commfig}). Since the potentiometer has only a 7bit network of resistors (128 different configurations), the data only takes up the last 7 bits of the 16 bit sequence, the rest are ignored. The memory address is question is the first wiper register (there is only one, but the same syntax is used for ICs with more than one resistor network). Wiper register 0 is at register address 0. The command used here is the "write" command (binary: 00). The two data bits included in the first byte are unnecessary, so they are left zero also. The second byte is simply the desired value (between 0 and 127). \newline \newline \noindent
+	This class makes use of the "spidev" python package, which supports the ability to communicate over SPI from a python script.
+	\begin{figure}[!h]
+		\centering
+		\fbox{\includegraphics[scale=0.3]{images/mcp4131commdat.png}}
+		\caption{MCP4131 Command Syntax \cite[p.~47]{mcp4131datasheet}}
+		\label{mcp4131commfig}
+	\end{figure} \newline  \noindent
 	
 	\subsection{adc.py}
-	\subsection{dig\_pot.py}
+	Similar to the dig\_pot class, this class is used to communicate via a serial protocol with a device. The \(I^2C\) protocol is used here to communicate with an 18bit analogue to digital converter (ADC). This device allows the Raspberry Pi to read in a voltage value from a circuit by converting it into a digital signal. This signal has a resolution of up to 18 bits - a range of 0-262144 (WHAT ABOUT NEGATIVES?), therefore with a voltage range of -0.3v to 5.3v \cite{mcp3424datasheet}, each unit step represents a measured voltage of \(2.136\times10^{-5}V\). The class reads in the digital serial signal and converts it from the binary number into a voltage reading which can be used or recorded as necessary.
 
 
 
