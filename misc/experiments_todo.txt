@@ -1,0 +1,56 @@
+Experiments
+
+Calibration of motor (1):
+    Goal:
+        Obtain Speed/volt curve
+    Procedure:
+        Set voltage to minimum
+        Increment voltage (dig_pot signal + 1)
+        Wait 1s
+        Record speed
+        Record voltage
+        Draw graph of pot value (0-127) vs recorded speed
+        Repeat x3
+        Fit eqn to graph(s)
+
+Calibration of motor (2):
+    Goal:
+        Torques (stall torque, free torque, torque/voltage) Torque => Stress
+    Procedure:
+        Run motor with no load, record input power, record rotational speed
+        Calculate power input to the motor: Power (W) = Current (A) * Voltage (V)
+        (There will be some efficiency term required)
+        Calculate Free Torque: Power(W) = Torque (Nm) * Rotational Speed (rad/s) [or W = Nm * (2Pi/60) * RPM]
+        Repeat at various voltages (dig pot values 0 to 127, step 8?)
+        Draw graph, fit line
+        eqn of line ~= T(V)
+        Calculate motor's efficiency
+        Compare efficiency calculated with datasheet
+        Use to calculate the Stress imposed per volt
+
+Calibration of motor (3):
+    Goal:
+        Motor control model, controller tuning
+    Procedure:
+        set motor speed to middle (pot val ~ 64)
+        Every 0.1s throughout, record time (from 0) and motor speed
+        wait 5s
+        increase motor speed (pot val ~ 96)
+        wait 5s
+        draw graph of response (speed vs time)
+        fit a FOPDT model to the response
+        
+        Options:
+            (1) implement model in simulink
+                use simulink's autotune to tune the control parameters, deciding upon the optimal solution
+            (2) use bespoke autotune script
+        
+        
+System check:
+    Goal:
+        Check if RPi control system works well
+    Procedure:
+        Use Rpi to examine rheology of reference fluids (glycerol/water/mix) (record viscosity)
+        Shear stress = shear viscosity * shear rate (t = mu * dU/dY)
+        Use rheomter to examine rheology
+        Compare resulting data
