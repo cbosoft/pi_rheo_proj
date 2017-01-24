@@ -9,6 +9,7 @@
 
 import motor as mot_r
 import time
+import matplotlib.pyplot as plt
 
 hall_pin = 16
 mag_count = 1
@@ -19,6 +20,8 @@ length = 5000  # ms
 time_ = 0  # ms since beginning
 log = open("./step_log.csv", "w")
 log.close()
+xs = [0]*2
+ys = [0]*2
 
 log = open("./step_log.csv", "a")
 
@@ -27,7 +30,10 @@ mot.pot.set_resistance(0)
 
 # pre step data
 while (time_ <= delay):
-    log.write(str(time_) + "," + str(mot.get_speed()))
+    spd = mot.get_speed()
+    log.write(str(time_) + "," + str(spd))
+    xs.append(time_)
+    ys.append(spd)
     time.sleep(0.001)
     time_ += 1
 
@@ -36,8 +42,14 @@ mot.pot.set_resistance(64)
 
 # collect the data
 while (time_ <= (delay + length)):
-    log.write(str(time_) + "," + str(mot.get_speed()))
+    spd = mot.get_speed()
+    log.write(str(time_) + "," + str(spd))
+    xs.append(time_)
+    ys.append(spd)
     time.sleep(0.001)
     time_ += 1
 
 log.close()
+
+plt.plot(xs, ys)
+plt.show()

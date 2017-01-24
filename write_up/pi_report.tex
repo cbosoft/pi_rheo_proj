@@ -318,7 +318,7 @@
 		y(n) = y(n-1) + K_P (e(n) - e(n-1)) + K_I  e(n) + K_D (e(n) -2 e(n-1) + e(n-2))
 		\label{eqnvelocityalgo}
 	\end{equation}\newline \noindent
-	Before it can be used, the PID algorithm parameters need to be tuned. This is done using an auto tuning script (AUTOTUNE SCRIPT DO).
+	Before it can be used, the PID algorithm parameters need to be tuned. This is done automatically by the controller. By performing a step test on the motor system, a model of the process can be formed. Using this model, the autotuning method analyses the different possibilities for the tuning parameters, checking how the controller with each tuning option handles a step change to the set point. Ideally, a tuned response should quickly rise to the new set point and not oscillate too much. (MORE WHY HOW)
 	\subsection{motor.py}
 	The motor class is used to manage the DC motor. It uses the dig\_pot class to control the speed and sets up a GPIO pin to read in information from the Hall Effect speed detection circuit. The motor class, when instantiated in the exp\_run script, will create a thread which will update the motor's speed value to the current value (every XX seconds). The program counts the number of times a magnet has passed the hall effect sensor (thus the number of rotations, or partial rotations, in a known time-frame). When the motor's speed is calculated, this count is reset to 0.
 	\subsection{dig\_pot.py}

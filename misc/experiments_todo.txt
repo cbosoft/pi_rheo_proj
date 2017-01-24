@@ -32,10 +32,10 @@ Calibration of motor (3):
     Goal:
         Motor control model, controller tuning
     Procedure:
-        set motor speed to middle (pot val ~ 64)
+        set motor speed to middle (pot val ~64)
         Every 0.1s throughout, record time (from 0) and motor speed
         wait 5s
-        increase motor speed (pot val ~ 96)
+        increase motor speed (pot val ~96)
         wait 5s
         draw graph of response (speed vs time)
         fit a FOPDT model to the response
