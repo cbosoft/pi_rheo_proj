@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{3549}
+\def\thewords{3790}
 
 
 % Imports
@@ -261,29 +261,22 @@
 		\label{circhall}
 	\end{figure} \newline  \noindent
 	This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
-	\iffalse
-	%Optical Sensor
-	The rotational speed of the motor is detected by aiming a laser (SERNO) at the rotating cylinder and also putting a line of reflective tape on the cylinder such that laser light reflecting off the cylinder enters a light sensor (SERNO). The value of rotational speed is discovered by detecting the number of times the cylinder makes a complete rotation in a given time span. (How photodetectors work). The sensor is simply connected to a GPIO pin on the raspberry pi, to ground, and to a 3.3v supply. Figure \ref{circhall} shows the schematic of this circuit. \newline
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=1]{images/blank.png}}
-		\caption{Circuit Schematic Diagram: Motor Speed Detection}
-		\label{circoptical}
-	\end{figure} \newline  \noindent
-	(Advantages and disadvantages of this circuit) \newline \newline \noindent
-	\fi
+
+
 	\subsection{\textit{Motor Speed Control}}
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol). The data is sent to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. A transistor (BD243C) is used to reduce the power load through the divider, protecting the digital potentiometer. \newline
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier is used to boost the voltage range from 1.2v to 5v up to 2.6v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply aroudn 20mA. The Transistor boosts this up to 2A, assuming a conservative gain of hFE = 100.\newline
+	
+	%%%%%%%%%% RODO
 	\begin{equation}
-		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_1 + R_2 + R_{pot}}
+		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
 	\end{equation}\newline
 	\begin{equation}
-		V_{min} = V_{in}\times \frac{R_2}{R_1 + R_2 + R_{pot}}
+		V_{min} = V_{in}\times \frac{R_2}{R_2 + R_{pot}}
 		\label{eqnminvol}
 	\end{equation}\newline
 	\begin{equation}
-		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_1 + R_2 + R_{pot}}
+		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
@@ -296,7 +289,7 @@
 	\begin{figure}[!htb]
 		\centering
 		\fbox{\includegraphics[width=\textwidth]{images/circspeedcontr.png}}
-		\caption{Circuit Schematic Diagram: Motor Speed Control (REDO WITH UPDATED VALUES)}
+		\caption{Circuit Schematic Diagram: Motor Speed Control ADD RESISTOR NAMES}
 		\label{circspeedcontr}
 	\end{figure} \newline  \noindent
 
