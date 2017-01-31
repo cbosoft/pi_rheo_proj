@@ -264,9 +264,9 @@
 
 
 	\subsection{\textit{Motor Speed Control}}
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier is used to boost the voltage range from 1.2v to 5v up to 2.6v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply aroudn 20mA. The Transistor boosts this up to 2A, assuming a conservative gain of hFE = 100.\newline
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier is used to boost the voltage range from 1.2v to 5v up to 2.6v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A, assuming a conservative gain of hFE = 100.\newline
 	
-	%%%%%%%%%% RODO
+	%%%%%%%%%% REDO?
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
@@ -335,6 +335,13 @@
 
 
 	\section{Procedure}
+	%Experimental Procedures
+	\subsection{Motor Speed Calibration}
+	The speed of the motor with respect to the value sent to the digital potentiometer (and therefore the voltage across the motor) was found out by varying the voltage and recording the speed at each voltage. Starting from a value of 0, the digital potentiometer value was increased in steps of 8, at each stage the voltage was allowed to settle for a period of ten seconds which also gave time for an accurate speed reading to be undertaken.(MOAR!)
+	\subsection{Motor Torque Calibration}
+	The torque output from the motor with respect to the voltage applied to the motor must be known to be able to calculate the rheology of the liquid in the couette cell. There are two torques output from the motor: the load torque, and the shaft torque. The former is the torque imposed upon the load, and the latter is the torque imposed upon the motor's shaft. \newline \newline \noindent 
+	There are limits upon the motor's output, at high enough torque, the rotational speed will reach zero. This torque value is the \textit{stall torque (\(\tau_s\))} and represents the maximum value of torque able to be output by the motor. The second limit is where the motor has no load imposed upon it. The torque here is the no-load torque (equal to the shaft torque). The rotational speed here is the greatest possible value (for a particular voltage) and can be used to calculate the no-load torque and thus the shaft torque. \newline \newline \noindent
+	By recording the voltage and current through the motor, the power input to the motor can be calculated. Using the electrical power and the efficiency, the mechanical power output and the torque output can also be calculated. The speed at different loadings was recorded, giving the torque in terms of the voltage/current (power). (REWORD?)
 
 
 

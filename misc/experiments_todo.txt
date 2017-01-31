@@ -6,6 +6,8 @@ Check Motor Control Circuit
         Discover more information about how the circuit is working IRL
     Procedure:
         Find actual relation between resistance of pot and potval (should be 0-10kR for 0-127 val)
+    DONE!
+        Motor speed contro circuit fixed, ranges as expected (a little clipping, but is being investigated)
 
 Calibration of motor (1):
     Goal:
@@ -51,6 +53,7 @@ Calibration of motor (3):
             (1) implement model in simulink
                 use simulink's autotune to tune the control parameters, deciding upon the optimal solution
             (2) use bespoke autotune script
+            (3) Do both of the above and compare <--
         
         
 System check:
