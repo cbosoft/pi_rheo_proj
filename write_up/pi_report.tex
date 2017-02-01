@@ -235,7 +235,7 @@
 
 
 	\section{Experimental Setup}
-	As mentioned previously, the experimental setup consists of two concentric cylinders. The outer cylinder is fixed in place and the inner cylinder is rotated by a DC electric motor (SERNO). A needle attached to a piezo is inserted into the gap between the cylinders such that when the gap is filled with liquid, the needle will be in contact with the surface but will not hinder flow. A camera (SERNO) is held in place above the gap between the cylinders and a lens (SERNO) is attached to allow the closer observation of the experiment by the camera. See Figure \ref{expdia} for a diagram.\newline
+	The experiment is based around a Couette (CITE) consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (SERNO) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets its speed (voltage) and reads in the torque load on the motor. This is used to calculate the viscosity of the fluid. A needle attached to a piezo-electric (PEND) is used to detect shear stress at a point within the fluid. When the liquid undergoes jamming, then the needle will move and generate a voltage proportional to the amount it moves. Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
 	\centering
 	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
@@ -253,7 +253,7 @@
 
 	\subsection{\textit{Motor Speed Detection}}
 	%Hall Effect
-	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. This means that every time a magnet triggers the sensor, it will correspond to a quarter turn of the motor. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin (pin 2 on the diagram) will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low. To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and was connected through a transistor to ground. When the hall effect sensor detects a magnet, the high signal on its output will end, and so the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
+	The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. Thus, every time a magnet triggers the sensor it corresponds to a quarter turn. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low (0v). To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and connected through a transistor to ground. Normally, the high input to the transistor allows the flow of current from the GPIO pin to ground, meaning it has a low value. When the hall effect sensor detects a magnet the high signal to the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	\begin{figure}[!htb]
 		\centering
 		\fbox{\includegraphics[scale=0.4]{images/circspeeddet.png}}
@@ -336,9 +336,13 @@
 
 	\section{Procedure}
 	%Experimental Procedures
-	\subsection{Motor Speed Calibration}
-	The speed of the motor with respect to the value sent to the digital potentiometer (and therefore the voltage across the motor) was found out by varying the voltage and recording the speed at each voltage. Starting from a value of 0, the digital potentiometer value was increased in steps of 8, at each stage the voltage was allowed to settle for a period of ten seconds which also gave time for an accurate speed reading to be undertaken.(MOAR!)
-	\subsection{Motor Torque Calibration}
+	\subsection{Motor Calibration}
+	There are several parameters that need to be calculated before the motor can be used in the rheometer. The torque and efficiency characteristic curves of the motor need to be calculated (OR FOUND??). To find this, the digital potentiometer was set to 0 and initial readings of the speed and voltage were taken. Then the value was incremented, the motor speed and voltage were recorded. This was done for every possible value for the digital potentiometer. Using the recorded information, a relationship was found between efficiency and speed. This allows the torque to be calculated using only the electrical power input to the motor, and the rotational speed of the motor (see Equation \ref{eqntorque}).
+	\begin{equation}
+	\tau = \frac{I \times V \times \eta}{\omega}
+	\label{eqntorque}
+	\end{equation}
+	\subsection{Motor Torque Calibration (NECESSARY??)}
 	The torque output from the motor with respect to the voltage applied to the motor must be known to be able to calculate the rheology of the liquid in the couette cell. There are two torques output from the motor: the load torque, and the shaft torque. The former is the torque imposed upon the load, and the latter is the torque imposed upon the motor's shaft. \newline \newline \noindent 
 	There are limits upon the motor's output, at high enough torque, the rotational speed will reach zero. This torque value is the \textit{stall torque (\(\tau_s\))} and represents the maximum value of torque able to be output by the motor. The second limit is where the motor has no load imposed upon it. The torque here is the no-load torque (equal to the shaft torque). The rotational speed here is the greatest possible value (for a particular voltage) and can be used to calculate the no-load torque and thus the shaft torque. \newline \newline \noindent
 	By recording the voltage and current through the motor, the power input to the motor can be calculated. Using the electrical power and the efficiency, the mechanical power output and the torque output can also be calculated. The speed at different loadings was recorded, giving the torque in terms of the voltage/current (power). (REWORD?)
