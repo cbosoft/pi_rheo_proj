@@ -76,7 +76,7 @@ class motor(object):
             value = self.min_speed
         value = int(((value - self.min_speed) /
         (self.max_speed - self.min_speed)) * 127)
-        dp.set_resistance(value)
+        self.dp.set_resistance(value)
 
     def incr(self):
         self.rot_count += 1
@@ -86,10 +86,20 @@ class motor(object):
         # self.pot.close()
 
 if __name__ == "__main__":
+    #  motor(max_speed, min_speed, hall_pin, mag_count, start_now)
+    #  Will get motor's speed for select potvals
     motr = motor(0, 0, 16, 1, startnow=True)
     try:
         while (True):
-            print "Speed (RPM) : " + str(motr.cur_speed)
-            time.sleep(1)
+            for i in range(0, 128):
+                motr.dp.set_resistance(i)
+                for j in range(0, 10):
+                    print "Val: " + str(i) + " Speed (RPM): " + str(motr.cur_speed)
+                    time.sleep(0.5)
+            for i in range(0, 128):
+                motr.dp.set_resistance(127 - i)
+                for j in range(0, 10):
+                    print "Val: " + str(127 - i) + " Speed (RPM) " + str(motr.cur_speed)
+                    time.sleep(0.5)
     except KeyboardInterrupt:
         motr.clean_exit()
