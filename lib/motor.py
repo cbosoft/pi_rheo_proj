@@ -8,7 +8,7 @@
 import time
 import thread as td
 import RPi.GPIO as gpio
-from dig_pot import mcp4131 as dp
+from dig_pot import MCP4131 as dp
 
 
 class motor(object):
@@ -33,7 +33,7 @@ class motor(object):
         self.hall_pin = hall_pin_
         self.pot = dp()
         self.mag_count = mag_count_
-        gpio.setmode(gpio.Board)
+        gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
 
         if (startnow):
@@ -50,11 +50,11 @@ class motor(object):
 
         while (self.poll_running):
             self.cur_speed = (float(self.rot_count)
-            * float(60 / (0.1 * self.mag_count)))  # rotational speed in RPM
+            * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
             self.rot_count = 0
             time.sleep(0.1)
 
-        print("Motor speed polling has halted!")
+        print("Motor speed polling has halted.")
 
     def get_speed(self):
         if (self.poll_running):
@@ -82,6 +82,9 @@ class motor(object):
         self.rot_count += 1
 
     def clean_exit(self):
+        print "Closing poll thread..."
+        self.poll_running = False
+        time.sleep(0.5)
         gpio.cleanup()
         # self.pot.close()
 
@@ -89,6 +92,7 @@ if __name__ == "__main__":
     #  motor(max_speed, min_speed, hall_pin, mag_count, start_now)
     #  Will get motor's speed for select potvals
     motr = motor(0, 0, 16, 1, startnow=True)
+    #test script for testing
     try:
         while (True):
             for i in range(0, 128):

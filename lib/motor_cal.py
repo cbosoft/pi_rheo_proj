@@ -1,8 +1,7 @@
 #
 # Motor Calibration Script
 #
-# Will return the maximum speed and the minimum speed of the motor
-#
+# Will record the speed results at a range of potentiometer values (from 0 to 127)
 #
 
 import motor as mot_r
@@ -12,22 +11,24 @@ hall_pin = 16
 mag_count = 1
 mot = mot_r.motor(0, 0, hall_pin, mag_count, True)
 
-print "getting low end speed limit"
+print "Starting..."
 mot.pot.set_resistance(0)
+time.sleep(2)
 
-print "waiting..."
-time.sleep(10)  # wait 10 seconds
-
-print "speed got"
-low_speed = mot.get_speed()
-
-print "getting high end speed limit"
-mot.set_resistance(127)
-
-print "waiting..."
-time.sleep(10)  # wait 10 seconds
-
-print "speed got"
-high_speed = mot.get_speed()
-
-print "results\nhigh: " + str(high_speed) + "\nlow: " + str(low_speed)
+outp = open("./spdvals.csv", "w"):
+linstr = ""
+try:
+    for i in range(0, 128):
+        print "Setting potval to " + str(i)
+        linstr = str(i)
+        mot.pot.set_resistance(i)
+        for j in range(0, 10):
+            print "Speed: " + str(mot.cur_speed) + "RPM"
+            linstr += "," + str(mot.cur_speed)
+        outp.write(linstr + "\n")
+    print "Output saved as \"spdvals.csv\""
+    outp.close()
+    mot.clean_exit()
+except KeyboardInterrupt:
+    outp.close()
+    mot.clean_exit()
