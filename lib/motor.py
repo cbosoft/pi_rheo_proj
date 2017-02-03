@@ -14,9 +14,12 @@ from dig_pot import MCP4131 as dp
 class motor(object):
 
     cur_speed = 0.0
+    cur_speed_method_2 = 0.0
+    prev_hit_time = 0.0
     mag_count = 1
     poll_running = False
     rot_count = 0
+    log_dir = "./log.csv"
 
     max_speed = 0  # RPM, at voltage = 11v
     min_speed = 0  # RPM, at voltage = ~3v
@@ -49,12 +52,14 @@ class motor(object):
         self.poll_running = True
 
         while (self.poll_running):
+            self.logf = open(log_dir, "w")
             self.cur_speed = (float(self.rot_count)
             * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
             self.rot_count = 0
             time.sleep(0.1)
 
         print("Motor speed polling has halted.")
+        self.logf.close()
 
     def get_speed(self):
         if (self.poll_running):
@@ -71,7 +76,7 @@ class motor(object):
             print("Warning! Desired speed too high, setting to max speed.")
             value = self.max_speed
         elif (value < self.min_speed):
-            # value too small! want + set to min speed
+            # value too small! warn + set to min speed
             print("Warning! Desired speed too low, setting to min speed.")
             value = self.min_speed
         value = int(((value - self.min_speed) /
@@ -80,12 +85,20 @@ class motor(object):
 
     def incr(self):
         self.rot_count += 1
+        self.logf.write(str(time.time() * 1000) + ", " + rot_count)
+        temp_time = time.time() * 1000
+        if (self.prev_hit_time == 0.0):
+            self.prev_hit_time = temp_time()
+        else:
+            self.cur_speed_other = 1 / (self.mag_count * (temp_time - self.prev_hit_time))
+            # rotations per hit / time per hit = rotations per time
 
     def clean_exit(self):
         print "Closing poll thread..."
         self.poll_running = False
         time.sleep(0.5)
         gpio.cleanup()
+        self.logf.close()
         # self.pot.close()
 
 if __name__ == "__main__":
