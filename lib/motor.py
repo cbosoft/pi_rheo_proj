@@ -14,7 +14,7 @@ from dig_pot import MCP4131 as dp
 class motor(object):
 
     cur_speed = 0.0
-    cur_speed_method_2 = 0.0
+    cur_speed_other = 0.0
     prev_hit_time = 0.0
     mag_count = 1
     poll_running = False
@@ -50,9 +50,9 @@ class motor(object):
     def poll(self):
 
         self.poll_running = True
+        self.logf = open(log_dir, "w")
 
         while (self.poll_running):
-            self.logf = open(log_dir, "w")
             self.cur_speed = (float(self.rot_count)
             * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
             self.rot_count = 0
@@ -90,8 +90,9 @@ class motor(object):
         if (self.prev_hit_time == 0.0):
             self.prev_hit_time = temp_time()
         else:
-            self.cur_speed_other = 1 / (self.mag_count * (temp_time - self.prev_hit_time))
-            # rotations per hit / time per hit = rotations per time
+            self.cur_speed_other = 60000 / (self.mag_count * (temp_time - self.prev_hit_time))
+            # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
+            # (R/ms) * 60,000 = RPM
 
     def clean_exit(self):
         print "Closing poll thread..."
