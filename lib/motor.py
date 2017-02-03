@@ -8,15 +8,18 @@
 import time
 import thread as td
 import RPi.GPIO as gpio
-from dig_pot import mcp4131 as dp
+from dig_pot import MCP4131 as dp
 
 
 class motor(object):
 
     cur_speed = 0.0
+    cur_speed_other = 0.0
+    prev_hit_time = 0.0
     mag_count = 1
     poll_running = False
     rot_count = 0
+    log_dir = "./log.csv"
 
     max_speed = 0  # RPM, at voltage = 11v
     min_speed = 0  # RPM, at voltage = ~3v
@@ -33,7 +36,7 @@ class motor(object):
         self.hall_pin = hall_pin_
         self.pot = dp()
         self.mag_count = mag_count_
-        gpio.setmode(gpio.Board)
+        gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
 
         if (startnow):
@@ -47,14 +50,16 @@ class motor(object):
     def poll(self):
 
         self.poll_running = True
+        self.logf = open(log_dir, "w")
 
         while (self.poll_running):
             self.cur_speed = (float(self.rot_count)
-            * float(60 / (0.1 * self.mag_count)))  # rotational speed in RPM
+            * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
             self.rot_count = 0
             time.sleep(0.1)
 
-        print("Motor speed polling has halted!")
+        print("Motor speed polling has halted.")
+        self.logf.close()
 
     def get_speed(self):
         if (self.poll_running):
@@ -71,7 +76,7 @@ class motor(object):
             print("Warning! Desired speed too high, setting to max speed.")
             value = self.max_speed
         elif (value < self.min_speed):
-            # value too small! want + set to min speed
+            # value too small! warn + set to min speed
             print("Warning! Desired speed too low, setting to min speed.")
             value = self.min_speed
         value = int(((value - self.min_speed) /
@@ -80,15 +85,28 @@ class motor(object):
 
     def incr(self):
         self.rot_count += 1
+        self.logf.write(str(time.time() * 1000) + ", " + rot_count)
+        temp_time = time.time() * 1000
+        if (self.prev_hit_time == 0.0):
+            self.prev_hit_time = temp_time()
+        else:
+            self.cur_speed_other = 60000 / (self.mag_count * (temp_time - self.prev_hit_time))
+            # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
+            # (R/ms) * 60,000 = RPM
 
     def clean_exit(self):
+        print "Closing poll thread..."
+        self.poll_running = False
+        time.sleep(0.5)
         gpio.cleanup()
+        self.logf.close()
         # self.pot.close()
 
 if __name__ == "__main__":
     #  motor(max_speed, min_speed, hall_pin, mag_count, start_now)
     #  Will get motor's speed for select potvals
     motr = motor(0, 0, 16, 1, startnow=True)
+    #test script for testing
     try:
         while (True):
             for i in range(0, 128):
