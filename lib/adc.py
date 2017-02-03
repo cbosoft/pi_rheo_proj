@@ -9,7 +9,7 @@
 from smbus2 import SMBus
 
 
-class mpc3424(object):
+class MCP3424(object):
     bus = 0  # holds the bus connection
 
     address = 0x6e  # address of the adc (in hex, set by setting pins on the adc high or low)
@@ -41,11 +41,9 @@ class mpc3424(object):
     def read_data(self):
         self.open_()  # open bus connection
         self.bus.write_byte_data(self.address, 0, self.address)  # tell adc to expect the spanish inquisition
-        b = self.output_bits()
-        if (b == 18):
-            b = 3  # 3 bytes to hold 18 bits
-        else:
-            b = 2  # 2bytes to hold 12 to 16 bits
+        b = 2  # probably 2 bytes needed
+        if (self.output_bits() == 18):
+            b = 3  # sometimes 3 bytes needed
         byte = self.bus.read_i2c_block_data(self.address, 0, b)
         self.close_()  # close the connection
         total = 0
@@ -85,5 +83,5 @@ class mpc3424(object):
             v_mult = 0.0000625
         elif (self.sample_rate == 3):
             v_mult = 0.000015625
-        v_out = d * v_mult(0)
+        v_out = float(d) * v_mult(0)
         return v_out

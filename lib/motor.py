@@ -9,6 +9,7 @@ import time
 import thread as td
 import RPi.GPIO as gpio
 from dig_pot import MCP4131 as dp
+from adc import MCP3424 as ac
 
 
 class motor(object):
@@ -28,13 +29,15 @@ class motor(object):
     hall_pin = 0
 
     pot = dp()
+    aconv = ac()
 
     def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, mag_count_=1,
-    startnow=False):
+    startnow=False, adc_addr=0x6E, adc_channel=0, adc_rate=0, adc_gain=2):
         self.max_speed = max_speed_
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_
         self.pot = dp()
+        self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
         self.mag_count = mag_count_
         gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
@@ -53,12 +56,14 @@ class motor(object):
         self.logf = open(log_dir, "w")
 
         while (self.poll_running):
-            self.cur_speed = (float(self.rot_count)
-            * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
-            self.rot_count = 0
-            time.sleep(0.1)
+            self.mot_current = self.aconv.read_data()
+            # alt speed get algo
+            # self.cur_speed = (float(self.rot_count)
+            # * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
+            # self.rot_count = 0
+            # time.sleep(0.1)
 
-        print("Motor speed polling has halted.")
+        print("Motor polling has halted.")
         self.logf.close()
 
     def get_speed(self):
