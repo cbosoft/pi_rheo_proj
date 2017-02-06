@@ -135,7 +135,7 @@
 		\subitem Re-set the current cylinder in new lump of epoxy/aroldite/whatever
 		\subsection*{Wednesday}
 		\item Looked at ways of reading in electrical power sent to the motor (used to calculate the Torque load on the motor)
-		\item Meeting with Dr. Lue
+		\item Meeting with Dr. Lue, Dr. Haw, and Aditi.
 		\subsection*{Thursday}
 		\item Showed Aditi around the lab, discussed:
 		\subitem How the hardware works (will work)
@@ -156,15 +156,16 @@
 	\section{Week Beginning 6 February 2017 (Week 4)}
 	\begin{itemize}
 		\subsection*{Monday}
-		\item Today's To-Do:
-		\subitem Test the current sensor
-		\subitem Test the ADC (what range does it actually sense?)
-		\subitem Use the ADC to get the waveform output from the hall effect sensor (Is it working as expected?)
-		\subitem Adjust code to deal with new data logging. Will need to now calc the electrical power sent to the motor.
+		\item Tried to use the ADC to check the waveform of the Hall effect sesnor (to diagnose why it isn't working correctly)
+		\item ADC has issues reading from the hall effect sesnor (it shouldn't). Should be a software issue, so debugged code. Will test tomorrow.
+		\item (difficult to debug and test at the same time due to the lack of internet in the lab :/ )
+		\item Tested new speed detection algorithm - seems to work better (gives, mostly, more accurate results) but is \textbf{very} noisy
+		\item Waiting on the ADC being fixed to be able to properly diagnose the hall problem
 	\end{itemize}
 	\newpage
 	\section{Considerations/To-do list}
 	\begin{itemize}
+		\item test the current sensor
 		\item Improve accuracy of speed measurement circuit:
 		\subitem use different method of speed calculation
 		\subitem check measurements with some third party something or other
