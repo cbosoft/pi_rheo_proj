@@ -37,7 +37,7 @@ class motor(object):
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_
         self.pot = dp()
-        self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
+        #self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
         self.mag_count = mag_count_
         gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
@@ -53,10 +53,11 @@ class motor(object):
     def poll(self):
 
         self.poll_running = True
-        self.logf = open(log_dir, "w")
+        self.logf = open(self.log_dir, "w")
 
         while (self.poll_running):
-            self.mot_current = self.aconv.read_data()
+            pass
+            #self.mot_current = self.aconv.read_data()
             # alt speed get algo
             # self.cur_speed = (float(self.rot_count)
             # * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
@@ -88,16 +89,17 @@ class motor(object):
         (self.max_speed - self.min_speed)) * 127)
         self.dp.set_resistance(value)
 
-    def incr(self):
+    def incr(self, channel):
         self.rot_count += 1
-        self.logf.write(str(time.time() * 1000) + ", " + rot_count)
         temp_time = time.time() * 1000
         if (self.prev_hit_time == 0.0):
-            self.prev_hit_time = temp_time()
+            pass
         else:
             self.cur_speed_other = 60000 / (self.mag_count * (temp_time - self.prev_hit_time))
             # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
             # (R/ms) * 60,000 = RPM
+        self.prev_hit_time = temp_time
+        self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.cur_speed_other) + "\n")
 
     def clean_exit(self):
         print "Closing poll thread..."
@@ -113,16 +115,9 @@ if __name__ == "__main__":
     motr = motor(0, 0, 16, 1, startnow=True)
     #test script for testing
     try:
-        while (True):
-            for i in range(0, 128):
-                motr.dp.set_resistance(i)
-                for j in range(0, 10):
-                    print "Val: " + str(i) + " Speed (RPM): " + str(motr.cur_speed)
-                    time.sleep(0.5)
-            for i in range(0, 128):
-                motr.dp.set_resistance(127 - i)
-                for j in range(0, 10):
-                    print "Val: " + str(127 - i) + " Speed (RPM) " + str(motr.cur_speed)
-                    time.sleep(0.5)
+        for i in range(0, 128):
+            for j in range(0, 10):
+                print "Speed (RPM): " + str(motr.cur_speed_other)
+                time.sleep(0.5)
     except KeyboardInterrupt:
         motr.clean_exit()

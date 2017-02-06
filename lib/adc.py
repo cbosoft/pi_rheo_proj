@@ -40,7 +40,7 @@ class MCP3424(object):
 
     def read_data(self):
         self.open_()  # open bus connection
-        self.bus.write_byte_data(self.address, 0, self.address)  # tell adc to expect the spanish inquisition
+        self.bus.write_byte_data(self.address, 0, self.address * 2)  # tell adc to expect the spanish inquisition
         b = 2  # probably 2 bytes needed
         if (self.output_bits() == 18):
             b = 3  # sometimes 3 bytes needed
@@ -49,6 +49,10 @@ class MCP3424(object):
         total = 0
         for i in range(0, b):
             total += (byte[i] << ((b - i - 1) * 8))  # getting total
+
+        if total > 3000:
+            total = 65536 - total
+
         return total
 
     def output_bits(self):
@@ -85,3 +89,12 @@ class MCP3424(object):
             v_mult = 0.000015625
         v_out = float(d) * v_mult(0)
         return v_out
+
+if __name__ == "__main__":
+    aconv = MCP3424()
+    try:
+        while (True):
+            print str(aconv.read_data())
+			r = raw_input()
+    except KeyboardInterrupt:
+        print "Interrupted!"
