@@ -14,22 +14,29 @@ from adc import MCP3424 as ac
 
 class motor(object):
 
+    # Two methods. First doesn't work but should...
+    # Second also doesn't work, but is less broken that the first.
     cur_speed = 0.0
     cur_speed_other = 0.0
-    prev_hit_time = 0.0
-    mag_count = 1
-    poll_running = False
-    rot_count = 0
-    log_dir = "./log.csv"
+    
+    #Globals
+    prev_hit_time = 0.0  # Used to calculate the speed of the motor - time the hall last had a hit
+    mag_count = 1  # number of magnets on the motor's rotor
+    poll_running = False  # is the speed currently being polled?
+    rot_count = 0  # number of magnet hits counted
+    auto_logging = True  # Will log if this is True
+    log_dir = "./log.csv"  # where the logged data should be saved
 
     max_speed = 0  # RPM, at voltage = 11v
     min_speed = 0  # RPM, at voltage = ~3v
 
     # GPIO pins
     hall_pin = 0
-
-    pot = dp()
-    aconv = ac()
+    
+    # Instances of Class
+    pot = dp()  # potentiometer to control voltage
+    aconv = ac()  # adc to read current/voltage
+    adc_chan = [1, 2]  # voltage channel, current channel
 
     def __init__(self, max_speed_=0, min_speed_=0, hall_pin_=0, mag_count_=1,
     startnow=False, adc_addr=0x6E, adc_channel=0, adc_rate=0, adc_gain=2):
@@ -37,10 +44,11 @@ class motor(object):
         self.min_speed = min_speed_
         self.hall_pin = hall_pin_
         self.pot = dp()
-        #self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
+        self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
         self.mag_count = mag_count_
         gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+        self.logf = open(self.log_dir, "w")
 
         if (startnow):
             self.start_poll()
@@ -53,19 +61,19 @@ class motor(object):
     def poll(self):
 
         self.poll_running = True
-        self.logf = open(self.log_dir, "w")
 
         while (self.poll_running):
-            pass
-            #self.mot_current = self.aconv.read_data()
-            # alt speed get algo
-            # self.cur_speed = (float(self.rot_count)
-            # * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
-            # self.rot_count = 0
-            # time.sleep(0.1)
+            # self.get_power()  # get electrical power supplied to motor
+            
+            self.cur_speed = (float(self.rot_count)
+             * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
+            self.rot_count = 0
+        
+            if (self.auto_logging):
+                self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.cur_speed_other) + ", " + str(self.cur_speed) + "\n")
+            time.sleep(0.1)
 
-        print("Motor polling has halted.")
-        self.logf.close()
+        #print("Motor polling has halted.")
 
     def get_speed(self):
         if (self.poll_running):
@@ -99,14 +107,19 @@ class motor(object):
             # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
             # (R/ms) * 60,000 = RPM
         self.prev_hit_time = temp_time
-        self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.cur_speed_other) + "\n")
 
     def clean_exit(self):
         print "Closing poll thread..."
         self.poll_running = False
         time.sleep(0.5)
+        
+        print "Tidying GPIO..."
         gpio.cleanup()
+        
+        print "Saving log file..."
         self.logf.close()
+        
+        # print "Closing SPI connection..."
         # self.pot.close()
 
 if __name__ == "__main__":

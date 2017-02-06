@@ -39,13 +39,13 @@ class MCP3424(object):
         self.close_()  # close bus connection
 
     def read_data(self):
-        self.open_()  # open bus connection
+        # bus connection must already be open
         self.bus.write_byte_data(self.address, 0, self.address * 2)  # tell adc to expect the spanish inquisition
+        # the address is multiplied by two to move it up one sb (self.address << 1 == self.address * 2)
         b = 2  # probably 2 bytes needed
         if (self.output_bits() == 18):
             b = 3  # sometimes 3 bytes needed
         byte = self.bus.read_i2c_block_data(self.address, 0, b)
-        self.close_()  # close the connection
         total = 0
         for i in range(0, b):
             total += (byte[i] << ((b - i - 1) * 8))  # getting total
@@ -53,6 +53,12 @@ class MCP3424(object):
         if total > 3000:
             total = 65536 - total
 
+        return total
+        
+    def read_single(self):
+        self.open_()  # open bus connection
+        total = self.read_data()  # get data
+        self.close_()  # close the connection
         return total
 
     def output_bits(self):
@@ -91,10 +97,13 @@ class MCP3424(object):
         return v_out
 
 if __name__ == "__main__":
+    # For debugging: 
+    # reads and displays data from the ADC every time the enter key is pressed.
     aconv = MCP3424()
     try:
         while (True):
-            print str(aconv.read_data())
+            print "Value: " + str(aconv.read_data())
+            print "Press enter to read another value, or ctrl-c to close."
 			r = raw_input()
     except KeyboardInterrupt:
-        print "Interrupted!"
+        pass
