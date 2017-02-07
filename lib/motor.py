@@ -18,9 +18,9 @@ class motor(object):
     # Second also doesn't work, but is less broken that the first.
     cur_speed = 0.0
     cur_speed_other = 0.0
-    
+
     #Globals
-    prev_hit_time = 0.0  # Used to calculate the speed of the motor - time the hall last had a hit
+    prev_hit_time = 0.0  # used to calculate the speed of the motor
     mag_count = 1  # number of magnets on the motor's rotor
     poll_running = False  # is the speed currently being polled?
     rot_count = 0  # number of magnet hits counted
@@ -32,7 +32,7 @@ class motor(object):
 
     # GPIO pins
     hall_pin = 0
-    
+
     # Instances of Class
     pot = dp()  # potentiometer to control voltage
     aconv = ac()  # adc to read current/voltage
@@ -64,13 +64,15 @@ class motor(object):
 
         while (self.poll_running):
             # self.get_power()  # get electrical power supplied to motor
-            
+
             self.cur_speed = (float(self.rot_count)
-             * float(60) / (float(0.1) * float(self.mag_count))))  # rotational speed in RPM
+             * float(60) / (float(0.1) * float(self.mag_count)))
             self.rot_count = 0
-        
+
             if (self.auto_logging):
-                self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.cur_speed_other) + ", " + str(self.cur_speed) + "\n")
+                self.logf.write(str(time.time()) + ", " + str(self.rot_count) +
+                 ", " + str(self.cur_speed_other) + ", " + str(self.cur_speed)
+                 + "\n")
             time.sleep(0.1)
 
         #print("Motor polling has halted.")
@@ -103,8 +105,10 @@ class motor(object):
         if (self.prev_hit_time == 0.0):
             pass
         else:
-            self.cur_speed_other = 60000 / (self.mag_count * (temp_time - self.prev_hit_time))
-            # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
+            self.cur_speed_other = 60000 / (self.mag_count * (temp_time -
+            self.prev_hit_time))
+            # rotations per hit (R/hit) / time per hit (ms/hit) =
+            # rotations per time (R/ms)
             # (R/ms) * 60,000 = RPM
         self.prev_hit_time = temp_time
 
@@ -112,13 +116,13 @@ class motor(object):
         print "Closing poll thread..."
         self.poll_running = False
         time.sleep(0.5)
-        
+
         print "Tidying GPIO..."
         gpio.cleanup()
-        
+
         print "Saving log file..."
         self.logf.close()
-        
+
         # print "Closing SPI connection..."
         # self.pot.close()
 

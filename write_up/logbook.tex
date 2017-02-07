@@ -162,8 +162,18 @@
 		\item Tested new speed detection algorithm - seems to work better (gives, mostly, more accurate results) but is \textbf{very} noisy
 		\item Waiting on the ADC being fixed to be able to properly diagnose the hall problem (hopefully tomorrow)
 		\subsection*{Tuesday}
-		\item Today's todo:
-		\subitem Check ADC
+		\item The ADC seems to be working, not had an issue with it and the new code this morning.
+		\item The hall effect sesnor doesn't seem to be giving out a regular waveform - resulting in very noisy speed data.
+		\item (See "hall\_sensor\_not\_working.png" in "pi\_rheo\_proj/write\_up/images")
+		\item Something is interfering with the operation of the hall effect sensor, will try using an optical sensor instead.
+		\item Spent some time (read: hours) trying to figure out what might be going wrong on the software side of things, couldn't see a solution.
+		\item Ordered a light based sensor to see if it was the hall sensor which was faulty (should arrive tomorrow)
+		\subsection*{Wednesday}
+		\item Today's To-Do:
+		\subitem (!!IMPORTANT!!) If arrived, attach heatsink to transistor. If not, remove transistor from the circuit and attach other (RPi) heatsink
+		\subitem (When it arrives) Test new sensor
+		\subitem If working, put all together and see how the motor controller works (can it set speeds? is it accurate with disturbances?)
+		\subitem If not, debug software.
 	\end{itemize}
 	\newpage
 	\section{Considerations/To-do list}
