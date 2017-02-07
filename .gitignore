@@ -17,3 +17,4 @@ write_up/*.out
 write_up/*.bbl
 write_up/*.blg
 write_up/figures/*.png
+lib/*.png
