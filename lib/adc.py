@@ -104,6 +104,6 @@ if __name__ == "__main__":
         while (True):
             print "Value: " + str(aconv.read_data())
             print "Press enter to read another value, or ctrl-c to close."
-			r = raw_input()
+            r = raw_input()
     except KeyboardInterrupt:
         pass
