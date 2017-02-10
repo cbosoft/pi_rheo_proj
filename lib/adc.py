@@ -12,7 +12,7 @@ from smbus2 import SMBus
 class MCP3424(object):
     bus = 0  # holds the bus connection
 
-    address = 0x6e  # address of the adc (in hex, set by setting pins on the adc high or low)
+    address = 110  # address of the adc (in hex, set by setting pins on the adc high or low)
 
     channel = 0  # (0-3) four different analogue inputs
 
@@ -40,19 +40,21 @@ class MCP3424(object):
 
     def read_data(self):
         # bus connection must already be open
-        self.bus.write_byte_data(self.address, 0, self.address * 2)  # tell adc to expect the spanish inquisition
-        # the address is multiplied by two to move it up one sb (self.address << 1 == self.address * 2)
-        b = 2  # probably 2 bytes needed
-        if (self.output_bits() == 18):
-            b = 3  # sometimes 3 bytes needed
-        byte = self.bus.read_i2c_block_data(self.address, 0, b)
         total = 0
-        for i in range(0, b):
-            total += (byte[i] << ((b - i - 1) * 8))  # getting total
-
-        if total > 3000:
-            total = 65536 - total
-
+        try:
+            self.bus.write_byte_data(self.address, 0, (self.address * 2))  # tell adc to expect the spanish inquisition
+            # the address is multiplied by two to move it up one sb (self.address << 1 == self.address * 2)
+            b = 2  # probably 2 bytes needed
+            if (self.output_bits() == 18):
+                b = 3  # sometimes 3 bytes needed
+            byte = self.bus.read_i2c_block_data(self.address, 0, b)
+            for i in range(0, b):
+                total += (byte[i] << ((b - i - 1) * 8))  # getting total
+    
+            if total > 3000:
+                total = 65536 - total
+        except IOError:
+            pass
         return total
         
     def read_single(self):
@@ -100,10 +102,12 @@ if __name__ == "__main__":
     # For debugging: 
     # reads and displays data from the ADC every time the enter key is pressed.
     aconv = MCP3424()
+    aconv.open_()
     try:
         while (True):
             print "Value: " + str(aconv.read_data())
             print "Press enter to read another value, or ctrl-c to close."
             r = raw_input()
+        aconv.close_()
     except KeyboardInterrupt:
-        pass
+        aconv.close_()

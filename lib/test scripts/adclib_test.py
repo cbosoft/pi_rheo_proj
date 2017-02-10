@@ -2,11 +2,11 @@
 import sys
 sys.path.append('./..')
 
-from adc import MPC3424
+from adc import MCP3424
 import time
 import os
 
-adc = MPC3424()
+adc = MCP3424(0x6e, 3, 0, 0)
 doing = True
 while (doing):
 	try:

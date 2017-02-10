@@ -91,7 +91,7 @@ class MCP4531(object):
 class MCP4131(object):
     """SPI 10K TH Digital potentiometer"""
     bus = 0  # holds the bus connection to the digital pot
-    
+    lav = 0
     chip_select = 0
     
     def __init__(self, chipselect=0):
@@ -100,6 +100,7 @@ class MCP4131(object):
 
     def set_resistance(self, value):
         # convert between value and a 7bit number?
+        self.lav = value
         self.write_byte(value)
        
     def write_byte(self, byte):
