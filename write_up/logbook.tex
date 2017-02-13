@@ -184,9 +184,14 @@
 	\newpage
 	\section{Week Beginning 13 February 2017 (Week 5)}
 	\begin{itemize}
+		\subsection*{Monday}
+		\item Tried the light based sensor to detect the speed; worked much better than the hall sensor. Still noisy output, but much smoother and both speed calculation methods agree. 
+		\item Will need to vary parameters to improve the response. (Tuning the sensor?)
+		\subsection*{Tuesday}
 		\item Today's Todo:
-		\subitem Take a last look at the code.
-		\subitem See how the phototransistor/LED version of the circuit works
+		\subitem Vary parameters and see how the speed sensor's output varies:
+		\subsubitem Poll rate (low, 0.01s, to high, 0.5s, step 0.01)
+		\subsubitem byspan method span length (low, 0.1s, to high, 1s, step 0.1)
 		\subitem Get the waveform output from the phototransistor
 		\subitem reduce the poll rate of the code (might be tying up the thread)
 		\subitem Read through report already written, re-write sections, check literature etc etc

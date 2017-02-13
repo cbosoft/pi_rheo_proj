@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 #Read logfile
-datf = open("./log_0.csv", "r")
+datf = open("./log_13.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -38,11 +38,11 @@ for i in range(0, len(datl)):
 # Process data
 for i in range(0, len(datl)):
     if hval[i] == 0:
-        hval[i] = 2  # ADC ERROR
+        hval[i] = 0
     elif hval[i] >= 612:
-        hval[i] = 0  # High value
+        hval[i] = 1  # High value
     else:
-        hval[i] = 1  # Low Value
+        hval[i] = 1
     avso[pval[i]] += so[i]
     av_c[pval[i]] += 1
 
