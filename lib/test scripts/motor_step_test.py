@@ -9,13 +9,13 @@
 import sys
 sys.path.append('./..')
 
-import motor as mot_r
+import motlib
 import time
 import matplotlib.pyplot as plt
 
 hall_pin = 16
 mag_count = 1
-mot = mot_r.motor(0, 0, hall_pin, mag_count, True)
+mot = motlib.motor(0, 0, hall_pin, mag_count, True)
 
 delay = 5000  # ms
 length = 5000  # ms

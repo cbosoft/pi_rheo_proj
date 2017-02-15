@@ -188,13 +188,10 @@
 		\item Tried the light based sensor to detect the speed; worked much better than the hall sensor. Still noisy output, but much smoother and both speed calculation methods agree. 
 		\item Will need to vary parameters to improve the response. (Tuning the sensor?)
 		\subsection*{Tuesday}
-		\item Today's Todo:
-		\subitem Vary parameters and see how the speed sensor's output varies:
-		\subsubitem Poll rate (low, 0.01s, to high, 0.5s, step 0.01)
-		\subsubitem byspan method span length (low, 0.1s, to high, 1s, step 0.1)
-		\subitem Get the waveform output from the phototransistor
-		\subitem reduce the poll rate of the code (might be tying up the thread)
-		\subitem Read through report already written, re-write sections, check literature etc etc
+		\item Tested the speed algorithm parameters, varied through several values to see how this effects the speed
+		\item used a "slow motion" camera to film the motor to obtain it actual speed (by counting revolutions manually)
+		\subsection*{Wednesday}
+		\item (TODO) Record the responses from the light sensor at a constant speed - use histogram to detect variances in speed
 	\end{itemize}
 	\newpage
 	\section{Considerations/To-do list}

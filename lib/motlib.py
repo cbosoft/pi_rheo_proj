@@ -24,17 +24,21 @@ class motor(object):
     prev_hit_time = 0.0  # Used to calculate the speed of the motor - time the hall last had a hit
     mag_count = 1  # number of magnets on the motor's rotor
     poll_running = False  # is the speed currently being polled?
-    rot_count = 0  # number of magnet hits counted
+    rot_count = 0  # number of magnet hits counted (total)
+    rot_count_last = 0
     
     # Logging
     hall_debug_logging = False  # Will record pseudo waveform when True
     poll_logging = True  # Will log if this is True
-    log_dir = "./dat+plot/log_"  # where the logged data should be saved
+    log_dir = "./dat+plot"  # where the logged data should be saved
+    log_titles = ["Time", "Rev Count", "Speed (Tick)", "Speed (Span)", "ADC val", "Pot val"]
+    log_note = ""
 
     # Speed calc methdos
     per_tick = True  # Calculates speed every time the hall pin registers a click, using time between ticks
     per_span = False  # Calculates speed every x second, using number of rotations in that time 
     span = 1.0  # x above
+    tick = 0.1
     span_time_last = 0.0
 
     max_speed = 0  # RPM, at voltage = 11v
@@ -58,16 +62,31 @@ class motor(object):
         self.mag_count = mag_count_
         gpio.setmode(gpio.BOARD)
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        un = str(len(glob("./dat+plot/log_hall*.csv")))
-
-        if (self.poll_logging):
-            self.logf = open(self.log_dir + un + ".csv", "w")
-
-        if (self.hall_debug_logging):
-            self.logh = open(self.log_dir + "hall_" + un + ".csv", "w")
+        self.new_logs()
 
         if (startnow):
             self.start_poll()
+
+    def new_logs(self):
+        # Close old log files
+        try:
+            logf.close()
+            logh.close()
+        except:
+            pass
+
+        # Get unique name for the log file
+        un = str(len(glob(self.log_dir + "/*.csv")))
+
+        # Creat logs (as necessary)
+        if (self.poll_logging):
+            self.logf = open(self.log_dir + "/log_" + un + ".csv", "w")
+            for s in self.log_titles:
+                self.logf.write(s + ", ")
+            self.logf.write("NOTE: " + self.log.note + "\n")
+
+        if (self.hall_debug_logging):
+            self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")
 
     def start_poll(self):
         gpio.add_event_detect(self.hall_pin, gpio.RISING, callback=self.incr)
@@ -87,17 +106,17 @@ class motor(object):
                 # set initial span time
             elif (self.per span and dspan >= self.span):
                 # Calculate speed
-                self.cur_speed = (float(self.rot_count)
-                 * float(60) / (float(dpsan) * float(self.mag_count)))  # rotational speed in RPM
+                self.cur_speed = (float(self.rot_count - self.rot_count_last)
+                 * float(60) / (float(dspan) * float(self.mag_count)))  # rotational speed in RPM
                 self.span_time_last = time.time()
-                self.rot_count = 0
+                self.rot_count_last = self.rot_count
             
             #if ((time.time() * 1000) - self.prev_hit_time) > 100:
                 #self.cur_speed = 0
             #    self.cur_speed_other = 0 
             if (self.poll_logging):
                 self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.cur_speed_other) + ", " + str(self.cur_speed) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
-            time.sleep(0.1)
+            time.sleep(tick)
 
         #print("Motor polling has halted.")
 
@@ -126,20 +145,20 @@ class motor(object):
         
         # Note: This assumes a perfectly linear variance of speed with resistance.
         # Will need to adjust this according to how the speed ACTUALLY varies with resistance.
-        # If the variation is fairly unpredictable, then another (incr/decr) system will need to be used.
+        # If the variation is fairly unpredictable, then another system (incr/decr) will need to be used.
         # set this value on the digital potentiometer
         self.dp.set_resistance(value)
 
     def incr(self, channel):
         self.rot_count += 1
+        temp_time = time.time() * 1000.0
         if (self.per_tick and self.prev_hit_time != 0.0):
-            temp_time = time.time() * 1000
             self.cur_speed_other = float(60000) / (float(self.mag_count) * (temp_time - self.prev_hit_time))
             # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
             # (R/ms) * 60,000 = RPM
 
         if (self.hall_debug_logging):
-            self.logh.write(str(time.time() * 1000) + "\n")
+            self.logh.write(str(temp_time) + "\n")
         self.prev_hit_time = temp_time
 
     def clean_exit(self):
