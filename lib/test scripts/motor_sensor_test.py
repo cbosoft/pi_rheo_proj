@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 
 hall_pin = 16
 mag_count = 1
-mot = motlib.motor(0, 0, hall_pin, mag_count, startnow=True, per_tick=True, per_span=True, log_dir=r"./interval testing/" + time.strftime("%H:%M:%S", time.gmtime() + "/")
+mot = motlib.motor(0, 0, hall_pin, mag_count, startnow=True, per_tick=True, per_span=True, log_dir=r"./interval testing/" + time.strftime("%H:%M:%S", time.gmtime()) + "/"
 
 try:
     for i in range(0, 8):

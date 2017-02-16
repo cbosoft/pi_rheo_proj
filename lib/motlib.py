@@ -31,11 +31,10 @@ class motor(object):
     mag_count = 1  # number of magnets on the motor's rotor
     
     # Logging
-    hall_debug_logging = False  # Will record pseudo waveform when True
+    input_logging = False  # Will record pseudo waveform when True
     poll_logging = True  # Will log if this is True
     log_dir = "./dat+plot"  # where the logged data should be saved
     log_titles = ["Time", "Rev Count", "Speed (Tick)", "Speed (Span)", "ADC val", "Pot val"]
-    log_note = ""
 
     # Speed Calc Settings
     per_tick = True  # Calculates speed every time the hall pin registers a rotation (or partial), using time between ticks
@@ -56,7 +55,7 @@ class motor(object):
 
     def __init__(self, max_speed=0, min_speed=0, hall_pin=0, mag_count=1,
     startnow=False, adc_addr=0x6E, adc_channel=0, adc_rate=0, adc_gain=2,
-    hall_debug_logging=True, poll_logging=True, log_dir="./dat+plot",
+    input_logging=True, poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time", "Rev Count", "Speed (Tick)", "Speed (Span)", "ADC val", "Pot val"],
     log_note="DATETIME"):
 
@@ -75,14 +74,12 @@ class motor(object):
         gpio.setup(self.hall_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
         
         # Set up logs
-        if (log_note == "DATETIME"):
-            log_note = time.strftime("%H:%M %d-%m-%Y", time.gmtime())
-        self.new_logs()
+        self.new_logs(log_note)
 
         if (startnow):
             self.start_poll()
 
-    def new_logs(self):
+    def new_logs(self, log_note="--"):
         # Try closing old log files
         try:
             logf.close()
@@ -90,6 +87,7 @@ class motor(object):
         except:
             pass
         
+        # Check if log directory exists. If not, create it.
         if not os.path.isdir(self.log_dir):
             os.mkdir(self.log_dir)
 
@@ -97,18 +95,21 @@ class motor(object):
         un = str(len(glob(self.log_dir + "/*.csv")))
 
         # Creat logs (as necessary)
-        if (self.poll_logging):
+        if (self.poll_logging):  # Poll log: every (i_poll_rate) seconds, info is logged.
             self.logf = open(self.log_dir + "/log_" + un + ".csv", "w")
             for s in self.log_titles:
                 self.logf.write(s + ", ")
-            self.logf.write("NOTE: " + self.log.note + "\n")
+            if (log_note == "DATETIME"):
+                self.logf.write(time.strftime("%H:%M %d-%m-%Y", time.gmtime())
+            else:
+                self.logf.write("NOTE: " + self.log.note + "\n")
 
-        if (self.hall_debug_logging):
+        if (self.input_logging):  # Input log: every time a revolution is detected, the time this occurs is recorded.
             self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")
 
     def start_poll(self):
-        gpio.add_event_detect(self.hall_pin, gpio.RISING, callback=self.incr)
-        gpio.add_event_detect(self.hall_pin, gpio.FALLING, callback=self.unwait)
+        gpio.add_event_detect(self.hall_pin, gpio.RISING, callback=self.incr)  # When the GPIO pin is first risen to a high level, the method "incr(self, channel)" is called
+        gpio.add_event_detect(self.hall_pin, gpio.FALLING, callback=self.unwait)  # When the GPIO pin falls back to a low level, the method "unwait(self, channel" is called
 
         if (not self.poll_running):
             td.start_new_thread(self.poll, tuple())
@@ -134,7 +135,7 @@ class motor(object):
                 self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.speed_insta) + ", " + str(self.speed_avish) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
             time.sleep(i_poll_rate)
 
-        #print("Motor polling has halted.")
+        print("Motor polling has halted.")
 
     def get_speed(self):
         if (self.poll_running):
@@ -174,7 +175,7 @@ class motor(object):
                 # rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
                 # (R/ms) * 60,000 = RPM
 
-            if (self.hall_debug_logging):
+            if (self.input_logging):
                 self.logh.write(str(temp_time) + "\n")
             self.prev_hit_time = temp_time
             self.waiting = True
@@ -193,7 +194,7 @@ class motor(object):
         if (self.poll_logging):
             print "Saving log file..."
             self.logf.close()
-        if (self.hall_debug_logging):
+        if (self.input_logging):
             self.logh.close()
         
         # print "Closing SPI connection..."
