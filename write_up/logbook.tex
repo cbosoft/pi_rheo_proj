@@ -199,19 +199,21 @@
 		\item Added another script for debugging
 		\subsection*{Friday}
 		\item Discovered a possible reason for why the histograms are not correct, the time is saved as a 2dp number, therefore losing accuracy. This has now been rectified.
-		\item Need to test the fix, hopefully it works!
+		\item (GPIO wait) Fix does not work, cannot have two events associated with the same gpio pin.
+		\item Logged some data to try to re-evaluate the sensor interval timings, forgot to log the correct data. Thoroughly frustrating. Will go back down to the lab this afternoon.
+		\item Noticed an error in code preventing the correct data from being logs, have fixed but now test will have to wait for Monday.
+	\end{itemize}
+	\newpage
+	\section{Week Beginning 20 February 2017 (Week 5)}
+	\begin{itemize}
+		\subsection*{Monday}
+		\item TODO: Get interval histogram.
 	\end{itemize}
 	\newpage
 	\section{Considerations/To-do list}
 	\begin{itemize}
-		\item test the current sensor
-		\item Improve accuracy of speed measurement circuit:
-		\subitem use different method of speed calculation
-		\subitem check measurements with some third party something or other
-		\subitem use multiple methods together?
 		\item calibrate motor speed control circuit (ie get min speed, max speed, and speed(voltage))
 		\item test speed is being detected properly (use reference tachometer/second method to detect the speed (record a video of the motor spinning? Is that acceptable?))
-		\item Read more lit (re: jamming and stats)
 		\item peclet number?
 		\item wall slip?
 		\subitem wall slip is often avoided by "roughening" the walls of the viscometer

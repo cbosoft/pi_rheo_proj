@@ -1,7 +1,7 @@
 #
 # Motor Speed Test Script
 #
-# Will set the digpot value and hold for a while before increasing the pot value
+# Will set the digpot value and hold for a while before increasing
 #
 import sys
 sys.path.append('./..')
@@ -10,9 +10,7 @@ import motlib
 import time
 import matplotlib.pyplot as plt
 
-hall_pin = 16
-mag_count = 1
-mot = motlib.motor(0, 0, hall_pin, mag_count, startnow=True, per_tick=True, per_span=True, log_dir=r"./interval testing/" + time.strftime("%H:%M:%S", time.gmtime()) + "/"
+mot = motlib.motor(max_speed=0, min_speed=0, sens_pin=16, trip_count=1, startnow=True, per_tick=True, per_span=True, log_dir="./interval_testing/" + time.strftime("%d %m %Y - %H %M %S", time.gmtime()), input_logging=True, poll_logging=True)
 
 try:
     for i in range(0, 8):
