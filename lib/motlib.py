@@ -105,7 +105,7 @@ class motor(object):
                 self.logf.write("NOTE: " + self.log.note + "\n")
 
         if (self.input_logging):  # Input log: every time a revolution is detected, the time this occurs is recorded.
-            self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")
+            self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")  # log file is called "hall" for historically reasons
 
     def start_poll(self):
         gpio.add_event_detect(self.hall_pin, gpio.RISING, callback=self.incr)  # When the GPIO pin is first risen to a high level, the method "incr(self, channel)" is called
@@ -132,7 +132,8 @@ class motor(object):
                 self.rot_count_last = self.rot_count
 
             if (self.poll_logging):
-                self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.speed_insta) + ", " + str(self.speed_avish) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
+                #self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.speed_insta) + ", " + str(self.speed_avish) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
+                self.logf.write(("{0:.6f}, {1}, {2:.3f}, {3:.3f}, {4}, {5} \n").format(time.time(), self.rot_count, self.speed_insta, self.speed_avish, self.aconv.read_single(), self.pot.lav)  # maybe take new epoch since 1485907200 (1st feb 2017) to reduce data to write?
             time.sleep(i_poll_rate)
 
         print("Motor polling has halted.")
@@ -176,7 +177,7 @@ class motor(object):
                 # (R/ms) * 60,000 = RPM
 
             if (self.input_logging):
-                self.logh.write(str(temp_time) + "\n")
+                self.logh.write(("{0:.3f} \n").format(temp_time))
             self.prev_hit_time = temp_time
             self.waiting = True
 
@@ -209,7 +210,7 @@ if __name__ == "__main__":
         for i in range(0, 128):
             motr.pot.set_resistance(i)
             for j in range(0, 10):
-                print "Speed (RPM): " + str(motr.speed_insta) + " val: " + str(motr.pot.lav)
+                print ("Speed (RPM): {0:.3f} val: {1}").format(motr.speed_insta, motr.pot.lav)
                 time.sleep(0.5)
     except KeyboardInterrupt:
         motr.clean_exit()
