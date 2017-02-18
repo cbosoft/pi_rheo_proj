@@ -1,7 +1,7 @@
 \documentclass[a4]{report}
 \def\atitle{Development of a Control System Using a Raspberry Pi}
 \def\theauthor{Christopher Boyle}
-\def\thewords{4189}
+\def\thewords{4424}
 
 
 % Imports
@@ -131,7 +131,8 @@
 	\pagenumbering{arabic}
 	\setcounter{page}{1}
 	
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY BEGIN PROPER
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
+                                                               
 	\chapter*{Introduction}
 	\addcontentsline{toc}{chapter}{Introduction}
 	\def\achapter{Introduction}
@@ -207,7 +208,7 @@
 		%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
 		}
 		\label{figshearthinthick}
-		\caption{Graphs Showing Non-Newtonian Behaviour (adapted from \cite{figshearthin, figshearthick})}
+		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure} \newline  \noindent
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
@@ -218,7 +219,7 @@
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
-	
+
 	\section{This Project}
 	This project aims to design, build, and test a control system for a bespoke jamming-focussed experimental rheometer. The experiment itself aims to gather more information about the statistical probability of the occurrence of a jam and how the shear stress affects this. 
 	The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to a constant shear force or a constant shear rate. The torque output from the motor, as well as its rotational speed, will be recorded. A needle strain gauge (The PiezoElectric Needle Device) will be mounted above the surface of the shearing suspension to (WHYYYYY????!??"?!?). \newline \newline \noindent
@@ -234,10 +235,11 @@
 	%The University of Strathclyde is a well respected technical university based in Glasgow, UK. The University is big and has lots of shiny metal walls. There are undergraduate students, postgraduate students, teaching assistants, lecturers, doctors, and professors here. There is research done here. I study here. You work here. Yay.
 	
 
-
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 	\chapter*{Description of the Work}
 	\addcontentsline{toc}{chapter}{Description of the Work}
+	\label{chap:dow}
 	\def\achapter{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially.
 
@@ -245,7 +247,7 @@
 
 	\section{Experimental Setup}
 	The experiment is based around a Couette (CITE) consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (SERNO) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets its speed (voltage) and reads in the torque load (current) on the motor. This is used to calculate the viscosity of the fluid. Attached to the inner cylinder is a metal trip. An IR-LED is set up such that it aims at a phototransistor near the 
-	A needle attached to a piezo-electric (PEND) is used to detect shear stress at a point within the fluid. When the liquid undergoes jamming, then the needle will move and generate a voltage proportional to the amount it moves. Figure \ref{expdia} gives a diagram of the set-up.\newline
+	A needle attached to a piezo-electric (PEND) is used to detect shear stress at a point within the fluid. When the fluid jams the needle will move and generate a voltage proportional to the needle's displacement. Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
 	\centering
 	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
@@ -298,6 +300,8 @@
 		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
+
+
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
 	\begin{figure}[!htb]
 		\centering
@@ -317,7 +321,7 @@
 
 
 
-	\section{Software}
+	\section{Software} % RE DO SECTION
 	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: exp\_run.py, control.py, motor.py, dig\_pot.py, and adc.py. \newline \newline \noindent
 	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
 	\begin{figure}[!htb]
@@ -353,9 +357,48 @@
 
 
 
-	\section{Procedure}
-	%Experimental Procedures
-	\subsection{Motor Calibration}
+	\section{Design Evaluation}
+	%The project can be split into different sections; design, development, and evaluation. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
+	
+	\subsection{Voltage Control} % Add figure
+	The DC motor used in the experiment was able to accept an electrical supply of variable voltage; between 4.5v and 15v. Due to the relatively low speeds required by the shear cell, it was decided that the motor would be controlled in a shifted voltage range, between 2.5v and 10.5v. 
+The low end of that range being 2v less than the motor's minimum voltage was a design artifact, but was later found to adequately power the motor at low speeds. %%%%%%<----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+The circuit was deemed to be satisfactory if it could achieve quick and reliable control over the motor's supply voltage. This was tested by using a script to automatically vary the controlled voltage, and a voltmeter placed in parallel across the motor. The values were recorded for selected values (between 0 and 127, in steps of 16) of the potentiometer, resulting in a correlation between the potentiometer value and the voltage supplied to the motor. The voltage varied linearly with potentiometer value (see figure \ref{figvoltvval}) between the desired minimum and maximum thus proving the circuit to be satisfactory.
+	\begin{figure}[!htb]
+		\centering
+		\fbox{\includegraphics[scale=0.3]{images/blank.png}}
+		\caption{Motor Voltage Supply vs. Potentiometer Value}
+		\label{figvoltvval}
+	\end{figure} \newline  \noindent
+
+	\subsection{Speed Measurement}
+	The rotational speed of the motor needed to be able to be measured both accurately and frequently (at least 40 times every second - data gathered at most every 25ms). The final design used to meet this specification % THIS IS SUBJECT TO CHANGE, SEE RESULTS ON MONDAY
+	made use of a light sensor and a light source set up such that a metal trip attached to the rotating inner cylinder (see Description of Work, page \pageref{chap:dow}). The design was tested for compliance by altering the potentiometer value, thus varying the supply voltage and rotational speed of the motor. The rotations were read in by the sensor, the time of each detection was logged, along with a running log of the speed (recorded every 0.1s). The potentiometer value was held for 10 seconds to allow any dynamic responses in the speed to settle away. If there are any dynamic elements to the motor's speed as a result of a change in voltage, it would show in the results as an altered initial value after a change, which quickly settles to a constant value after  a period of time. The data recorded was evaluated using a histogram plot of the interval times between detected rotations, and a line plot of the measured speed (using both methods) against potentiometer value. \newline \newline \noindent
+	The histogram should be a single straight line indicating no variation in interval time. If there is found to be small variation in the time, this could be small variation in the supply voltage due to changes in the electrical mains - this would be the main disturbance the control system is working to defend against. Small variation can also be explained away as a leftover between potentiometer value changes with little to no impact on the overall data. Large variation in interval time indicates that something is not right, either with the circuit or the software. It is more likely to be a software error or a limitation of the Raspberry Pi itself rather than a circuit design issue due to the digital nature of the sensor - it can only be on or off. It is unlikely that the sensor is giving a false positive part way through a revolution, or a false negative. \newline \newline \noindent
+	The line graph of speed against potentiometer value should display two lines which are almost exact copies of each other and are easy to describe lines, preferably linear. WHY WANT THIS? WHAT CAUSES NOT THIS TO HAPPEN? 
+\newline \newline \noindent\begin{figure}[!htb]
+		\centering
+		\fbox{
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.25]{figures/figsenshisto.png}
+			\caption{Histogram Plot of \newline Sensor Input Interval Time}
+			\label{figsenshisto}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.15]{figures/figspeedvval.png}
+			\caption{Motor Rotational Speed vs. \newline Digital Potentiometer Value}
+			\label{figspeedvval}
+		\end{subfigure}
+		%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
+		}
+		\label{figshearthinthick}
+		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
+	\end{figure} \newline  \noindent
+	The histogram showed [RESULTS](Figure \ref{figsenshisto}), while the speed comparison was [RESULTS2] (Figure \ref{figspeedvval}) therefore this design meets the specified requirements and is suitable for use.
+
+	\subsection{Speed Calibration} % Rework
 	There are several parameters that need to be calculated before the motor can be used in the rheometer. The torque and efficiency characteristic curves of the motor need to be calculated (OR FOUND??). To find this, the digital potentiometer was set to 0 and initial readings of the speed and voltage were taken. Then the value was incremented, the motor speed and voltage were recorded. This was done for every possible value for the digital potentiometer. Using the recorded information, a relationship was found between efficiency and speed. This allows the torque to be calculated using only the electrical power input to the motor, and the rotational speed of the motor (see Equation \ref{eqntorque}).
 	\begin{equation}
 	\tau = \frac{I \times V \times \eta}{\omega}
@@ -364,17 +407,17 @@
 	\subsection{Motor Torque Calibration (NECESSARY??)}
 	The torque output from the motor with respect to the voltage applied to the motor must be known to be able to calculate the rheology of the liquid in the couette cell. There are two torques output from the motor: the load torque, and the shaft torque. The former is the torque imposed upon the load, and the latter is the torque imposed upon the motor's shaft. \newline \newline \noindent 
 	There are limits upon the motor's output, at high enough torque, the rotational speed will reach zero. This torque value is the \textit{stall torque (\(\tau_s\))} and represents the maximum value of torque able to be output by the motor. The second limit is where the motor has no load imposed upon it. The torque here is the no-load torque (equal to the shaft torque). The rotational speed here is the greatest possible value (for a particular voltage) and can be used to calculate the no-load torque and thus the shaft torque. \newline \newline \noindent
-	By recording the voltage and current through the motor, the power input to the motor can be calculated. Using the electrical power and the efficiency, the mechanical power output and the torque output can also be calculated. The speed at different loadings was recorded, giving the torque in terms of the voltage/current (power). (REWORD?)
+	By recording the voltage and current through the motor, the power input to the motor can be calculated. Using the electrical power and the efficiency, the mechanical power output and the torque output can also be calculated. The speeds at different loadings were recorded, giving the torque in terms of the voltage/current (power). (REWORD?)
 
 
-
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 	\chapter*{Conclusions}
 	\addcontentsline{toc}{chapter}{Conclusions}
 	\def\achapter{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
 	
-
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
 	\chapter*{Review}
@@ -383,7 +426,7 @@
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	
 
-
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 	\chapter*{Nomenclature}
 	\addcontentsline{toc}{chapter}{Nomenclature}
@@ -445,7 +488,8 @@
 \pagenumbering{alph}
 \setcounter{page}{1}
 \setcounter{section}{1}
-\section{Appendix 1 -  Programming Languages}
+\section{1 - Further Information}
+\subsection{A -  Programming Languages}
 Programming languages come in many forms. High level languages (like C, Java, C\#, Python) are abstracted from the binary in which it will be eventually stored. High level languages consist of a natural-like language which is converted by a "compiler" or "interpreter" into machine code, understandable by the processor \cite{proglanghighlow}.\newline \newline  \noindent
 \noindent
 An example of a high level language (Python):
@@ -455,7 +499,7 @@ An example of a high level language (Python):
                     alarm_time = 2147483647
 
                     while (time() < alarm_time):
-                              pass
+                         pass
 
                     print("Alert!")
 \end{verbatim}
@@ -479,6 +523,11 @@ An example of a machine code (in hexadecimal)\cite{proglangmachex}:
 	As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason.\newline \newline  \noindent
 	To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.\newline \newline  \noindent
 %Other appendices, alternative circuits etc
+\section{2 - Design Process Discussion}
+\subsection{A - Voltage Control}
+\subsection{B - Measuring Speed}
+\section{3 - Alternative Designs}
+\subsection{A - }
 %Appendix Bibliography
 
 \end{document}
