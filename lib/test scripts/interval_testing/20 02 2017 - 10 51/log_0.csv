@@ -1,0 +1,2 @@
+Time, Rev Count, Speed (Tick), Speed (Span), ADC val, Pot val, 10:51 20-02-2017
+1487587909.438697, 0, 0.000, 0.000, self.aconv.read_single(), 0 
