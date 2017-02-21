@@ -78,10 +78,12 @@ class motor(object):
         
         # Set up logs
         self.log_dir = log_dir
+        self.input_logging = input_logging
+        self.poll_logging = poll_logging
         self.new_logs(log_note)
-
-        if (startnow):
-            self.start_poll()
+        
+        # Start speed polling (if necessary)
+        self.start_poll(startnow)
 
     def new_logs(self, log_note="--"):
         # Try closing old log files
@@ -96,7 +98,7 @@ class motor(object):
             os.mkdir(self.log_dir)
 
         # Get unique number for the log file
-        un = str(len(glob(self.log_dir + "/*.csv")))
+        un = time.strftime("%H %M %S", time.gmtime()) # str(len(glob(self.log_dir + "/*.csv")))
 
         # Creat logs (as necessary)
         if (self.poll_logging):  # Poll log: every (i_poll_rate) seconds, info is logged.
@@ -111,10 +113,11 @@ class motor(object):
         if (self.input_logging):  # Input log: every time a revolution is detected, the time this occurs is recorded.
             self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")  # log file is called "hall" for historically reasons
 
-    def start_poll(self):
-        gpio.add_event_detect(self.sens_pin, gpio.RISING, callback=self.incr)  # When the GPIO pin is first risen to a high level, the method "incr(self, channel)" is called
+    def start_poll(self, startnow):
+        gpio.add_event_detect(self.sens_pin, gpio.RISING, callback=self.incr)  
+        # When the GPIO pin is first risen to a high level, the method "incr(self, channel)" is called
 
-        if (not self.poll_running):
+        if (not self.poll_running and startnow):
             td.start_new_thread(self.poll, tuple())
 
     def poll(self):
@@ -136,7 +139,7 @@ class motor(object):
 
             if (self.poll_logging):
                 #self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.speed_insta) + ", " + str(self.speed_avish) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
-                self.logf.write(("{0:.6f}, {1}, {2:.3f}, {3:.3f}, {4}, {5} \n").format(time.time(), self.rot_count, self.speed_insta, self.speed_avish, "self.aconv.read_single()", self.pot.lav))  # maybe take new epoch since 1485907200 (1st feb 2017) to reduce data to write?
+                self.logf.write(("{0:.6f}, {1}, {2:.3f}, {3:.3f}, {4}, {5} \n").format(time.time(), self.rot_count, self.speed_insta, self.speed_avish, "self.aconv.read_single()", self.pot.lav))  # maybe take new epoch (eg since 1485907200 (1st feb 2017)) to reduce data to write?
             time.sleep(self.i_poll_rate)
 
         print("Motor polling has halted.")
