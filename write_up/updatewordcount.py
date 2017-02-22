@@ -1,6 +1,7 @@
 # update .tex with wordcount
 
 import wordcount
+import time
 
 rep_file = open("pi_report.tex","r")
 rep = rep_file.readlines()
