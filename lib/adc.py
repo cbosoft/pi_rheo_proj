@@ -118,7 +118,7 @@ class MCP3008(object):
             pass
         
         # Set up bus connection
-        bus = spi.SpiDev()
+        self.bus = spi.SpiDev()
         
         # Vref setting
         self.vref = vref
@@ -126,7 +126,7 @@ class MCP3008(object):
     def read_data(self, channel):
         # tells the ADC which channel to convert
         self.open()
-        command = ((1 << 3) + channel) << 4
+        command = [((1 << 3) + channel) << 4] * 1
         self.bus.writebytes(command)
         indat = self.bus.readbytes(2)
         self.close()
@@ -144,16 +144,16 @@ class MCP3008(object):
         self.close()
 
     def open(self):
-        if (cs_pin > 1):
+        if (self.cs_pin > 1):
             gpio.output(self.cs_pin, gpio.HIGH)
             self.bus.open(0, 1)
             self.bus.max_speed_hz = 10000000
         else:
-            self.bus.open(0, self.chip_select)
+            self.bus.open(0, self.cs_pin)
             self.bus.max_speed_hz = 10000000
 
     def close(self):
-        if (cs_pin > 1):
+        if (self.cs_pin > 1):
             gpio.output(self.cs_pin, gpio.LOW)
             self.bus.close()
         else:

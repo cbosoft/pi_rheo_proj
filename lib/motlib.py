@@ -38,7 +38,7 @@ class motor(object):
     adc_chan = [0, 1]  # voltage channel, current channel
 
     def __init__(self, max_speed=0, min_speed=0,
-    startnow=False, adc_channels=[0, 1], adc_vref=3.3
+    startnow=False, adc_channels=[0, 1], adc_vref=3.3,
     poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"],
     log_note="DATETIME"):
@@ -58,7 +58,7 @@ class motor(object):
         
         # Start speed polling (if necessary)
         if (startnow):
-            self.start_poll(startnow)
+            self.start_poll()
 
     def new_logs(self, log_note="--"):
         # Try closing old log file
@@ -96,7 +96,7 @@ class motor(object):
             # self.get_power()  # get electrical power supplied to motor
             
             # Get speed
-            volts = self.aconv.read_volts(self.adc_channels[0])
+            volts = self.aconv.read_volts(self.adc_chan[0])
             self.speed = self.svf[0] * volts + self.svf[1]
             
             if (self.poll_logging):
