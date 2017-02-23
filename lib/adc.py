@@ -7,6 +7,8 @@
 #
 
 from smbus2 import SMBus
+import RPi.GPIO as gpio
+import spidev as spi
 
 
 class MCP3424(object):
@@ -98,11 +100,71 @@ class MCP3424(object):
         v_out = float(d) * v_mult(0)
         return v_out
 
+        
+class MCP3008(object):
+
+    bus = 0  # holds the bus connection
+    cs_pin = 0  # which GPIO pin is used to talk to this chip? (gpio.BOARD numbering) OR which cs channel to use
+    vref = 3.3  # Reference voltage in use
+
+    def __init__(self, cs_pin=1, vref=3.3):
+        # Chip select setup
+        if (cs_pin > 1):  # using the GPIO pins as chip_select pins
+            self.cs_pin = cs_pin
+            gpio.setmode(gpio.BOARD)
+            gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)  # CS is normally high, pulled up by the RPi
+            gpio.output(self.cs_pin, gpio.HIGH)
+        else:  # using the Pi's built in chip select method
+            pass
+        
+        # Set up bus connection
+        bus = spi.SpiDev()
+        
+        # Vref setting
+        self.vref = vref
+        
+    def read_data(self, channel):
+        # tells the ADC which channel to convert
+        self.open()
+        command = ((1 << 3) + channel) << 4
+        self.bus.writebytes(command)
+        indat = self.bus.readbytes(2)
+        self.close()
+        return (indat[1] << 8) + indat[0]
+        
+    def read_volts(self, channel):
+        dat = self.read_data(channel)
+        volts = (float(dat) / 1024.0) * self.vref
+        return volts
+        
+    def write_byte(self, byte):  # needed?
+        self.open()
+        command = [byte, 0]  # Two bytes; first is command shifted 4 bits, second is blank
+        self.bus.writebytes(command)
+        self.close()
+
+    def open(self):
+        if (cs_pin > 1):
+            gpio.output(self.cs_pin, gpio.HIGH)
+            self.bus.open(0, 1)
+            self.bus.max_speed_hz = 10000000
+        else:
+            self.bus.open(0, self.chip_select)
+            self.bus.max_speed_hz = 10000000
+
+    def close(self):
+        if (cs_pin > 1):
+            gpio.output(self.cs_pin, gpio.LOW)
+            self.bus.close()
+        else:
+            self.bus.close()
+        
 if __name__ == "__main__":
     # For debugging: 
     # reads and displays data from the ADC every time the enter key is pressed.
-    aconv = MCP3424()
-    aconv.open_()
+    # aconv = MCP3424()
+    aconv = MCP3008()
+    # aconv.open_()
     try:
         while (True):
             print "Value: " + str(aconv.read_data())
