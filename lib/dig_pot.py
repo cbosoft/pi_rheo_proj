@@ -92,7 +92,7 @@ class MCP4131(object):
     """SPI 10K TH Digital potentiometer"""
     bus = 0  # holds the bus connection to the digital pot
     lav = 0
-    chip_select = 0
+    chip_select = 0  # doesn't use a chip select
     
     def __init__(self, chipselect=0):
         self.bus = spi.SpiDev()
