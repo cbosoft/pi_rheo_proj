@@ -11,53 +11,36 @@ import thread as td
 import RPi.GPIO as gpio
 from glob import glob
 from dig_pot import MCP4131 as dp
-from adc import MCP3424 as ac
+from adc import MCP3008 as ac
 
 
 class motor(object):
     
-    # Outputs
-    prev_hit_time = 0.0  # Used to calculate the speed of the motor - time the hall last had a hit
-    rot_count_last = 0  # Last value of the rot count before speed_avish was calculated
-    prev_span_time = 0.0  # Time of previous span speed calc
-    speed_insta = 0.0  # Speed taken from a single sample, closest to actual instant speed
-    speed_avish = 0.0  # Speed taken from a number of samples, almost instant speed but is average
-    rot_count = 0  # number of magnet hits counted (total)
-    
     # Internal Switches
     poll_running = False  # is the speed currently being polled?
     
-    # Misc Settings
-    trip_count = 1  # number of magnets on the motor's rotor
-    
     # Logging
-    input_logging = False  # Will record pseudo waveform when True
-    poll_logging = True  # Will log if this is True
+    poll_logging = True  # Will log every (i_poll_rate)s if this is True
     log_dir = "./dat+plot"  # where the logged data should be saved
-    log_titles = ["Time", "Rev Count", "Speed (Tick)", "Speed (Span)", "ADC val", "Pot val"]
-
-    # Speed Calc Settings
-    per_tick = True  # Calculates speed every time the hall pin registers a rotation (or partial), using time between ticks
-    per_span = False  # Calculates speed every x second, using number of rotations in that time 
-    span = 1.0  # x above -> How often the average speed is calculated (smaller time, more instant, less average)
+    log_titles = ["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"]
     i_poll_rate = 0.1  # How often data is polled, should not be less than span
+    
+    # Speed calc
+    speed = 0.0  # Output value
+    svf = [0.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
 
     max_speed = 0  # RPM, at voltage = ~10.5v
     min_speed = 0  # RPM, at voltage = ~2.5v
-
-    # GPIO pins
-    sens_pin = 16  # normally board pin 16, GPIO 23
     
     # Instances of Class
     pot = dp()  # potentiometer to control voltage
-    # aconv = ac()  # adc to read current/voltage
-    # adc_chan = [1, 2]  # voltage channel, current channel
+    aconv = ac()  # adc to read current/voltage
+    adc_chan = [0, 1]  # voltage channel, current channel
 
-    def __init__(self, max_speed=0, min_speed=0, sens_pin=0, trip_count=1,
-    startnow=False, adc_addr=0x6E, adc_channel=0, adc_rate=0, adc_gain=2,
-    input_logging=True, poll_logging=True, log_dir="./dat+plot",
-    per_span=False, per_tick=True,
-    log_titles=["Time", "Rev Count", "Speed (Tick)", "Speed (Span)", "ADC val", "Pot val"],
+    def __init__(self, max_speed=0, min_speed=0,
+    startnow=False, adc_channels=[0, 1], adc_vref=3.3
+    poll_logging=True, log_dir="./dat+plot",
+    log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"],
     log_note="DATETIME"):
 
         # Set calibration variables
@@ -65,31 +48,22 @@ class motor(object):
         self.min_speed = min_speed
 
         # Set sensor variables
-        self.sens_pin = sens_pin
         self.pot = dp()
-        #self.aconv = ac(adc_addr, adc_channel, adc_rate, adc_gain)
-        self.trip_count = trip_count
-        self.per_tick = per_tick
-        self.per_span = per_span
-
-        # Set up GPIO
-        gpio.setmode(gpio.BOARD)
-        gpio.setup(self.sens_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+        self.aconv = ac(cs_pin=1, vref=adc_vref)
         
         # Set up logs
         self.log_dir = log_dir
-        self.input_logging = input_logging
         self.poll_logging = poll_logging
         self.new_logs(log_note)
         
         # Start speed polling (if necessary)
-        self.start_poll(startnow)
+        if (startnow):
+            self.start_poll(startnow)
 
     def new_logs(self, log_note="--"):
-        # Try closing old log files
+        # Try closing old log file
         try:
             logf.close()
-            logh.close()
         except:
             pass
         
@@ -101,7 +75,7 @@ class motor(object):
         un = time.strftime("%H %M %S", time.gmtime()) # str(len(glob(self.log_dir + "/*.csv")))
 
         # Creat logs (as necessary)
-        if (self.poll_logging):  # Poll log: every (i_poll_rate) seconds, info is logged.
+        if (self.poll_logging):
             self.logf = open(self.log_dir + "/log_" + un + ".csv", "w")
             for s in self.log_titles:
                 self.logf.write(s + ", ")
@@ -110,14 +84,8 @@ class motor(object):
             else:
                 self.logf.write("NOTE: " + log_note + "\n")
 
-        if (self.input_logging):  # Input log: every time a revolution is detected, the time this occurs is recorded.
-            self.logh = open(self.log_dir + "/log_" + "hall_" + un + ".csv", "w")  # log file is called "hall" for historically reasons
-
-    def start_poll(self, startnow):
-        gpio.add_event_detect(self.sens_pin, gpio.RISING, callback=self.incr)  
-        # When the GPIO pin is first risen to a high level, the method "incr(self, channel)" is called
-
-        if (not self.poll_running and startnow):
+    def start_poll(self):
+        if (not self.poll_running):  # if not already running
             td.start_new_thread(self.poll, tuple())
 
     def poll(self):
@@ -127,26 +95,21 @@ class motor(object):
         while (self.poll_running):
             # self.get_power()  # get electrical power supplied to motor
             
-            dspan = time.time() - self.prev_span_time
-            if (self.prev_span_time == 0):
-                self.prev_span_time = time.time()  # set initial span time
-            elif (self.per_span and dspan >= self.span):
-                # Calculate speed
-                self.cur_speed = (float(self.rot_count - self.rot_count_last)
-                 * float(60) / (float(dspan) * float(self.trip_count)))  # rotational speed in RPM
-                self.prev_span_time = time.time()
-                self.rot_count_last = self.rot_count
-
+            # Get speed
+            volts = self.aconv.read_volts(self.adc_channels[0])
+            self.speed = self.svf[0] * volts + self.svf[1]
+            
             if (self.poll_logging):
-                #self.logf.write(str(time.time()) + ", " + str(self.rot_count) + ", " + str(self.speed_insta) + ", " + str(self.speed_avish) + ", " + str(self.aconv.read_single()) + ", " + str(self.pot.lav) + "\n")
-                self.logf.write(("{0:.6f}, {1}, {2:.3f}, {3:.3f}, {4}, {5} \n").format(time.time(), self.rot_count, self.speed_insta, self.speed_avish, "self.aconv.read_single()", self.pot.lav))  # maybe take new epoch (eg since 1485907200 (1st feb 2017)) to reduce data to write?
+                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4}, {5} \n").format(time.time(), volts, self.speed, "(current)", self.pot.lav, "(p = iv)"))
+            
+            # delay for x seconds
             time.sleep(self.i_poll_rate)
 
         print("Motor polling has halted.")
 
     def get_speed(self):
         if (self.poll_running):
-            return self.speed_avish  # or speed_insta?
+            return self.speed
         else:
             print "Warning! Speed poll is not running, speed value is wrong."
             return 0.0
@@ -173,45 +136,23 @@ class motor(object):
         # set this value on the digital potentiometer
         self.dp.set_resistance(value)
 
-    def incr(self, channel):
-		self.rot_count += 1
-		temp_time = time.time() * 1000.0
-		if (self.per_tick and self.prev_hit_time != 0.0):
-			self.speed_insta = float(60000) / (float(self.trip_count) * (temp_time - self.prev_hit_time))
-			# rotations per hit (R/hit) / time per hit (ms/hit) = rotations per time (R/ms)
-			# (R/ms) * 60,000 = RPM
-
-		if (self.input_logging):
-			self.logh.write(("{0:.3f} \n").format(temp_time))
-		self.prev_hit_time = temp_time
-		
-
     def clean_exit(self):
         print "Closing poll thread..."
         self.poll_running = False
         time.sleep(0.5)
         
-        print "Tidying GPIO..."
-        gpio.cleanup()
-        
         if (self.poll_logging):
             print "Saving log file..."
             self.logf.close()
-        if (self.input_logging):
-            self.logh.close()
-        
-        # print "Closing SPI connection..."
-        # self.pot.close()
 
 if __name__ == "__main__":
     #  Will get motor's speed for select potvals
-    motr = motor(0, 0, 16, 1, startnow=True, adc_gain=0)
+    motr = motor(startnow=True, poll_logging=False)
     #test script for testing (plz don't use; its lazy, and bad form)
     try:
         for i in range(0, 128):
             motr.pot.set_resistance(i)
-            for j in range(0, 10):
-                print ("Speed (RPM): {0:.3f} val: {1}").format(motr.speed_insta, motr.pot.lav)
-                time.sleep(0.5)
+            print ("Speed (RPM): {0:.3f} val: {1}").format(motr.speed, motr.pot.lav)
+            time.sleep(5)
     except KeyboardInterrupt:
         motr.clean_exit()
