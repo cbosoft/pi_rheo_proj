@@ -1,6 +1,11 @@
 \documentclass[a4]{report}
 \def\atitle{Logbook}
 \def\myname{Christopher Boyle}
+\def\mon{\subsection*{Monday}}
+\def\tue{\subsection*{Tuesday}}
+\def\wed{\susbection*{Wednesday}}
+\def\thu{\subsection*{Thursday}}
+\def\fri{\subsection*{Friday}}
 
 % Preamble
 \usepackage{graphicx}
@@ -152,7 +157,7 @@
 		\subitem New method of calculating speed (more instant, less average)
 		\subitem Logs more information for better debugging
 	\end{itemize}
-	\newpage
+	\chapter{February 2017}
 	\section{Week Beginning 6 February 2017 (Week 4)}
 	\begin{itemize}
 		\subsection*{Monday}
@@ -220,13 +225,16 @@
 		\subsection*{Wednesday}
 		\item Tried the dynamo speedometer, good results! easy to calibrate (roughly: speed = measured voltage * ~26000)
 		\item Tested using a semi temporary set up utilising a lid from a coffee pot and a rubber band. Will invest in a new motor and ADC set up following further testing to see if it is indeed suitable.
-		
+		\thu
+		\item After experiencing issues with the \(I^2C\) ADC (and simple success with the SPI digpot), an SPI ADC was purchased.
+		\item New ADC (MPC3008) has an external voltage reference - can be set at what is relevant and will measure a voltage up to this reference voltage
+		\item Adapted adc.py to deal with new ADC, and motlib.py to recognise the new (dyno) method of speed detection
 	\end{itemize}
 	\newpage
-	\section{Considerations/To-do list}
+	\chapter{Considerations/To-do list}
 	\begin{itemize}
 		\item calibrate motor speed control circuit (ie get min speed, max speed, and speed(voltage))
-		\item test speed is being detected properly (use reference tachometer/second method to detect the speed (record a video of the motor spinning? Is that acceptable?))
+		\item test that speed is being detected properly (use reference tachometer/second method to detect the speed (record a video of the motor spinning? Is that acceptable?))
 		\item peclet number?
 		\item wall slip?
 		\subitem wall slip is often avoided by "roughening" the walls of the viscometer
