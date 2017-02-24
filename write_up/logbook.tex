@@ -223,7 +223,7 @@
 		\subitem Use dynamo motor to get speed
 		\subitem If (after testing) that fails, maybe ignore speed detection entirely? - Just log power to motor and use potval to figure speed (assuming it is constant!)
 		\subsection*{Wednesday}
-		\item Tried the dynamo speedometer, good results! easy to calibrate (roughly: speed = measured voltage * ~26000, not final version)
+		\item Tried the dynamo speedometer, good results! easy to calibrate (roughly: speed = measured voltage * 26000)
 		\item Tested using a semi temporary set up utilising a lid from a coffee pot and a rubber band. Will invest in a new motor and ADC set up following further testing to see if it is indeed suitable.
 		\thu
 		\item After experiencing issues with the \(I^2C\) ADC (and simple success with the SPI digpot), an SPI ADC was purchased.
@@ -232,11 +232,10 @@
 		\item Re-wired circuit to make better use of space, went to test new motor set up and prompty broke the digital potentiometer (I had the power in backwards)
 		\item Much frustration - there is little to do before the DP can be replaced (tomorrow hopefully)
 		\fri
-		\item TODO:
 		\item Installed and tested new ADC - works a charm. External reference voltage makes things much easier (plus 8 channels and single ended inputs!)
 		\item Installed replacement potentiometer - found out I ordered a rheostat instead. Rheostat in a potential divider results in an inverse parabolic response.
 		\item Sigh. Will do for now, 'nother potentiometer, on the way.
-		\item Pulley too large, dynamo is too slow at low motor voltages, input is too noisy. Smaller pulley required.
+		\item Pulley too large, dynamo is rotating too slowly at low motor voltages, resulting in noisy/inaccurate voltage readings. Smaller pulley required.
 	\end{itemize}
 	\newpage
 	\section{Week Beginning 27 February 2017 (Week 7)}
