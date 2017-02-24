@@ -12,17 +12,16 @@ import matplotlib.pyplot as plt
 
 hall_pin = 16
 mag_count = 1
-mot = motlib.motor(sens_pin=16, mag_count=1, startnow=True, poll_logging=True, input_logging=True, per_tick=True, per_span=True)
+mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./speed_test_new")
 
 print "Starting..."
 mot.pot.set_resistance(48)
-mot.log_dir = "./speed_test"
 time.sleep(2)
 try:
-    for i in range(0, 11):
-        print "Setting potval to " + str(48 + (i * 8))
-        mot.pot.set_resistance(48 + (i * 8))
-        time.sleep(20)
+    for i in range(0, 17):
+        print "Setting potval to " + str(0 + (i * 8))
+        mot.pot.set_resistance(0 + (i * 8))
+        time.sleep(5)
     mot.clean_exit()
     
 except KeyboardInterrupt:

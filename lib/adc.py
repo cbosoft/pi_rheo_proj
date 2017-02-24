@@ -109,8 +109,8 @@ class MCP3008(object):
 
     def __init__(self, cs_pin=1, vref=3.3):
         # Chip select setup
+        self.cs_pin = cs_pin
         if (cs_pin > 1):  # using the GPIO pins as chip_select pins
-            self.cs_pin = cs_pin
             gpio.setmode(gpio.BOARD)
             gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)  # CS is normally high, pulled up by the RPi
             gpio.output(self.cs_pin, gpio.HIGH)
@@ -126,11 +126,13 @@ class MCP3008(object):
     def read_data(self, channel):
         # tells the ADC which channel to convert
         self.open()
-        command = [((1 << 3) + channel) << 4] * 1
-        self.bus.writebytes(command)
-        indat = self.bus.readbytes(2)
+        #command = [((1 << 3) + channel) << 4] * 1
+        #self.bus.
+        #self.bus.writebytes(command)
+        #indat = self.bus.readbytes(2)
+        indat = self.bus.xfer2([1, 8 + channel << 4, 0])
         self.close()
-        return (indat[1] << 8) + indat[0]
+        return ((indat[1] & 3) << 8) + indat[2]
         
     def read_volts(self, channel):
         dat = self.read_data(channel)
@@ -167,9 +169,9 @@ if __name__ == "__main__":
     # aconv.open_()
     try:
         while (True):
-            print "Value: " + str(aconv.read_data())
+            print "Value: " + str(aconv.read_data(0))
             print "Press enter to read another value, or ctrl-c to close."
             r = raw_input()
-        aconv.close_()
+        aconv.close()
     except KeyboardInterrupt:
-        aconv.close_()
+        aconv.close()

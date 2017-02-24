@@ -27,7 +27,7 @@ class motor(object):
     
     # Speed calc
     speed = 0.0  # Output value
-    svf = [0.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
+    svf = [1.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
 
     max_speed = 0  # RPM, at voltage = ~10.5v
     min_speed = 0  # RPM, at voltage = ~2.5v
@@ -147,11 +147,11 @@ class motor(object):
 
 if __name__ == "__main__":
     #  Will get motor's speed for select potvals
-    motr = motor(startnow=True, poll_logging=False)
+    motr = motor(startnow=True, poll_logging=False, log_dir="./new_chip")
     #test script for testing (plz don't use; its lazy, and bad form)
     try:
-        for i in range(0, 128):
-            motr.pot.set_resistance(i)
+        for i in range(0, 7):
+            motr.pot.set_resistance(i*16)
             print ("Speed (RPM): {0:.3f} val: {1}").format(motr.speed, motr.pot.lav)
             time.sleep(5)
     except KeyboardInterrupt:
