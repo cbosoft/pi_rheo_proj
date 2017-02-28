@@ -29,6 +29,10 @@ class motor(object):
     speed = 0.0  # Output value
     svf = [1.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
 
+    # Current calc
+    current = 0.0 # Read current in A
+    cvf = [1.0, 0.0]  # 1st order linear fit equation; CURRENT = cvf[0] * VOLTAGE + cvf[1]; VOLTAGE in volts, CURRENT in Amps
+
     max_speed = 0  # RPM, at voltage = ~10.5v
     min_speed = 0  # RPM, at voltage = ~2.5v
     
@@ -96,11 +100,18 @@ class motor(object):
             # self.get_power()  # get electrical power supplied to motor
             
             # Get speed
-            volts = self.aconv.read_volts(self.adc_chan[0])
-            self.speed = self.svf[0] * volts + self.svf[1]
+            volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1])]
+            self.speed = self.svf[0] * volts[0] + self.svf[1]
             
+            # Get current
+            self.current = self.cvf[0] * volts[1] + self.cvf[1]
+            
+            # Power = Current x Supply Voltage
+            # Supply voltage is calculable from the potentiometer value (POTVAL/127) * (10.5 - 2.8) + 2.8 = SUPPLY VOLTAGE
+            self.power = (((self.pot.lav / 127) * (10.5 - 2.8)) + 2.8) * self.current
+
             if (self.poll_logging):
-                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4}, {5} \n").format(time.time(), volts, self.speed, "(current)", self.pot.lav, "(p = iv)"))
+                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4}, {5} \n").format(time.time(), volts[0], self.speed, volts[1], self.pot.lav, self.power))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
