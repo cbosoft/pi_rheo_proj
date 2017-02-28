@@ -243,7 +243,16 @@
 		\mon
 		\item Talked Aditi through the electronics set up
 		\item Looked into theory behind current sensor
-		\item Updated lit review
+		\tue
+		\item Went through the basics of the software side of things with Aditi
+		\item Took an initial calibration of the current sensor.
+		\item The current sensor doesn't seem to be very sensitive to changes in current (66mV/A per the datasheet). The output will need to be boosted before it can be read by the ADC.
+		\subitem The sensor's output is 2.5V at 0A (50\% of Vcc)
+		\subitem will have to offset this before it reaches the ADC/amp
+		\subitem Current sensor output = (2.5) + I * dV/dI
+		\subitem Will need a resistor in the circuit to reduce the voltage (what is the sensor output current?)
+		\item Updated report: wrote up dynamo theory sections, started dynamo eval section (pending results), and some general tidying up.
+		
 		
 
 	\end{itemize}
