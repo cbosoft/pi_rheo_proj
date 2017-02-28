@@ -166,12 +166,19 @@ if __name__ == "__main__":
     # reads and displays data from the ADC every time the enter key is pressed.
     # aconv = MCP3424()
     aconv = MCP3008()
+    chan = 0
     # aconv.open_()
     try:
         while (True):
-            print "Value: " + str(aconv.read_data(0))
+            print "\n\nValue: " + str(aconv.read_data(chan)) + "\n\n"
             print "Press enter to read another value, or ctrl-c to close."
+            print "To change channel, enter the channel number and press enter."
             r = raw_input()
+
+            if r == "1":
+                chan = 1
+            elif r == "0":
+                chan = 0
         aconv.close()
     except KeyboardInterrupt:
         aconv.close()
