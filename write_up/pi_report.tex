@@ -23,19 +23,27 @@
 %\usepackage{lipsum}
 
 % Settings
-\geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}
-\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
-\patchcmd{\section}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
-\patchcmd{\subsection}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
-\setcounter{secnumdepth}{0}
-\renewcommand{\theequation}{\arabic{equation}}
-\renewcommand\UrlFont{\rmfamily\itshape}
-\setlength{\fboxsep}{0pt}
-\setlength{\fboxrule}{0pt}
-\def\achapter{preamble}
+\geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}  % Sets the mnargins
+
+%\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}  % not sure?
+%\patchcmd{\section}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
+%\patchcmd{\subsection}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
+
+\setcounter{secnumdepth}{0}  % removes the numbering from toc entires
+
+%\renewcommand{\theequation}{\arabic{equation}}  % not sure?
+
+\renewcommand\UrlFont{\rmfamily\itshape}  % sets URL font to normal font (rather than code font)
+
+\setlength{\fboxsep}{0pt}  % separator length around figure boxes
+\setlength{\fboxrule}{0pt}  % rule width around figures
+
+\def\achapter{preamble}  % set the command "achapter" to  the name of the current section
 \def\rpi{Raspberry Pi}
-%%%% TEMPLATES
-\iffalse
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
+% TEMPLATES
+
+\iffalse  % This bit won't go onto the PDF
 
 
 %%%EQUATION
@@ -61,18 +69,19 @@
 	\end{itemize}
 
 \fi
-%%%%
+
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 % Header/footer preamble
-\fancyhf{}
-\fancypagestyle{plain}{
-	\renewcommand{\headrulewidth}{0.4pt}
-	\renewcommand{\footrulewidth}{0.4pt}
-%	\fancyhead[L]{\atitle}
-	\fancyhead[L]{\achapter}
-	\fancyhead[R]{\theauthor}
-	\fancyfoot[L]{\today}
-	\fancyfoot[R]{\thepage}
+\fancyhf{}  % clear the current header footer
+\fancypagestyle{plain}{  % add settings for plain page style
+	\renewcommand{\headrulewidth}{0.4pt}  % weight of the header rule (set to 0 for no line)
+	\renewcommand{\footrulewidth}{0.4pt}  % height of the footer rule (set to 0 for no line)
+%	\fancyhead[L]{\atitle}  % Header left is title
+	\fancyhead[L]{\achapter}  % Header lift is name of chapter
+	\fancyhead[R]{\theauthor}  % Header right is author name
+	\fancyfoot[L]{\today}  % Footer left is date
+	\fancyfoot[R]{\thepage}  % Footer right is page number
 }
 \pagestyle{plain}
 
@@ -163,7 +172,9 @@
 %	\end{figure}
 
 
-%	more info on lab automation
+%	more info on lab automation?
+
+	
 
 
 	\section{Raspberry Pi}
@@ -215,7 +226,7 @@
 	\end{figure} \newline  \noindent
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
-\newline \newline \noindent
+	\newline \newline \noindent
 	\begin{figure}[!htb]
 		\centering
 		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
@@ -302,8 +313,6 @@
 		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
-
-
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
 	\begin{figure}[!htb]
 		\centering
