@@ -10,7 +10,12 @@ sys.path.append('./..')
 import motlib
 import time
 
-mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./current_test_tues")
+# Get log directory name
+print "Enter the log directory name:"
+print "(Or leave blank for default)"
+r = raw_input()
+
+mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./logs" + r)
 
 print "Starting..."
 mot.pot.set_resistance(48)
