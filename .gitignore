@@ -16,6 +16,7 @@ write_up/*.toc
 write_up/*.out
 write_up/*.bbl
 write_up/*.blg
+write_up/report_template.tex
 write_up/figures/*.png
 lib/*.png
 write_up/images/hall_sensor_waveform.png
