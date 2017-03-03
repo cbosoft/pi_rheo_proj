@@ -32,27 +32,28 @@ class PIDcontroller(object):
     sample_time = 0.1  # time between runs, in seconds
 
     # class initialisation method
-    def __init__(self, KP_=0, KI_=0, KD_=0, sample_time_=0.1, set_point=0):
+    def __init__(self, KP=0, KI=0, KD=0, sample_time=0.1, set_point=0):
 
-        self.sample_time = sample_time_  # initial sample time
+        self.sample_time = sample_time  # initial sample time
+        self.set_point = set_point
 
-        if (KP_ == 0):  # if KP is zero, turn off proportional control
+        if (KP == 0):  # if KP is zero, turn off proportional control
             self.P_On = False
         else:
             self.P_On = True
-            self.KP = KP_
+            self.KP = KP
 
-        if (KI_ == 0):  # if KI is zero, turn off integral control
+        if (KI == 0):  # if KI is zero, turn off integral control
             self.I_On = False
         else:
             self.I_On = True
-        self.KI = KI_
+            self.KI = KI
 
-        if (KD_ == 0):
+        if (KD == 0):
             self.D_On = False  # if KD is zero, turn off derivative control
         else:
             self.D_On = True
-            self.KD = KD_
+            self.KD = KD
 
     # simple method that moves values up in array
     def shift_arrs(self):
@@ -205,8 +206,8 @@ class PIDcontroller(object):
 
 if __name__ == "__main__":
     a = PIDcontroller(1, 1, 1)
-    tuning = a.tune(2, 10, 100, 10)
-    print "Optimum tuning found:"
+    a.tune(2, 10, 100, 10)
+    print "Model controller tuned:"
     print "Kp: " + str(a.KP)
     print "Ki: " + str(a.KI)
     print "Kd: " + str(a.KD)

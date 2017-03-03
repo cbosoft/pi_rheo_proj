@@ -3,6 +3,9 @@
 #
 # Will record the speed results at a range of potentiometer values (from 0 to 127)
 #
+#
+#
+# OUTDATED # OUTDATED # OUTDATED # OUTDATED # OUTDATED # OUTDATED # OUTDATED # OUTDATED # OUTDATED #
 import sys
 sys.path.append('./..')
 

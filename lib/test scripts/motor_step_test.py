@@ -13,12 +13,11 @@ import motlib
 import time
 import matplotlib.pyplot as plt
 
-hall_pin = 16
-mag_count = 1
-mot = motlib.motor(0, 0, hall_pin, mag_count, True)
+print "setting up..."
+mot = motlib.motor(startnow=True)
 
-delay = 5000  # ms
-length = 5000  # ms
+delay = 1000  # delay before step change occurs, ms
+length = 1000  # how long the effects of the step are observed for, ms
 time_ = 0  # ms since beginning
 log = open("./step_log.csv", "w")
 log.close()
@@ -30,28 +29,28 @@ log = open("./step_log.csv", "a")
 #set starting value
 mot.pot.set_resistance(0)
 
+print "starting, pre step"
 # pre step data
 while (time_ <= delay):
     spd = mot.get_speed()
-    log.write(str(time_) + "," + str(spd))
+    log.write(str(time_) + "," + str(spd) + "\n")
     xs.append(time_)
     ys.append(spd)
     time.sleep(0.001)
     time_ += 1
 
+print "stepping up"
 # perform the step
 mot.pot.set_resistance(64)
 
+print "post step"
 # collect the data
 while (time_ <= (delay + length)):
     spd = mot.get_speed()
-    log.write(str(time_) + "," + str(spd))
+    log.write(str(time_) + "," + str(spd) + "\n")
     xs.append(time_)
     ys.append(spd)
     time.sleep(0.001)
     time_ += 1
 
 log.close()
-
-plt.plot(xs, ys)
-plt.show()

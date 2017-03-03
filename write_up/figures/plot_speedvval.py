@@ -17,23 +17,38 @@ for i in range(2, len(datl) - 2):
     av_spd.append(float(splt[12]))
     pv.append(float(splt[0]))
 
+# Read csv
+datf = open("./../lib/test scripts/logs/read_sweep/read_sweep.csv", "r")
+datl = datf.readlines()
+datf.close()
+
+# Create lists for sorting
+read_speed = [0] * 0
+read_pv = [0] * 0
+
+for i in range(2, len(datl) - 2):
+    splt = datl[i].split(",", 13)
+    read_speed.append(float(splt[2]))
+    read_pv.append(float(splt[4]))
+
 # Speed v Value
 # Set up figure
-f = plt.figure(figsize=(7, 7))
+f = plt.figure(figsize=(10, 10))
 ax = f.add_subplot(111)
 
 # Calculate trendline
-z = np.polyfit(pv[2:], av_spd[2:], 1)
+z = np.polyfit(pv[4:], av_spd[4:], 1)
 tl = np.poly1d(z)
 
 # Plot data and trendline
-ax.plot(pv, av_spd, 'o', label="$Motor\ Speed$")
+ax.plot(pv[4:], av_spd[4:], 'bx-', label="$Actual\ Motor\ Speed$")
+ax.plot(read_pv, read_speed, 'g^', label='$Read\ Motor\ Speed$')
 ax.plot(pv, tl(pv), 'r--', label="$Fit\ Line:\ SPD = {0:.3f}PV + {1:.3f}$".format(z[0], z[1]))
 
 ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
-plt.legend()
+plt.legend(loc=2)
 
 
 # Show plot

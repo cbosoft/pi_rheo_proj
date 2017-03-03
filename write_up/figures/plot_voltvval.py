@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 # Read csv
-datf = open("./../lib/test scripts/logs/smallx4.csv", "r")  # opens the latest one
+datf = open("./../lib/test scripts/logs/smallx4.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -41,7 +41,7 @@ for i in range(2, len(datl) - 2):
     p2v.append(float(splt[0]))
 
 # 1st Trend: speed as a function of potval
-zavspdpv = np.polyfit(p2v, av_spd, 1)
+zavspdpv = np.polyfit(p2v[4:], av_spd[4:], 1)
 tlo = np.poly1d(zavspdpv)
 
 # Speed v Val  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
