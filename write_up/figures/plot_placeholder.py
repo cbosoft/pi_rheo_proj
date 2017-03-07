@@ -18,4 +18,4 @@ ax.set_ylabel("$Y\ axis\ is\ best\ axis$\n", ha='center', va='center', fontsize=
 
 
 # Show plot
-plt.savefig("./figures/placeholderfig.png")
+plt.savefig("./placeholderfig.png")

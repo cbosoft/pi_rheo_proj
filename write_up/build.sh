@@ -1,6 +1,6 @@
 python updatewordcount.py
-./getfigs.sh
-pdftex ./pi_report.tex
+bash ./getfigs.sh
+pdflatex ./pi_report.tex
 bibtex ./pi_report.tex
-pdftex ./pi_report.tex
-pdftex ./pi_report.tex
+pdflatex ./pi_report.tex
+pdflatex ./pi_report.tex

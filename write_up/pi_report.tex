@@ -1,7 +1,8 @@
-\documentclass[a4]{report}
-\def\atitle{Development of a Control System Using a Raspberry Pi}
+\documentclass[twoside,a4]{report}
+\def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
+\def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{4466}
+\def\thewords{4401}
 
 \def\br{\newline \newline \noindent}
 
@@ -79,10 +80,11 @@
 	\renewcommand{\headrulewidth}{0.4pt}  % weight of the header rule (set to 0 for no line)
 	\renewcommand{\footrulewidth}{0.4pt}  % height of the footer rule (set to 0 for no line)
 %	\fancyhead[L]{\atitle}  % Header left is title
-	\fancyhead[L]{\achapter}  % Header lift is name of chapter
-	\fancyhead[R]{\theauthor}  % Header right is author name
-	\fancyfoot[L]{\today}  % Footer left is date
-	\fancyfoot[R]{\thepage}  % Footer right is page number
+	\fancyhead[LE]{\achapter}  % Header left is name of chapter
+	\fancyhead[RO]{\shorttitle}  % Header left is name of chapter
+	\fancyhead[RE,LO]{\theauthor}  % Header right is author name
+	\fancyfoot[LO,RE]{\today}  % Footer left is date
+	\fancyfoot[RO,LE]{\thepage}  % Footer right is page number
 }
 \pagestyle{plain}
 
@@ -211,6 +213,11 @@
 		\fbox{
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
+			
+			
+			
+			
+			
 			\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
 			\caption{Shear Thinning}
 			\label{figshearthin}
@@ -245,12 +252,12 @@
 	Hardware was be developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the motor, the electrical power supplied to the motor, the current shear stress observed within the fluid, and the presence of 'cracks' on the surface of the fluid.\br
 	Software will be developed to facilitate the accurate reading of information from the experiment, as well as control of the experimental parameters. There are two general operating modes; constant shear rate (or rotational speed), and constant shear stress (or torque). The former is relatively simple to do. By recording the motor's rotational speed and comparing with a set point, the speed can easily be held at a fixed point (thus a constant shear rate is achieved). The output torque is fixed in a similar way, using feedback from the process to fix the torque from the motor.
 
-	\chapter*{Description of the Organisation} % section last edited 3/3/2017
-	\addcontentsline{toc}{chapter}{Description of the Organisation}
-	\label{chap:doo}
-	\def\achapter{Description of the Organisation}
+	%\chapter*{Description of the Organisation} % section last edited 3/3/2017
+	%\addcontentsline{toc}{chapter}{Description of the Organisation}
+	%\label{chap:doo}
+	%\def\achapter{Description of the Organisation}
 	%In this section, you should show a good understanding of the organisation. Details may include the type of organisation, management structure, products, and markets catered for. Mention your position in the organisation.
-	The University of Strathclyde is a well respected technical university based in Glasgow, UK. The University is big and has lots of shiny metal walls. There are undergraduate students, postgraduate students, teaching assistants, lecturers, doctors, and professors here. There is research done here. I study here. You work here.
+	%The University of Strathclyde is a well respected technical university based in Glasgow, UK. The University is big and has lots of shiny metal walls. There are undergraduate students, postgraduate students, teaching assistants, lecturers, doctors, and professors here. There is research done here. I study here. You work here.
 	
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -263,25 +270,24 @@
 
 
 
-	\section{Experimental Setup}
-	The experiment is based around a Couette (CITE) consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (SERNO) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets its speed (voltage) and reads in the torque load (current) on the motor. This is used to calculate the viscosity of the fluid. Attached to the inner cylinder is a metal trip. An IR-LED is set up such that it aims at a phototransistor near the 
-	A needle attached to a piezo-electric (PEND) is used to detect shear stress at a point within the fluid. When the fluid jams the needle will move and generate a voltage proportional to the needle's displacement. Figure \ref{expdia} gives a diagram of the set-up.\newline
+	\section{Experimental Setup} % last edited 7/3/2017
+	The experiment is based around a Couette cell (CITE), consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (SERNO) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets its speed and reads in the torque load on the motor. This is used to calculate the viscosity of the fluid. 
+	Motor speed is read in using a secondary motor acting as a dynamo. This dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
+	A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
 	\centering
-	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
-	\caption{Diagram of the Experimental Apparatus (from )}
+	\fbox{\includegraphics[scale=0.6]{images/expsetup.png}}
+	\caption{Diagram of the Experimental Apparatus}
 	\label{expdia}
-	\end{figure} \newline  \noindent
-
-
-
-	\section{Electronic Circuits}
+	\end{figure}
+	
+	\section{Electronic Circuits} % last edited 7/3/2017
 	%in depth description of relevant electronic circuits
-	The electronic circuits attached to the Raspberry Pi can be split into three distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, the motor speed control converts a digital signal into rotation of the motor, and the PEND signal processing circuit converts the analogue signal from the PEND into a digital signal. All of the circuits are designed in order to facilitate the communication between the real world and the software running on the Raspberry Pi. 
+	The electronic circuits attached to the Raspberry Pi can be split into three distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, the motor speed control converts a digital signal into rotation of the motor, and the PEND signal processing circuit converts the analogue signal from the PEND into a digital signal.
 
 
 
-	\subsection{\textit{Motor Speed Detection}}
+	\subsection{\textit{Motor Speed Detection}} % last edited 7/3/2017
 	%Hall Effect
 	%The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. Thus, every time a magnet triggers the sensor it corresponds to a quarter turn. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low (0v). To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and connected through a transistor to ground. Normally, the high input to the transistor allows the flow of current from the GPIO pin to ground, meaning it has a low value. When the hall effect sensor detects a magnet the high signal to the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
 	%\begin{figure}[!htb]
@@ -293,16 +299,18 @@
 	%This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
 	%Light Sensor
 	%The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
-	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using the ADC. This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using ARGH TACHOMETER PLEASE. Thus the speed as a function of the dynamo voltage can be calculated. \br
+	%Dynamo
+	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using the ADC. This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
 	\begin{figure}[!htb]
 		\centering
 		\fbox{\includegraphics[scale=0.4]{images/blank.png}}
 		\caption{Circuit Schematic Diagram: Motor Speed Detection}
 		\label{circspeeddet}
-	\end{figure} \newline  \noindent
+	\end{figure}
+	
 
-	\subsection{\textit{Motor Speed Control}}
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\Omega \), in this case). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier is used to boost the voltage range from 1.2v to 5v up to 2.6v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A, assuming a conservative gain of hFE = 100.\newline
+	\subsection{\textit{Motor Speed Control}} % last edited 7/3/2017
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\ \Omega \)). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While thiswould also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3000\ \Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	
 	%%%%%%%%%% REDO?
 	\begin{equation}
@@ -336,7 +344,7 @@
 
 
 
-	\section{Software} % RE DO SECTION
+	\section{Software} % Re do section
 	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: exp\_run.py, control.py, motor.py, dig\_pot.py, and adc.py. \newline \newline \noindent
 	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
 	\begin{figure}[!htb]

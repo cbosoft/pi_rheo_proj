@@ -269,7 +269,21 @@
 		\item Started to calibrate the speed controller, but the input (while much better than it was) is a bit too noisy. A preliminary step test was performed to obtain a model (SSG=4.29, TC=0.0012)
 		\item Will need to look into methods of noise reduction/filtering (moving average?)
 		\item Confirmed input voltages
-		
+	\end{itemize}
+	\newpage
+	\chapter{February 2017}
+	\section{Week Beginning 6 March 2017 (Week 8)}
+	\begin{itemize}
+		\mon
+		\item Wrote a script to simulate the occurance of jamming (to test the efficacy of the speed detector)
+		\item Result of the test is not good, the speed detector doesn't seem to react to such a short change in the speed
+		\item Took a moving average of the read speed data, this seemed to clear it up. Dips in mav speed line up with the simulated instance of jamming.
+		\tue
+		\item Looked at getting the current sensor to work:
+		\subitem Sensor output is too low (0-120mA) and has an offset of 2.5V (complicating matters)
+		\subitem Will use a differencing op-amp to subtract the offset and gain the result by 20 or so.
+		\item Continued writing 1st draft of report
+		\item Will put current sensor together this afternoon
 		
 
 	\end{itemize}

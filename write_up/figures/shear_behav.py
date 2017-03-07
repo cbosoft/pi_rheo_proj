@@ -70,5 +70,5 @@ f.text(0.5, 0.03, r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
 va='center', fontsize=20)
 f.text(0.08, 0.5, r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
 va='center', rotation='vertical', fontsize=20)
-plt.savefig("./figures/fig_shear_behav.png")
+plt.savefig("./fig_shear_behav.png")
 

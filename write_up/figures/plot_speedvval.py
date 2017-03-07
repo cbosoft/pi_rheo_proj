@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read csv
-datf = open("./../lib/test scripts/logs/voltvval.csv", "r")
+datf = open("./../../lib/test scripts/logs/voltvval.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -18,7 +18,7 @@ for i in range(2, len(datl) - 2):
     pv.append(float(splt[0]))
 
 # Read csv
-datf = open("./../lib/test scripts/logs/read_sweep/read_sweep.csv", "r")
+datf = open("./../../lib/test scripts/logs/read_sweep/read_sweep.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -52,7 +52,7 @@ plt.legend(loc=2)
 
 
 # Show plot
-plt.savefig("./figures/figspeedvval.png")
+plt.savefig("./figspeedvval.png")
 
 # Todo: include read motor speed on graph (as opposed to just actual motor speed)
 
@@ -79,4 +79,4 @@ plt.legend()
 
 
 # Show plot
-plt.savefig("./figures/figvoltvval.png")
+plt.savefig("./figvoltvval.png")

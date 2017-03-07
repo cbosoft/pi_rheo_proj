@@ -15,7 +15,7 @@ print "Enter the log directory name:"
 print "(Or leave blank for default)"
 r = raw_input()
 
-mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./logs" + r)
+mot = motlib.motor(startnow=True, poll_logging=False, log_dir="./logs" + r)
 
 print "Starting..."
 mot.pot.set_resistance(48)
@@ -25,6 +25,7 @@ try:
         print "Setting potval to " + str(0 + (i * 8))
         mot.pot.set_resistance(0 + (i * 8))
         time.sleep(5)
+	r = raw_input("Next")
     mot.clean_exit()
     
 except KeyboardInterrupt:

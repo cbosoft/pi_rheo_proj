@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 # Read csv
-datf = open("./../lib/test scripts/logs/smallx4.csv", "r")
+datf = open("./../../lib/test scripts/logs/smallx4.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -25,7 +25,7 @@ for i in range(2, len(datl) - 2):
     pv.append(int(splt[4]))
 
 # Read csv
-datf = open("./../lib/test scripts/logs/voltvval.csv", "r")
+datf = open("./../../lib/test scripts/logs/voltvval.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -68,6 +68,6 @@ ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 plt.legend()
 
 # Show plot
-plt.savefig("./figures/figspeedvrv.png")
+plt.savefig("./figspeedvrv.png")
 plt.close(f)
 

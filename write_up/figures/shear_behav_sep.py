@@ -61,8 +61,7 @@ ax1.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
 va='center', fontsize=12)
 ax1.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
 va='center', fontsize=12)
-plt.savefig("./figures/fig_shear_behav_thin.png")
-#plt.savefig("./fig_shear_behav_thin.png")
+plt.savefig("./fig_shear_behav_thin.png")
 
 #plt.clf()
 #plot 2
@@ -76,6 +75,5 @@ ax2.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
 va='center', fontsize=12)
 ax2.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
 va='center', rotation='vertical', fontsize=12)
-plt.savefig("./figures/fig_shear_behav_thick.png")
-#plt.savefig("./fig_shear_behav_thick.png")
+plt.savefig("./fig_shear_behav_thick.png")
 

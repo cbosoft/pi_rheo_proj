@@ -45,16 +45,18 @@ class motor(object):
     startnow=False, adc_channels=[0, 1], adc_vref=3.3,
     poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"],
-    log_note="DATETIME", svf=[258.624, 26.728]):
+    log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1):
 
         # Set calibration variables
         self.max_speed = max_speed
         self.min_speed = min_speed
         self.svf = svf
+        self.cvf = cvf
 
         # Set sensor variables
         self.pot = dp()
         self.aconv = ac(cs_pin=1, vref=adc_vref)
+        self.i_poll_rate=i_poll_rate
         
         # Set up logs
         self.log_dir = log_dir
