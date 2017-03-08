@@ -3,7 +3,7 @@
 \def\myname{Christopher Boyle}
 \def\mon{\subsection*{Monday}}
 \def\tue{\subsection*{Tuesday}}
-\def\wed{\susbection*{Wednesday}}
+\def\wed{\subsection*{Wednesday}}
 \def\thu{\subsection*{Thursday}}
 \def\fri{\subsection*{Friday}}
 
@@ -58,15 +58,15 @@
 	\chapter{January 2017}
 	\section{Week Beginning 9 January 2017 (Week 0)}
 	\begin{itemize}
-		\subsection*{Monday}
+		\mon
 		\item Met with Dr. Lue.
 		\item Had a tour about the lab, looked at the hardware that would be used.
 		\item Discussed what steps should first be taken (focus on how to detect the motor's speed), and the format of contact (regular email contact, meetings as necessary).
 		\item Discussed methods of calibrating the motor speed detector (relating speed to voltage, torque to current, etc)
 		\item Found a method for speed detection using magnets and a Hall Effect sensor.
-		\subsection*{Wednesday}
+		\wed
 		\item Dr. Lue postulated another method for detecting the speed using a light sensor, some reflective material mounted on the rotating cylinder and a laser.
-		\subsection*{Friday}
+		\fri
 		\item Discovered a simple electronic circuit using a potentiometer/voltage-divider and a transistor to control the voltage being supplied to the motor (to control the speed)
 		\item Implemented a scaled-down prototype version of the speed control circuit, it seemed to work well.
 		\subsection*{Saturday}
@@ -75,11 +75,11 @@
 	\newpage
 	\section{Week beginning 16 January 2017 (Week 1)}
 	\begin{itemize}
-		\subsection*{Monday}
+		\mon
 		\item Met with Dr. Lue and Dr. Haw, RE motor speed control.
 		\item Discussed different methods of calibrating the motor, decided to use a reference fluid to test how well the RPi system works vs a commercial rheometer.
 		\item  To do this week: fill out risk assessment, find out more about the Hall Effect sensor as a means to detect speed, set up speed control and speed detection circuit, and get it working with the pi.
-		\subsection*{Tuesday}
+		\tue
 		\item Found problem with the hall effect sensor: magnetic field in single small magnet not enough to trigger it. Two magnets required, possible creating problems when fitting later on?
 		\item Hall effect sensor not working properly with the raspberry pi - it is pulling down the pin voltage too far: the RPi cannot sense the signal.
 		\item Dr. Lue gave me some smaller magnets, will test these with the hall effect sensor.
@@ -87,15 +87,15 @@
 		\item Fixed problem with hall effect sensor circuit (by adding a transistor)
 		\item Hall sensor is triggered when a magnet's south pole comes within 10mm of the sensor.
 		\item To do tomorrow: go into lab and test speed sensor with the actual motor, check motor class is working properly.
-		\subsection*{Wednesday}
+		\wed
 		\item New digital potentiometer arrived and tested, updated dig\_pot class to reflect the new hardware
 		\item Preliminary testing of the new equipment showed it works as expected, some tweaking to the resistor values necessary to change the voltage range accross the motor. 
 		\item Ready to test on actual process motor!
 		\item Added description of how the hall effect sensor circuit works to the report draft.
-		\subsection*{Thursday}
+		\thu
 		\item Continued background reading on the DST/Jamming phenomenon.
 		\item Wrote scripts to automatically discover the maximum and minimum speeds of the motor and also to perform a step test on the motor system - this allows a model of the control process to be produced enabling a simulation of the system to be used to tune the controller.
-		\subsection*{Friday}
+		\fri
 		\item Continued background reading.
 	\end{itemize}
 	\newpage
@@ -163,28 +163,20 @@
 		\subsection*{Monday}
 		\item Tried to use the ADC to check the waveform of the Hall effect sesnor (to diagnose why it isn't working correctly)
 		\item ADC has issues reading from the hall effect sesnor (it shouldn't). Should be a software issue, so debugged code. Will test tomorrow.
-		\item (difficult to debug and test at the same time due to the lack of internet in the lab :/ )
 		\item Tested new speed detection algorithm - seems to work better (gives, mostly, more accurate results) but is \textbf{very} noisy
-		\item Waiting on the ADC being fixed to be able to properly diagnose the hall problem (hopefully tomorrow)
 		\subsection*{Tuesday}
 		\item The ADC seems to be working, not had an issue with it and the new code this morning.
-		\item The hall effect sesnor doesn't seem to be giving out a regular waveform - resulting in very noisy speed data.
-		\item (See "hall\_sensor\_not\_working.png" in "pi\_rheo\_proj/write\_up/images")
+		\item The hall effect sensor doesn't seem to be giving out a regular waveform - resulting in very noisy speed data.
 		\item Something is interfering with the operation of the hall effect sensor, will try using an optical sensor instead.
 		\item Spent some time (read: hours) trying to figure out what might be going wrong on the software side of things, couldn't see a solution.
-		\item Ordered a light based sensor to see if it was the hall sensor which was faulty (should arrive tomorrow)
 		\subsection*{Wednesday}
-		\item Waiting on package to arrive
 		\item (Re) reading lit on shear thickening mechanisms and effects
 		\item Retested hall effect sensor (logged a more complete idea of what is going on) 
-		\item Light sensor not arrived yet.
-		\item spent time processing the logged data and attempting to find out what is going wrong.
+		\item Spent time processing the logged data and attempting to find out what is going wrong.
 		\subsection*{Friday}
 		\item Found an interesting paper going into detail about the causes of shear thickening (how it occurs etc)
-		\item Had another look at why the speeds are being calculated differently, no avail. Will try the new method this afternoon.
-		\item A third method of calculating the speed will be tried and compared with the other methods.
-		\item The current sensor will be tested. Briefly tried last night, it didn't seem to be giving out the expected signal.
-		\item Will also take a video of the motor to try to confirm what the actual speed is.
+		\item Had another look at why the speeds are being calculated differently, no avail.
+		\item The current sensor was tested, it didn't seem to be giving out the expected signal. Need more data.
 	\end{itemize}
 	\newpage
 	\section{Week Beginning 13 February 2017 (Week 5)}
@@ -233,8 +225,7 @@
 		\item Much frustration - there is little to do before the DP can be replaced (tomorrow hopefully)
 		\fri
 		\item Installed and tested new ADC - works a charm. External reference voltage makes things much easier (plus 8 channels and single ended inputs!)
-		\item Installed replacement potentiometer - found out I ordered a rheostat instead. Rheostat in a potential divider results in an inverse parabolic response.
-		\item Sigh. Will do for now, 'nother potentiometer, on the way.
+		\item Installed replacement pot - accidentally ordered wrong part - re-replacement on its way
 		\item Pulley too large, dynamo is rotating too slowly at low motor voltages, resulting in noisy/inaccurate voltage readings. Smaller pulley required.
 	\end{itemize}
 	\newpage
@@ -271,7 +262,7 @@
 		\item Confirmed input voltages
 	\end{itemize}
 	\newpage
-	\chapter{February 2017}
+	\chapter{March 2017}
 	\section{Week Beginning 6 March 2017 (Week 8)}
 	\begin{itemize}
 		\mon
@@ -282,8 +273,10 @@
 		\item Looked at getting the current sensor to work:
 		\subitem Sensor output is too low (0-120mA) and has an offset of 2.5V (complicating matters)
 		\subitem Will use a differencing op-amp to subtract the offset and gain the result by 20 or so.
-		\item Continued writing 1st draft of report
-		\item Will put current sensor together this afternoon
+		\item Continued writing 1st draft of report (drawing diagrams, fixing things, tinkering with \LaTeX)
+		\wed
+		\item Tested the new current sensor signal conditioning circuits, Is not working as anticipated. Value is still hovering around 2v, despite having the offset removed. Maybe the offset subtraction is off? Maybe the amount subtracted is not entirely accurate?
+		\item will test with removed gains (so adc is measuring HES output - 2.5)
 		
 
 	\end{itemize}

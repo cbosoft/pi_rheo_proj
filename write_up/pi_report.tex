@@ -2,10 +2,12 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{4401}
+\def\thewords{4842} % last proper build on Wed 08 March 2017 at 11:35:41
 
 \def\br{\newline \newline \noindent}
-
+\def\hi{\huge{!!!}}
+\def\nohi{!!!! \normalsize}
+\def\cbh{\large\bfseries !!! ??? !!! \normalsize\normalfont}
 
 % Imports
 \usepackage{graphicx}
@@ -201,38 +203,54 @@
 	\label{gpiopinout}
 	\end{figure} \newline  \noindent
 	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \br
-	The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions. \br
-
-
-	\section{Colloidal Suspensions and Jamming NOT HAPPY, REDO}
-	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-newtonian fluids. Shear thickening behaviour can be split into further categories: continuous shear thickening, and discontinuous shear thickening. Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \newline \newline \noindent
-	%Particles in a suspension can be of different shapes. The shape most often considered is the Hard Sphere (HS). HS particles are spherical and do not interact (WHAT) \newline
-	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE).
+	The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
+	
+	\section{Rheometry} % last edited 7/3/2017
+	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products are have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it shears(\(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
+	\begin{equation}
+	\mu = \frac{\tau}{\dot{\gamma}}
+	\label{eqnvisco}
+	\end{equation}
+	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate (the speed of the deformation) or the shear stress (the force behind the deformation). Newtonian fluids (like water) have a viscosity which is independent of the shear stress - proportional only to the shear rate. Some fluids have time-dependant viscosities: thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied, and rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress: shear-thinning fluids have a viscosity that appears to decrease with increased stress, and shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
 	\begin{figure}[!htb]
 		\centering
 		\fbox{
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			
-			
-			
-			
-			
-			\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
-			\caption{Shear Thinning}
-			\label{figshearthin}
-		\end{subfigure}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
-			\caption{Shear Thickening}
-			\label{figshearthick}
-		\end{subfigure}
-		%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
+			\begin{subfigure}[t]{0.45\textwidth}
+				\centering
+				\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
+				\caption{Shear Thinning}
+				\label{figshearthin}
+			\end{subfigure}
+			\begin{subfigure}[t]{0.45\textwidth}
+				\centering
+				\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
+				\caption{Shear Thickening}
+				\label{figshearthick}
+			\end{subfigure}
+			%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
 		}
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure} \newline  \noindent
+	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
+	The capillary rheometer \cbh \br %(Information about the CR: how does it work, how accurate can it be, what is it usually used for)
+	The cone-and-plate rheometer \cbh \br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
+	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. In this scenario, \cbh
+	constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder.
+	
+	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
+	Multiphase suspensions \cbh \br
+	Shear thickening: DST \cbh \br
+	Jamming, problems \cbh \br
+	\textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam} \cbh \br
+	void fraction \cbh \br
+	\( \Phi = 0.64 \) \cite{backguypoonjam} \cbh \br
+	void frac v jamming probability \cbh \br
+	hard spheres \cbh \br
+	
+	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br
+	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE).
+	
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	\newline \newline \noindent
@@ -242,8 +260,9 @@
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
+	
 
-	\section{This Project} % section last edited 3/3/2017
+	\section{This Project} % last edited 3/3/2017
 	This project aims to design, build, and test a control system for a bespoke jamming-focussed experimental rheometer. The experiment itself aims to gather more information about the statistical probability of the occurrence of a jam and how the shear stress affects this. \br
 	The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to either a constant shear force, or a constant shear rate. 
 	%To find out how the formation of the cracks on the fluid's surface during shear correlate with the occurrence of discontinuous shear thickening, a camera will be aimed at the surface of the shearing fluid throughout the course of the experiment. The camera will be optically magnified using lenses placed in front of the aperture and will record images, which can later be processed using image recognition software to detect the formation of the cracks. \newline \newline \noindent
@@ -252,7 +271,7 @@
 	Hardware was be developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the motor, the electrical power supplied to the motor, the current shear stress observed within the fluid, and the presence of 'cracks' on the surface of the fluid.\br
 	Software will be developed to facilitate the accurate reading of information from the experiment, as well as control of the experimental parameters. There are two general operating modes; constant shear rate (or rotational speed), and constant shear stress (or torque). The former is relatively simple to do. By recording the motor's rotational speed and comparing with a set point, the speed can easily be held at a fixed point (thus a constant shear rate is achieved). The output torque is fixed in a similar way, using feedback from the process to fix the torque from the motor.
 
-	%\chapter*{Description of the Organisation} % section last edited 3/3/2017
+	%\chapter*{Description of the Organisation} % last edited 3/3/2017
 	%\addcontentsline{toc}{chapter}{Description of the Organisation}
 	%\label{chap:doo}
 	%\def\achapter{Description of the Organisation}
@@ -276,14 +295,20 @@
 	A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
 	\centering
-	\fbox{\includegraphics[scale=0.6]{images/expsetup.png}}
+	\fbox{\includegraphics[scale=0.3]{images/exp_set_up.png}} % https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fexp_set_up.xml
 	\caption{Diagram of the Experimental Apparatus}
 	\label{expdia}
-	\end{figure}
+	\end{figure} 
 	
 	\section{Electronic Circuits} % last edited 7/3/2017
 	%in depth description of relevant electronic circuits
-	The electronic circuits attached to the Raspberry Pi can be split into three distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, the motor speed control converts a digital signal into rotation of the motor, and the PEND signal processing circuit converts the analogue signal from the PEND into a digital signal.
+	The electronic circuits attached to the Raspberry Pi can be split into three distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, the motor speed control converts a digital signal into rotation of the motor, and the PEND signal processing circuit converts the analogue signal from the PEND into a digital signal. See Figure \ref{circfull} for an overall diagram of the circuit.
+	\begin{figure}[!htb]
+		\centering
+		\fbox{\includegraphics[scale=0.3]{images/blank.png}}
+		\caption{Schematic Diagram of Electronic Circuits}
+		\label{circfull}
+	\end{figure}
 
 
 
@@ -300,19 +325,18 @@
 	%Light Sensor
 	%The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
 	%Dynamo
-	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using the ADC. This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.4]{images/blank.png}}
-		\caption{Circuit Schematic Diagram: Motor Speed Detection}
-		\label{circspeeddet}
-	\end{figure}
+	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
+	%\begin{figure}[!htb]
+	%	\centering
+	%	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
+	%	\caption{Circuit Schematic Diagram: Motor Speed Detection}
+	%	\label{circspeeddet}
+	%\end{figure}
+	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor pakcage (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through the inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it to a suitable level for the ADC to read it.
 	
 
 	\subsection{\textit{Motor Speed Control}} % last edited 7/3/2017
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Figure \ref{circdigpotclose} highlights the resistances in the potentiometer: \(R_{AW}\) is the resistance between the A terminal pin on the potentiometer and the wiper pin and \(R_{WB}\) is the resistance between the wiper pin and the B terminal pin. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value (\(R_{pot} = 10,000\ \Omega \)). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While thiswould also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3000\ \Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
-	
-	%%%%%%%%%% REDO?
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10,000\ \Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3000\ \Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
@@ -325,22 +349,22 @@
 		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The resistance is sent as a number between 0 and 127. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.2]{images/circdigpotclose.png}}
-		\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
-		\label{circdigpotclose}
-	\end{figure} \newline  \noindent
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[width=\textwidth]{images/circspeedcontr.png}}
-		\caption{Circuit Schematic Diagram: Motor Speed Control ADD RESISTOR NAMES}
-		\label{circspeedcontr}
-	\end{figure} \newline  \noindent
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
+	%\begin{figure}[!htb]
+	%	\centering
+	%	\fbox{\includegraphics[scale=0.2]{images/circdigpotclose.png}}
+	%	\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
+	%	\label{circdigpotclose}
+	%\end{figure} \newline  \noindent
+	%\begin{figure}[!htb]
+	%	\centering
+	%	\fbox{\includegraphics[width=\textwidth]{images/circspeedcontr.png}}
+	%	\caption{Circuit Schematic Diagram: Motor Speed Control ADD RESISTOR NAMES}
+	%	\label{circspeedcontr}
+	%\end{figure} \newline  \noindent
 
 
-	\subsection{\textit{PEND Signal Processing}}
+	%\subsection{\textit{PEND Input Processing}}
 
 
 
@@ -394,7 +418,7 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 	
 	\subsection{Current Sensor}
 	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the current will increase (reverse direction) or decrease (forward direction) this voltage. \br
-	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by [WHAT IS THE GAIN?!] and fed into the ADC (channel \#1). \br
+	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). \br
 	[RESULTS AND SUCH]
 	
@@ -512,7 +536,7 @@ An example of a machine code (in hexadecimal)\cite{proglangmachex}:
                     0x 20 04 04 05
                     0x 11 20 04 01
 \end{verbatim}
-	From the above it can be seen that high level languages, while not strictly English, are far easier to read than machine code. Machine code will take multiple instructions to achieve the same thing that could be done in a single line in a high level language, thus a high level instruction needs to be converted into multiple machine level instructions for the processor to understand it. There are different ways of doing this, leading to diversity in the types of high level languages. (MISSING LINK). Object Oriented Programming Languages (OOPLs) deal with data in terms of "objects"\cite{proglangwhatisoopl}. An object is, like the name suggest, something. This something has properties, and can have things done to it. In the above Python example, "alarm\_time" is a number object, and it is being assigned a value. A "method" is a way of doing something in the program. In the above, the "time()" method is used to get the current time (in number of seconds since 1 January 1970). The advantage of OOPLs lies in the ability to collect objects and methods together in a class. The "time" class above contains a lot of methods which can be used by the programmer, in the example the "time.time()" method is called from the class. The programmer can therefore define a set of methods for dealing with some data in a certain way in a class, and then create multiple instances of this class with different starting data to make use of different starting data. For example, a "sphere" class could be written, with methods which provide the sphere's surface area and volume, given the sphere's diameter. Then a program could be written to create three sphere class instances, each with different diameters and then the areas and volumes could be calculate simply when needed. This creates tidy programs, which are easier to understand and reduces the amount of redundant code that needs to be written.\newline \newline  \noindent
+	From the above it can be seen that high level languages, while not strictly English, are far easier to read than machine code. Machine code will take multiple instructions to achieve the same thing that could be done in a single line in a high level language, thus a high level instruction needs to be converted into multiple machine level instructions for the processor to understand it. There are different ways of doing this, leading to diversity in the types of high level languages. \hi (MISSING LINK) \nohi. Object Oriented Programming Languages (OOPLs) deal with data in terms of "objects"\cite{proglangwhatisoopl}. An object is, like the name suggest, something. This something has properties, and can have things done to it. In the above Python example, "alarm\_time" is a number object, and it is being assigned a value. A "method" is a way of doing something in the program. In the above, the "time()" method is used to get the current time (in number of seconds since 1 January 1970). The advantage of OOPLs lies in the ability to collect objects and methods together in a class. The "time" class above contains a lot of methods which can be used by the programmer, in the example the "time.time()" method is called from the class. The programmer can therefore define a set of methods for dealing with some data in a certain way in a class, and then create multiple instances of this class with different starting data to make use of different starting data. For example, a "sphere" class could be written, with methods which provide the sphere's surface area and volume, given the sphere's diameter. Then a program could be written to create three sphere class instances, each with different diameters and then the areas and volumes could be calculate simply when needed. This creates tidy programs, which are easier to understand and reduces the amount of redundant code that needs to be written.\newline \newline  \noindent
 	Another, less common, type of programming language is the procedural language. This language is simply one instruction following another\cite{proglangwhatisoopl}. The procedural program starts at the start and continues down the list of instructions until it finishes. This language requires writing out the same code multiple times to achieve the same effect as an OOPL, which is a reason for its reduced popularity.\newline \newline  \noindent
 	As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason.\newline \newline  \noindent
 	To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.\newline \newline  \noindent
