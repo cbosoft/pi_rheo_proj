@@ -35,7 +35,7 @@ if (wc == "1912 words"):
     wc = "something went wrong...      "
 
 print "result: {0}".format(wc)
-rep[4] = "\\def\\thewords{" + str(wc)[:-6] + "}\n"
+rep[4] = "\\def\\thewords{" + str(wc)[:-6] + "} % last proper build on " + time.strftime("%a %d %B %Y at %H:%M:%S", time.gmtime())+ "\n"
 
 print "updating tex"
 rep_file = open("pi_report.tex","w")
