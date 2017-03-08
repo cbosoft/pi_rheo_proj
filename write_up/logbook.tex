@@ -275,8 +275,13 @@
 		\subitem Will use a differencing op-amp to subtract the offset and gain the result by 20 or so.
 		\item Continued writing 1st draft of report (drawing diagrams, fixing things, tinkering with \LaTeX)
 		\wed
-		\item Tested the new current sensor signal conditioning circuits, Is not working as anticipated. Value is still hovering around 2v, despite having the offset removed. Maybe the offset subtraction is off? Maybe the amount subtracted is not entirely accurate?
-		\item will test with removed gains (so adc is measuring HES output - 2.5)
+		\item Tested the new current sensor signal conditioning circuits, Is not working as anticipated.
+		\item Tested with removed gains (so adc was measuring HES output - 2.5)
+		\item Fixed current sensor now, seems to be properly recording current now, although there is a bit of an offset here also. Will try to reduce the gain (from x22 to x15?) tomorrow.
+		\item Continued writing report
+		\thu
+		\item TODO: tets current sensor with lower gains
+		\item look into python data filtering libraries? are they a thing?
 		
 
 	\end{itemize}
