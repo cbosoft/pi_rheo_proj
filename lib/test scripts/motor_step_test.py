@@ -23,6 +23,7 @@ log = open("./step_log.csv", "w")
 log.close()
 xs = [0]*2
 ys = [0]*2
+start_time = time.time() * 1000.0
 
 log = open("./step_log.csv", "a")
 
@@ -37,7 +38,7 @@ while (time_ <= delay):
     xs.append(time_)
     ys.append(spd)
     time.sleep(0.001)
-    time_ += 1
+    time_ = (time.time() * 1000.0) - start_time
 
 print "stepping up"
 # perform the step
@@ -51,6 +52,6 @@ while (time_ <= (delay + length)):
     xs.append(time_)
     ys.append(spd)
     time.sleep(0.001)
-    time_ += 1
+    time_ = (time.time() * 1000.0) - start_time
 
 log.close()

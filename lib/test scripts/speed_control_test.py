@@ -3,7 +3,6 @@
 #
 # Tries to maintain the speed at a set point using the control library.
 #
-#
 
 import sys
 sys.path.append('./..')
@@ -45,7 +44,7 @@ else:
 
 print "Starting..."
 mot.pot.set_resistance(48)  # roughly 414 RPM
-time.sleep(0.5)
+time.sleep(5) # wait 5s
 
 
 try:

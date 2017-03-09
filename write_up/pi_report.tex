@@ -43,7 +43,7 @@
 
 \def\achapter{preamble}  % set the command "achapter" to  the name of the current section
 \def\rpilong{Raspberry Pi}
-\def\rpi{\(R\pi\)}
+\def\rpi{Raspberry Pi}
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 % TEMPLATES
 
@@ -84,13 +84,15 @@
 %	\fancyhead[L]{\atitle}  % Header left is title
 	\fancyhead[LE]{\achapter}  % Header left is name of chapter
 	\fancyhead[RO]{\shorttitle}  % Header left is name of chapter
-	\fancyhead[RE,LO]{\theauthor}  % Header right is author name
-	\fancyfoot[LO,RE]{\today}  % Footer left is date
+	\fancyhead[RE]{\theauthor}  % Header right is author name
+	\fancyhead[LO]{University of Strathclyde Chemical Engineering}
+	\fancyfoot[LO]{\today}  % Footer left is date
 	\fancyfoot[RO,LE]{\thepage}  % Footer right is page number
 }
 \pagestyle{plain}
 
 \begin{document}
+%% COPY HERE %%
 %%%%%%%%%%%%%%%%%%%%%%%%%% TITLE PAGE
 	\begin{titlepage}
 		\makebox[\textwidth][c]{\includegraphics[scale=1]{images/titleheader.png}}
@@ -134,16 +136,18 @@
 	% Contents Page
 	\def\achapter{Contents}
 	\tableofcontents
-	
+	\noindent \space \br \space \br \space \br \space \br \space \br \space \br \space \br 
+	\begin{center}\vfill \cbh \vfill \end{center}
 	% Acknowledgements
 	\chapter*{Acknowledgements}
 	\addcontentsline{toc}{chapter}{Acknowledgements}
 	\def\achapter{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
-	%Dr. Lue
-	%Jim Murphy
+	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project. At every turn, he was there with new ideas and fresh ideas to keep me going. \br
+	%Dr. Mark Haw - allowing the use of his research room
+	I'd also like to thank Jim Murphy and Chris the lab tech for providing much needed help with the lab equipment! Special thanks to Jim, who made the couette cylinders himself. \br
 	%Aditi Mukhopadhyay
-	%Stack Exchanger Electrical Engineering Community
+	Finally, I'd like to thank the communities of the internet for telling me where I was going wrong, I would still be trying to spin a motor if not for them.
 	
 	\newpage
 	\pagenumbering{arabic}
@@ -239,21 +243,15 @@
 	constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder.
 	
 	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. The hydroclustering theory is that with increased shear stress, the particles stick together more, causing an apparent increase in viscosity. \cbh %more info.
+	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}.
 	The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
 	\cbh \br
-	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder. \cbh \br % cite!
-	Jamming, problems \cbh \br
-	\textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam} \cbh \br
-	void fraction \cbh \br
-	\( \Phi = 0.64 \) \cite{backguypoonjam} \cbh \br
-	void frac v jamming probability \cbh \br
+	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \cbh \br % cite!
+	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
+	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE). \br
 	hard spheres \cbh \br
-	
-	"Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br
-	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE).
-	
-	%flow, shear, jam frequency %TODO
+	% "Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br	
+	\cbh \br %flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	\newline \newline \noindent
 	\begin{figure}[!htb]
@@ -496,7 +494,7 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 	\bibliographystyle{unsrt}
 	%\bibliographystyle{apalike}
 
-%Appendix
+%% APPENDIX %%
 
 
 \appendix

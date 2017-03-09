@@ -18,7 +18,7 @@ print "removing appendix before count"
 app_index = len(rep) - 1
 # strip appendix
 for i in range(0, len(rep)):
-    if (rep[i][:9] == "\\appendix"):
+    if (rep[i][:9] == "%% APPENDIX %%"):
         app_index = i
 rep_na = rep[:app_index]
 rep_na.append("\\end{document}")
