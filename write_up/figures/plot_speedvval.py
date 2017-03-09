@@ -18,7 +18,7 @@ for i in range(2, len(datl) - 2):
     pv.append(float(splt[0]))
 
 # Read csv
-datf = open("./../../lib/test scripts/logs/read_sweep/read_sweep.csv", "r")
+datf = open("./../../lib/test scripts/logs/supply_sweep.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -28,7 +28,9 @@ read_pv = [0] * 0
 
 for i in range(2, len(datl) - 2):
     splt = datl[i].split(",", 13)
-    read_speed.append(float(splt[2]))
+    rv = float(splt[1])
+    #read_speed.append(float(splt[2]))
+    read_speed.append(317.666 * rv - 146.947)
     read_pv.append(float(splt[4]))
 
 # Speed v Value
@@ -61,7 +63,7 @@ plt.close(f)
 
 # Voltage v Value
 # Set up figure
-f = plt.figure(figsize=(7, 7))
+f = plt.figure(figsize=(10, 10))
 ax = f.add_subplot(111)
 
 # Calculate trendline

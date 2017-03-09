@@ -280,8 +280,13 @@
 		\item Fixed current sensor now, seems to be properly recording current now, although there is a bit of an offset here also. Will try to reduce the gain (from x22 to x15?) tomorrow.
 		\item Continued writing report
 		\thu
-		\item TODO: tets current sensor with lower gains
-		\item look into python data filtering libraries? are they a thing?
+		\item Wrote/tidied report.
+		\item Started testing the control system:
+		\subitem Performed a step test, obtained a coherent FOPDT model from the results
+		\subitem Tried to test the actual control system in use (put finger on motor, motor maintains speed under new load)
+		\subitem Control lib is not calculating the control action properly: always 0.0?!
+		\fri
+		\item Continued debugging controller.
 		
 
 	\end{itemize}
