@@ -12,6 +12,7 @@
 
 # Imports
 from time import time
+import sys
 #import matplotlib.pyplot as plt
 
 
@@ -111,9 +112,9 @@ class PIDcontroller(object):
 
         # current_tuning = (self.KP, self.KI, self.KP)
         print "Initialising"
-        points = [[[0, 0], [0, 0]]] * 2  # x, y
-        maxima_count = [0] * 2
-        first_xs = [0] * 2
+        points = [[[0, 0], [0, 0]]] * 0  # x, y
+        maxima_count = [0] * 0
+        first_xs = [0] * 0
 
         # initial tuning
         self.KP = 0
@@ -121,15 +122,15 @@ class PIDcontroller(object):
         self.KD = 0
 
         # tuning history
-        tuning_hist = [(0, 0, 0)] * 2
+        tuning_hist = [(0, 0, 0)] * 0
 
-        print "Checking tuning"
+        print "Checking paramter combinations..."
         # start running through all the possible tuning arrangements
-        for sP in range(0, maxs):
+        for sP in range(0, steps):
             self.KP = 0.0 + float(sP * (float(maxs) / float(steps)))
-            for sI in range(0, maxs):
+            for sI in range(0, steps):
                 self.KI = 0.0 + float(sI * (float(maxs) / float(steps)))
-                for sD in range(0, maxs):
+                for sD in range(0, steps):
                     # self.KD = 0.0 + float(sD * (float(maxs) / float(steps)))
                     #print ("getting tuned response: " + str(self.KP) + ", " +
                     #str(self.KI) + ", " + str(self.KD))
@@ -140,9 +141,12 @@ class PIDcontroller(object):
                     maxima_count.append(a)
                     first_xs.append(b)
                     tuning_hist.append([self.KP, self.KI, self.KD])
+                    prog = ((sP * steps) + sI) * 100 / (steps ** 2)
+                    sys.stdout.write(('\r[ {0} ] {1}% [ KP={2}, KI={3}]').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog, self.KP, self.KI))
+                    sys.stdout.flush()
 
-        print "Finding best option"
-        for i in range(2, len(points)):
+        print "Optimising..."
+        for i in range(0, len(points)):
             if (maxima_count[i] > 0 and maxima_count[i] < 5):
                 pass
             else:
@@ -150,7 +154,7 @@ class PIDcontroller(object):
 
         smallest_x = 1000.0
         at_indx = 0
-        for i in range(2, len(points)):
+        for i in range(0, len(points)):
             if (first_xs[i] < smallest_x):
                 at_indx = i
                 smallest_x = first_xs[i]
@@ -205,12 +209,14 @@ class PIDcontroller(object):
 
 
 if __name__ == "__main__":
-    a = PIDcontroller(1, 1, 1)
-    a.tune(2, 10, 100, 10)
+    #a = PIDcontroller(KP=30.0, KI=468.75, KD=0, set_point=200.0)
+    a = PIDcontroller(KP=0.01, KI=0.001, KD=0, set_point=200.0, sample_time=0.0001)
+    #a.tune(0.072, 0.21, 50, 50)
     print "Model controller tuned:"
     print "Kp: " + str(a.KP)
     print "Ki: " + str(a.KI)
     print "Kd: " + str(a.KD)
+    print str(a.get_control_action(400.0))
     #resp, tuning, index = a.tune(2, 10, 10, 10)
     #print str(tuning[index])
     #resp_y = [0] * 2
