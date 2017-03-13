@@ -286,9 +286,18 @@
 		\subitem Tried to test the actual control system in use (put finger on motor, motor maintains speed under new load)
 		\subitem Control lib is not calculating the control action properly: always 0.0?!
 		\fri
-		\item Continued debugging controller.
-		
-
+		\item Debugged control lib, started thinking about methods of filtering/smoothing the data
+	\end{itemize}
+	\newpage
+	\chapter{March 2017}
+	\section{Week Beginning 6 March 2017 (Week 8)}
+	\begin{itemize}
+		\mon
+		\item Still having issues with (my) PID controller. Looked at how other peopple have achieved PID control in python (and how it differs from my own solution)
+		\item Looked into the different methods of noise reduction/filtering/smoothing:
+		\subitem Moving average (MAV); exponential decay MAV; Gaussian weighted smoothing; 
+		\subitem Butterworth filter; Wiener probability filter; spline smoothing
+		\item Wrote more of the report.
 	\end{itemize}
 	\newpage
 	\chapter{Considerations/To-do list}

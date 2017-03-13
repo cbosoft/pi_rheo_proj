@@ -2,12 +2,11 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6270} % last proper build on Thu 09 March 2017 at 16:33:37
-
+\def\thewords{7526} % last proper build on Mon 13 March 2017 at 20:22:20
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
-\def\cbh{\large\bfseries !!! ??? !!! \normalsize\normalfont}
+\def\cbh{}%\large\bfseries !!! ??? !!! \normalsize\normalfont}
 
 % Imports
 \usepackage{graphicx}
@@ -145,7 +144,7 @@
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
 	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project. At every turn, he was there with new ideas and fresh ideas to keep me going. \br
 	%Dr. Mark Haw - allowing the use of his research room
-	I'd also like to thank Jim Murphy and Chris O'Labman for providing much needed help with the lab equipment! Special thanks to Jim, who made the couette cylinders himself. \br
+	I'd also like to thank Christopher Jones help with the lab equipment. Special thanks to Jim Murphy, who made the Couette cylinders himself. \br
 	%Aditi Mukhopadhyay
 	Finally, I'd like to thank the communities of the internet for telling me where I was going wrong, I would still be trying to spin a motor if not for them.
 	
@@ -163,11 +162,11 @@
 
 
 
-	\section{Laboratory Automation and Process Control} % section last edited 3/3/2017
-	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 1,000,000 observations and hypotheses per day \cite{backontorobsci}. \br
+	\section{Laboratory Automation and Process Control} % section last edited 13/3/2017
+	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 1,000,000 observations and hypotheses per day \cite{backontorobsci}. \cbh %safety? toxic environs?
+	\br
 	Laboratory automation emerged in the late 19th century, with siphons and controlled flow of water used to automate various processes. As technology advanced and electronics became more prevalent, the options for automation in the laboratory increased. Automatic titration equipment (using photo-cells to detect a colour change) were revolutionary in their ability to accurately and consistently record results, especially for difficult to discern colour changes \cite{backlabautohisto}. \br
-	Process control is a form of laboratory automation, using technology to replace the need for manual intervention in the running of a process. Process control has developed along a similar path to laboratory automation; starting with mechanical analogue devices, then moving into electronically assisted technology and then, with the advent of computer technology, process control became what it is today \cite{backautocontrolhisto}.
-	%Laboratory automation is similar in concept to process control, both using computers to manage the running of a process. %? How else to word this...
+	Process control can be thought of as the industrial mirror of laboratory automation which has developed along a similar path starting with mechanical analogue device, moving into electronically assisted technology and then, with the advent of computer technology, process control became the marriage of digital and analogue systems it is today \cite{backautocontrolhisto}.
 	Process control is an inherent area of process design; the process (whatever it may be) has parameters which must be controlled so that the process continues under the design paramters; at the correct temperature, pressure, etc. Process control has historically been achieved through the use of analogue equipment, using pressurised air to send and receive signals from process equipment. Modern process control is achieved through the use of computers and digital electronics, where the analogue measured signals are converted into digital signals, so that a computer can understand the data. The controller applies an algorithm to calculate the control action required to maintain the desired value of the variable. The modern digital controller can deal with almost any form of input, guarding against a wide variety of disturbances. If it can be measured, it can be controlled.\br
 	At the heart of the modern controller is the control algorithm. This is the calculation which determines what change to the control output needs to be made (the control action). Control algorithms vary with application. The most commonly used algorithm is the Proportional-Integral-Derivative algorithm (PID control), consisting of three sections which can be turned off or on depending on the needs of the situation:
 	\begin{itemize}
@@ -195,7 +194,6 @@
 	\fbox{\includegraphics[scale=0.3]{images/annotpidia.png}} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
 	\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
 	\label{pidia}
-%	\footnotesize Clockwise from top left: GPIO pins, USB ports, Ethernet port, audio jack, Camera Serial Interface (CSI), HDMI port, micro-USB power port, and Display Serial Interface (DSI).
 	\end{figure} \newline% \noindent
 	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. The quad core processor enables better multi-threaded operation for software running on the Raspberry Pi, meaning that big cumbersome programs can run much more efficiently than before. In addition, the increase in memory and CPU clock frequency means there is overall a massive performance boost. Operations like compiling a large program (for example OpenCV, the Open Source Computer Vision Library) which could take over 9 hours \cite{pipowercompold} on the Raspberry Pi 1, takes little over an hour and a half \cite{pipowercompnew} on the latest model.\br
 	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). \br
@@ -249,9 +247,9 @@
 	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \cbh \br % cite!
 	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
 	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE). \br
-	hard spheres \cbh \br
+	Hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
 	% "Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br	
-	\cbh \br %flow, shear, jam frequency %TODO
+	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	\newline \newline \noindent
 	\begin{figure}[!htb]
@@ -313,18 +311,7 @@
 
 
 
-	\subsection{\textit{Motor Speed Detection}} % last edited 7/3/2017
-	%Hall Effect
-	%The rotational speed of the motor is detected by attaching a magnet to the rotating cylinder and detecting how many times the magnet passes a Hall effect sensor (US5881) in a given time span. Four magnets will be attached to the motor, equally spaced. Thus, every time a magnet triggers the sensor it corresponds to a quarter turn. The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low (0v). To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and connected through a transistor to ground. Normally, the high input to the transistor allows the flow of current from the GPIO pin to ground, meaning it has a low value. When the hall effect sensor detects a magnet the high signal to the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
-	%\begin{figure}[!htb]
-	%	\centering
-	%	\fbox{\includegraphics[scale=0.4]{images/circspeeddet.png}}
-	%	\caption{Circuit Schematic Diagram: Motor Speed Detection}
-	%	\label{circhall}
-	%\end{figure} \newline  \noindent
-	%This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
-	%Light Sensor
-	%The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
+	\subsection*{\textit{Motor Speed Detection}} % last edited 13/3/2017
 	%Dynamo
 	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
 	%\begin{figure}[!htb]
@@ -333,10 +320,10 @@
 	%	\caption{Circuit Schematic Diagram: Motor Speed Detection}
 	%	\label{circspeeddet}
 	%\end{figure}
-	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor pakcage (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through the inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it to a suitable level for the ADC to read it.
+	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor pakcage (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through the inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read.
 	
 
-	\subsection{\textit{Motor Speed Control}} % last edited 7/3/2017
+	\subsection*{\textit{Motor Speed Control}} % last edited 7/3/2017
 	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10,000\ \Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3000\ \Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
@@ -369,23 +356,85 @@
 
 
 
-	\section{Software} % Re do section
-	To manage the hardware connected to the device, software was written in Python, using software packages from its extensive (community driven) online repositories. The object-oriented nature of the language was fully utilised in order to create class-based code that was easy to read so that another person wanting to use the software would be able to understand how it works. In addition, the classes make it easy to add additional functionality to the experiment (adding other sensors or motors to increase the scope of the experiment). The software was composed of five main classes: exp\_run.py, control.py, motor.py, dig\_pot.py, and adc.py. \newline \newline \noindent
-	A master script controls all of the classes and controls the overall flow. It looks for run information and checks whether there are runs to be done. Data defining the parameters of the experimental runs is contained in a comma separated value (CSV) file. This information is read in by the \(exp\_run\) class, which uses this to run the motor at the correct speed using the \(motor\), \(dig\_pot\), and \(control\) classes. The PEND sensor input is read in using the \(adc\) class. See Figure \ref{codemap} for a diagram of communication between the classes. \newline 
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.3]{images/codemap.png}}
-		\caption{Code Map Diagram (RE DO RE DO RE DO)}
-		\label{codemap}
-	\end{figure}
-	EXPLAIN THE DIFFERENT SCRIPTS AND CLASSES
+	\section{Software} % last edited 13/3/2017
+	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.\br
+	The hardware designed for this project makes heavy use of the SPI protocol - a kind of serial communication. The SPI protocol can be accessed in a python environment by using the SpiDev package \cite{srcspidev}. This package makes functions available to create a connection to an SPI device, to send data, and to receive data. This package is used to set the resistance on the digital potentiometer, and to read signal information from the analogue to digital converter. \br
+	The software is organised into different classes:
+	\begin{itemize}
+		\item Digital Potentiometer \newline 
+		This class manages the sending of data to a digital potentiometer and keeps a record of some key data.
+		\item ADC \newline 
+		This class manages the sending and receiving of data between the \rpi and an ADC.
+		\item Control\newline 
+		This class is a discrete time implementation of the PID algorithm used in process control.
+		\item Motor \newline
+		This class makes use of the digital potentiometer class to control the voltage supplied to the motor, the ADC class to read in the speed of the motor and the current drawn by the motor. This data is logged at a set rate to be used in calculating the viscosity.
+		\item Noise Filter \newline
+		Not a class, but a collection of functions and classes that can be used to reduce noise in read data.
+	\end{itemize}
+	Full copies of the software source code can be found in Appendix 1.
+	%Section detail
+	\subsection*{Digital Potentiometer} % last edited 13/3/2017
+	% Description
+	This class enables the software to interact with the digital potentiometer (model MCP4131) using the SPI protocol. This class makes use of the spidev package to enable SPI communication. The class contains a function to set a value on the resistor (as an integer number between 0 and 127), and is set up such that multiple digital potentiometers can be included on the same circuit.\br
+	% Usage
+	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the "\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: "\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.\br
+	To set the resistance on the potentiometer, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. Then it uses the spidev package to send this value to the correct register on the potentiometer, causing it to alter its resistance.\br
+	%What else to include?
+	\subsection*{ADC} % last edited 13/3/2017
+	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. Again, just as before, multiple instances can be used in conjunction to manage reading data from different ADCs connected to the \rpi at the same time. \br
+	The initialisation function for the ADC class has two parameters, both optional. The first is a chip select parameter (used to tell spidev which device we are trying to communicate with on the SPI network) which has a value of 1 by default. The second parameter is the value of the reference voltage (\texttt{vref}), 3.3 by default, used to calculate the voltage read in by the ADC from the 10-bit value read from the ADC. \br
+	Usage of the class is very simple: the "\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the "\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.\br
+	\subsection*{Control} % last edited 13/3/2017
+	This class is primarily a discrete-time implementation of the PID algorithm, also known as the velocity algorithm (Equation \ref{eqdiscpid}).\br
+	The initialisation function for this class accepts five optional arguments:
+	\begin{itemize}
+		\item KP, the proportional control coefficient. 0 by default.
+		\item KI, the integral control coefficient. 0 by default.
+		\item KD, the derivative control coefficient. 0 by default.
+		\item sample\_time, the interval time between control action updates. By default, this is automatically calculated, but can be set manually here for simulating the response.
+		\item set\_point, what is the desired value for the controlled process variable. 0 by default.
+	\end{itemize}
+	For the PID controller to be useful, it needs to be tuned. This can be done using a model transfer of the process and the "\texttt{tune}" function. This function will iterate through a range of possible tunings and decide upon the best solution based upon the model's response to a step change in set point. This decision is based upon rise time, and stability (amount of response oscillation). Alternatively, the tune function will based the optimal tuning upon the integral-squared-error (ISE) value of the result. The model must be first order, its parameters (time constant "\texttt{time\_constant}" and steady state gain "\texttt{steady\_state\_gain}") are passed to the tune function as required arguments. Optional arguments are the ranges for the tuning to iterate through for each tuning parameter: \texttt{pmx}, \texttt{imx}, and \texttt{dmx}. These arguments are tuples representing the bottom end of the range and the top end. By default all three are equal to \texttt{(0.0, 1.0)}. Other optional arguments are the number of iterations to go through ("\texttt{steps}", 20 by default), and "\texttt{ise\_tuning}", a boolean value indicating whether to use the ISE tuning method (\texttt{True} by default). \br
+	The main use of this class is to obtain a suitable control action to apply, based upon an input reading. This is calculated using Equation \ref{eqdiscpid}.
+	\begin{equation}
+	ca = \pm K_C \left(\Delta \epsilon (k) + \frac{\Delta t_s}{\tau _I}\epsilon (k) + \tau _D \frac{\Delta \epsilon(k) - \Delta \epsilon(k - 1)}{\Delta t_s}\right)
+	\label{eqdiscpid}
+	\end{equation}
+	Mentioned in Chapter 1 are the PID parameters; KP, KI, and KD. These are not absent from Equation \ref{eqdiscpid}, just hidden: \(KP = K_C\), \(KI = \frac{K_C}{\tau _I}\), and \(KD = K_C * \tau _D\).\br
+	Function "\texttt{get\_control\_action}" is used to obtain the control action in response to the input. This function takes a single argument, the value of the controlled variable (controller input). Then, python's "\texttt{time}" package is used to calculate, accurately, the time between now and the previous call of the function to give the accurate sample time (\(\Delta t_s\)) used in the velocity algorithm. The function then simply applies Equation \ref{eqdiscpid} to obtain the control action best suited to maintain the desired set point.
+	
+	\subsection*{Noise Filter} % last edited 13/3/2017
+	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms can be applied. \br
+	There are several different types of filtering algorithm: frequency filtering, probability filtering, and graphical smoothing. The first remose noise of a particular frequency while leaving other frequencies in - useful for readings where
+	
+	\subsection*{Motor} % last edited 13/3/2017
+	This class uses the ADC class the read in the current speed and current draw of the motor. The digital potentiometer class is used to control the voltage supply to the motor as well. The overall goal of the motor class is to manage every aspect of the motor, and to record as much relevant data as possible. \br
+	%self, max_speed=0, min_speed=0, startnow=False, adc_channels=[0, 1], adc_vref=3.3, poll_logging=True, log_dir="./dat+plot", log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"], log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1
+	The class is initialised with several optional variables; most are used by the motor class itself while some are for setting up the ADC class, and some are for setting up the digital potentiometer.\br
+	\large Motor-Relevant Arguments \normalsize
+	\begin{itemize}
+%		\item \texttt{min\_speed} - Unused
+%       \item \texttt{max\_speed} - Unused
+		\item \texttt{startnow} - a boolean value indicating whether the speed poll thread should begun now. \texttt{False} by default.
+		\item \texttt{poll\_logging} - a boolean value indicating whether data should be logged by the motor to file. \texttt{True} by default.
+		\item \texttt{log\_note} - a string added to the log file to give more information about the logged data (the test conditions etc). \texttt{"DATETIME"} by default, replaced by the current date and time when the log is written.
+		\item \texttt{log\_titles} - a list of strings giving the headings to be included above the data in the log.
+		\item \texttt{log\_dir} - string, path to directory where the logged data will be saved.
+		\item \texttt{i\_poll\_rate} - "inverse poll rate", the interval between speed polls. A higher value results in sporadic data and lower processing requirements, a low value results in better data but a higher toll on the Raspberry Pi's resources. \texttt{0.1} by default.
+		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(317.666, -146.947)} by default.
+		\item \texttt{cvf} = "current-voltage-function", tuple representing the two coefficients in a linear (1D) fit equation for the relationship between the motor's current draw and the voltage read from the HES current sensor via the ADC. \cbh by default.
+	\end{itemize}
+	The motor class, once set up, can be used to set the value on the digital potentiometer (thus setting its own supply voltage), can read in its speed (using the ADC), and it can calculate its power usage (using the ADC). \br
+	
+	
 
 
 
-	\section{Design Evaluation}
+	\section{Evaluation}
 	%The project can be split into different sections; design, development, and evaluation. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
 	
-	\subsection{Voltage Control} % Add figure
+	\subsection*{Voltage Control} % Add figure
 	The DC motor used in the experiment was able to accept an electrical supply of variable voltage; between 4.5v and 15v. Due to the relatively low speeds required by the shear cell, it was decided that the motor would be controlled in a shifted voltage range, between 2.5v and 10.5v. 
 The low end of that range being 2v less than the motor's minimum voltage was a design artifact, but was later found to adequately power the motor at low speeds. %%%%%%<----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 The circuit was deemed to be satisfactory if it could achieve quick and reliable control over the motor's supply voltage. This was tested by using a script to automatically vary the controlled voltage, and a voltmeter placed in parallel across the motor. The values were recorded for selected values (between 0 and 127, in steps of 16) of the potentiometer, resulting in a correlation between the potentiometer value and the voltage supplied to the motor. The voltage varied linearly with potentiometer value (see figure \ref{figvoltvval}) between the desired minimum and maximum thus proving the circuit to be satisfactory.
@@ -416,7 +465,7 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 %		\label{figvoltvval}
 %	\end{figure} \newline  \noindent
 
-	\subsection{Speed Measurement}
+	\subsection*{Speed Measurement}
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car [CITE?]. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using a slow-motion camera to film the rotation and gauge the actual rotational speed, compared with the value obtained using the dynamo.
 %	\begin{figure}[!htb]
 %		\centering
@@ -426,27 +475,23 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 %	\end{figure} \newline  \noindent
 	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well. This uses little of the computing power of the Raspberry Pi as all it has to do to obtain the rotational rate is read a value in from an ADC and perform a simple multiplication; thus this can be performed accurately and at high frequency - well suited to the required purposes.\br
 	In order to confirm the accuracy of readings, several videos were taken (at 120fps). The speed was set at a constant value for 10 second periods before lowering during filming, allowing the speed at different potentiometer values to be recorded. A mark was made on the rotating cylinder and as this mark passed a certain point, a counter was increased. After the 10 second period, the counter total represented the number of rotations in 10 seconds, the speed in RPM can be calculated by multiplying by 6. This was repeated several times with several different recordings to ensure the resulting correlation was correct. \br
-	To decypher whether this method was quick enough, the motor was set at a single speed, and the speed was recorded at different set intervals. The standard deviation of the resulting speed curves was taken for each interval. Ideally, these should all be the same and equal to zero. %Is this feasible? or just some quality bullshit?
+	%To decipher whether this method was quick enough, the motor was set at a single speed, and the speed was recorded at different set intervals. The standard deviation of the resulting speed curves was taken for each interval. Ideally, these should all be the same and equal to zero. %WHAT?
 	
-	
-	
-	\subsection{Speed Calibration} % Rework
+	\subsection*{Speed Calibration} % Rework
 	There are several parameters that need to be calculated before the motor can be used in the rheometer. The torque and efficiency characteristic curves of the motor need to be calculated (OR FOUND??). To find this, the digital potentiometer was set to 0 and initial readings of the speed and voltage were taken. Then the value was incremented, the motor speed and voltage were recorded. This was done for every possible value for the digital potentiometer. Using the recorded information, a relationship was found between efficiency and speed. This allows the torque to be calculated using only the electrical power input to the motor, and the rotational speed of the motor (see Equation \ref{eqntorque}).
 	\begin{equation}
 	\tau = \frac{I \times V \times \eta}{\omega}
 	\label{eqntorque}
 	\end{equation}
 	
-	\subsection{Current Sensor}
+	\subsection*{Current Sensor}
 	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the current will increase (reverse direction) or decrease (forward direction) this voltage. \br
 	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). \br
-	[RESULTS AND SUCH]
+	\cbh %[RESULTS AND SUCH]
 	
-	\subsection{Motor Torque Calibration (NECESSARY??)}
-	The torque output from the motor with respect to the voltage applied to the motor must be known to be able to calculate the rheology of the liquid in the couette cell. There are two torques output from the motor: the load torque, and the shaft torque. The former is the torque imposed upon the load, and the latter is the torque imposed upon the motor's shaft. \newline \newline \noindent 
-	There are limits upon the motor's output, at high enough torque, the rotational speed will reach zero. This torque value is the \textit{stall torque (\(\tau_s\))} and represents the maximum value of torque able to be output by the motor. The second limit is where the motor has no load imposed upon it. The torque here is the no-load torque (equal to the shaft torque). The rotational speed here is the greatest possible value (for a particular voltage) and can be used to calculate the no-load torque and thus the shaft torque. \newline \newline \noindent
-	By recording the voltage and current through the motor, the power input to the motor can be calculated. Using the electrical power and the efficiency, the mechanical power output and the torque output can also be calculated. The speeds at different loadings were recorded, giving the torque in terms of the voltage/current (power). (REWORD?)
+	\subsection*{Motor Characteristic Curves}
+	% Efficiency (powout/powin) as function of torque (load) and rate
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -470,7 +515,7 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 	\chapter*{Nomenclature}
 	\addcontentsline{toc}{chapter}{Nomenclature}
 	\def\achapter{Nomenclature}
-	%List all the symbols in alphabetical order, with Greek symbols at the end.
+	\hi List all the symbols in alphabetical order, with Greek symbols at the end\nohi
 	\begin{center}
 		\begin{tabular}{|c|l|}
 			\hline
@@ -527,41 +572,29 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 \pagenumbering{alph}
 \setcounter{page}{1}
 \setcounter{section}{1}
-\section{1 - Further Information}
-\subsection{A -  Programming Languages}
-Programming languages come in many forms. High level languages (like C, Java, C\#, Python) are abstracted from the binary in which it will be eventually stored. High level languages consist of a natural-like language which is converted by a "compiler" or "interpreter" into machine code, understandable by the processor \cite{proglanghighlow}.\newline \newline  \noindent
-\noindent
-An example of a high level language (Python):
+
+\section{1 - Source Code} \label{apxsrc}
+As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to debug. The source code for each class section, as well as the filtering library, is included here.
+\subsection{A - ADC}
 \begin{verbatim}
-                    from time import time()
-
-                    alarm_time = 2147483647
-
-                    while (time() < alarm_time):
-                         pass
-
-                    print("Alert!")
+INSERT_FROM("./../lib/adc.py")
 \end{verbatim}
-An example of a machine code (in hexadecimal)\cite{proglangmachex}:
+\subsection{B - Digital Potentiometer}
 \begin{verbatim}
-                    0x 60 00 00 80
-                    0x A4 00 00 00
-                    0x 60 01 00 84
-                    0x A4 01 01 00
-                    0x 60 02 00 00
-                    0x 60 03 00 04
-                    0x 60 04 00 00
-                    0x 60 05 00 01
-                    0x 08 00 00 02
-                    0x 20 00 00 03
-                    0x 20 04 04 05
-                    0x 11 20 04 01
+INSERT_FROM("./../lib/dig_pot.py")
 \end{verbatim}
-	From the above it can be seen that high level languages, while not strictly English, are far easier to read than machine code. Machine code will take multiple instructions to achieve the same thing that could be done in a single line in a high level language, thus a high level instruction needs to be converted into multiple machine level instructions for the processor to understand it. There are different ways of doing this, leading to diversity in the types of high level languages. \hi (MISSING LINK) \nohi. Object Oriented Programming Languages (OOPLs) deal with data in terms of "objects"\cite{proglangwhatisoopl}. An object is, like the name suggest, something. This something has properties, and can have things done to it. In the above Python example, "alarm\_time" is a number object, and it is being assigned a value. A "method" is a way of doing something in the program. In the above, the "time()" method is used to get the current time (in number of seconds since 1 January 1970). The advantage of OOPLs lies in the ability to collect objects and methods together in a class. The "time" class above contains a lot of methods which can be used by the programmer, in the example the "time.time()" method is called from the class. The programmer can therefore define a set of methods for dealing with some data in a certain way in a class, and then create multiple instances of this class with different starting data to make use of different starting data. For example, a "sphere" class could be written, with methods which provide the sphere's surface area and volume, given the sphere's diameter. Then a program could be written to create three sphere class instances, each with different diameters and then the areas and volumes could be calculate simply when needed. This creates tidy programs, which are easier to understand and reduces the amount of redundant code that needs to be written.\newline \newline  \noindent
-	Another, less common, type of programming language is the procedural language. This language is simply one instruction following another\cite{proglangwhatisoopl}. The procedural program starts at the start and continues down the list of instructions until it finishes. This language requires writing out the same code multiple times to achieve the same effect as an OOPL, which is a reason for its reduced popularity.\newline \newline  \noindent
-	As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason.\newline \newline  \noindent
-	To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.\newline \newline  \noindent
-
+\subsection{C - Motor}
+\begin{verbatim}
+INSERT_FROM("./../lib/motor.py")
+\end{verbatim}
+\subsection{D - Control}
+\begin{verbatim}
+INSERT_FROM("./../lib/control.py")
+\end{verbatim}
+\subsection{E - Filtering}
+\begin{verbatim}
+INSERT_FROM("./../lib/filter.py")
+\end{verbatim}
 \section{2 - Design Process Discussion}
 \subsection{A - Voltage Control}
 \subsection{B - Measuring Speed}
@@ -591,7 +624,52 @@ The line graph of speed against potentiometer value should display two lines whi
 	The histogram shows that the intervals are not a constant value (Figure \ref{figsenshisto}). The interval variance is not negligible, and by inspecting the raw data, it was found that the sensor was failing to record some rotations (especially noticable at low speeds). After multiple attempts (with different magnet position, different strengths of magnets) the sensor could not be found to work accurately enough. Perhaps there was a fault in the software, perhaps the \rpi was not able to process the information fast enough, or perhaps the hall effect sensor was simply not able to cope with the repeated switching. The second is highly unlikely; the CPU load on the \rpi was checked on several occasions and was found to only be around 3\% of maximum - the Pi was not at all struggling to run the script.\br
 	The speed comparison was [RESULTS2] (Figure \ref{figspeedvval}) therefore this design meets the specified requirements and is suitable for use.
 \section{3 - Alternative Designs}
-\subsection{A - }
+\subsection{A - Motor Rotation Rate Measuring}
+\large Hall Effect Sensor \normalsize \br
+A Hall Effect Sensor (HES) is a device which reacts to the presence of a magnetic field. There exist packages containing HESs which can be used to detect the presence of a magnetic field and thus output a digital signal based upon this. The rotational speed of the motor could be detected by attaching a magnet to the rotating cylinder and using an HES (model number US5881) to detect when a magnet passes a point. Using this, the time between the magnet detections can be used to calculate the rotation rate of the motor. \br
+The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low (0v). To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and connected through a transistor to ground. Normally, the high input to the transistor allows the flow of current from the GPIO pin to ground, meaning it has a low value. When the hall effect sensor detects a magnet the high signal to the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
+\begin{figure}[!htb]
+	\centering
+	\fbox{\includegraphics[scale=0.3]{images/circspeeddet.png}}
+	\caption{Hall Effect Speed Detector Circuit Diagram}
+	\label{circhall}
+\end{figure} \newline  \noindent
+This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
+\large Light Sensor \normalsize \br
+The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
+\section{4 - Further Information}
+\subsection{A -  Programming Languages}
+Programming languages come in many forms. High level languages (like C, Java, C\#, Python) are abstracted from the binary in which it will be eventually stored. High level languages consist of a natural-like language which is converted by a "compiler" or "interpreter" into machine code, understandable by the processor \cite{proglanghighlow}. \br
+\noindent
+An example of a high level language (Python):
+
+\begin{verbatim}
+        import time                                   # using the "time" package
+        
+        while True:                                   # loop the following forever:
+            print time.strftime("%X", time.gmtime())  # print the current time (HH:MM:SS)
+\end{verbatim}
+An example of a machine code (in hexadecimal)\cite{proglangmachex}:
+\begin{verbatim}
+            0x 60 00 00 80
+            0x A4 00 00 00
+            0x 60 01 00 84
+            0x A4 01 01 00
+            0x 60 02 00 00
+            0x 60 03 00 04
+            0x 60 04 00 00
+            0x 60 05 00 01
+            0x 08 00 00 02
+            0x 20 00 00 03
+            0x 20 04 04 05
+            0x 11 20 04 01
+\end{verbatim}
+From the above it can be seen that high level languages, while not strictly English, are far easier to read than machine code. Machine code will take multiple instructions to achieve the same thing that could be done in a single line in a high level language, thus a high level instruction needs to be converted into multiple machine level instructions for the processor to understand it. There are different ways of doing this, leading to diversity in the types of high level languages. \hi (MISSING LINK) \nohi. Object Oriented Programming Languages (OOPLs) deal with data in terms of "objects"\cite{proglangwhatisoopl}. An object is, like the name suggest, something. This something has properties, and can have things done to it. In the above Python example, "alarm\_time" is a number object, and it is being assigned a value. A "method" is a way of doing something in the program. In the above, the "time()" method is used to get the current time (in number of seconds since 1 January 1970). The advantage of OOPLs lies in the ability to collect objects and methods together in a class. The "time" class above contains a lot of methods which can be used by the programmer, in the example the "time.time()" method is called from the class. The programmer can therefore define a set of methods for dealing with some data in a certain way in a class, and then create multiple instances of this class with different starting data to make use of different starting data. For example, a "sphere" class could be written, with methods which provide the sphere's surface area and volume, given the sphere's diameter. Then a program could be written to create three sphere class instances, each with different diameters and then the areas and volumes could be calculate simply when needed. This creates tidy programs, which are easier to understand and reduces the amount of redundant code that needs to be written. \br
+Another, less common, type of programming language is the procedural language. This language is simply one instruction following another\cite{proglangwhatisoopl}. The procedural program starts at the start and continues down the list of instructions until it finishes. This language requires writing out the same code multiple times to achieve the same effect as an OOPL, which is a reason for its reduced popularity. \br
+As previously mentioned, code written in a programming language is usually compiled before it is run. However, some languages do not need to be compiled before being run. These languages are called "interpreted" languages and they are "compiled" line by line when you run them \cite{proglanginterp}. Since interpreted languages do not need to be compiled (and so software developers do not have to wait for the compilation step to complete before testing) they are preferred for developing software. However, they tend to run slower than compiled programs for the same reason. \br
+To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.
+
+\subsection{B -  Signal Noise Reduction}
 %Appendix Bibliography
 
 \end{document}
