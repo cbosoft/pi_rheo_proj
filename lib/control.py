@@ -6,23 +6,18 @@
 #
 # Uses the valocity discrete time algorithm for control action.
 #
-# To be implemented in the future:
-#	# Continuous time algorithm
-#	# Auto tuning
 
 # Imports
 from time import time
+from time import sleep
 import sys
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 
 class PIDcontroller(object):
     KP = 0.0  # Proportional Gain
     KI = 0.0  # Integral Gain
     KD = 0.0  # Derivative Gain
-    P_On = False
-    I_On = False
-    D_On = False
 
     set_point = 0.0  # Set point used to find the error
 
@@ -31,30 +26,28 @@ class PIDcontroller(object):
 
     time_of_last = 0  # time of last run, in seconds
     sample_time = 0.1  # time between runs, in seconds
+    manual_sample = False
 
     # class initialisation method
-    def __init__(self, KP=0, KI=0, KD=0, sample_time=0.1, set_point=0):
+    def __init__(self, KP=0, KI=0, KD=0, sample_time="AUTO", set_point=0):
+        print "CONTROLLER INITIALISING"
+        if str(sample_time) == "AUTO":
+            print "    auto_sample ON"
+            self.manual_sample = False
+        else:
+            print "    auto_sample OFF"
+            self.sample_time = sample_time
+            self.manual_sample = True
 
-        self.sample_time = sample_time  # initial sample time
+        print "    set_point {0:.1f}".format(set_point)
         self.set_point = set_point
-
-        if (KP == 0):  # if KP is zero, turn off proportional control
-            self.P_On = False
-        else:
-            self.P_On = True
-            self.KP = KP
-
-        if (KI == 0):  # if KI is zero, turn off integral control
-            self.I_On = False
-        else:
-            self.I_On = True
-            self.KI = KI
-
-        if (KD == 0):
-            self.D_On = False  # if KD is zero, turn off derivative control
-        else:
-            self.D_On = True
-            self.KD = KD
+        
+        print "    KP {0:.1f}".format(KP)
+        self.KP = KP        
+        print "    KI {0:.1f}".format(KI)
+        self.KI = KI        
+        print "    KD {0:.1f}".format(KD)
+        self.KD = KD
 
     # simple method that moves values up in array
     def shift_arrs(self):
@@ -66,42 +59,37 @@ class PIDcontroller(object):
         self.e[0] = temp
 
     # get required control action
-    def get_control_action(self, u_val, manual_sample_time=0):
+    def get_control_action(self, u_val):
         # Control action is a function of the k parameters, the previous
         # control actions, the previous errors, and the sample time
 
         # Get actual time between samples
-        if (manual_sample_time == 0):
+        if (self.manual_sample == False):
             if (self.time_of_last == 0):
                 self.time_of_last = time()
-                self.sample_time = 0.1  # rough initial sample time
+                self.sample_time = 0.1 
             else:
-                self.sample_time = time() - self.time_of_last  # set sample
-                                           #time to actual time between samples
+                self.sample_time = time() - self.time_of_last
                 self.time_of_last = time()
-        else:
-            self.sample_time = manual_sample_time
 
         self.shift_arrs()  # move stored values down, making space for next set
 
-        self.e[2] = float(self.set_point) - float(u_val)  # get new error
+        self.e[2] = (float(self.set_point) - float(u_val))  # get new error
+        
+        delta_e = self.e[2] - self.e[1]
 
-        self.ca[2] = self.ca[1]  # use velocity discrete time algorithm to
-                                 # obtain the required control action
+        self.ca[2] = 0.0  # self.ca[1]
 
-        if (self.P_On):
-            self.ca[2] += float(self.KP) * (float(self.e[2]) - float(self.e[1]))
+        self.ca[2] += float(self.KP) * delta_e
 
-        if (self.I_On):
-            self.ca[2] += (float(self.KI) * float(self.sample_time)
-            * float(self.e[2]))
+        self.ca[2] += (float(self.KI) * float(self.sample_time)
+        * float(self.e[2]))
 
-        if (self.D_On):
-            self.ca[2] += ((float(self.KD) / float(self.sample_time)) *
-            (float(self.e[2]) - (2 * float(self.e[1])) + float(self.e[0])))
+        self.ca[2] += ((float(self.KD) / float(self.sample_time)) * delta_e)
+        # (float(self.e[2]) - (2 * float(self.e[1])) + float(self.e[0])))
         return self.ca[2]
 
-    def tune(self, time_constant, steady_state_gain, steps=20, maxs=5):
+    def tune(self, time_constant, steady_state_gain, steps=20, pmx=(0.0, 1.0),imx=(0.0, 1.0), dmx=(0.0, 1.0), ise_tuning=True):
         # for each possible tuning arrangement...
         # gets response to a unit step at t=0
 
@@ -114,12 +102,13 @@ class PIDcontroller(object):
         print "Initialising"
         points = [[[0, 0], [0, 0]]] * 0  # x, y
         maxima_count = [0] * 0
+        ise = [0] * 0
         first_xs = [0] * 0
 
         # initial tuning
-        self.KP = 0
-        self.KI = 0
-        self.KD = 0
+        self.KP = 0.0
+        self.KI = 0.0
+        self.KD = 0.0
 
         # tuning history
         tuning_hist = [(0, 0, 0)] * 0
@@ -127,25 +116,26 @@ class PIDcontroller(object):
         print "Checking paramter combinations..."
         # start running through all the possible tuning arrangements
         for sP in range(0, steps):
-            self.KP = 0.0 + float(sP * (float(maxs) / float(steps)))
+            self.KP = float(pmx[0]) + float(sP * (float(pmx[1]) / float(steps)))
             for sI in range(0, steps):
-                self.KI = 0.0 + float(sI * (float(maxs) / float(steps)))
+                self.KI = float(imx[0]) + float(sI * (float(imx[1]) / float(steps)))
                 for sD in range(0, steps):
-                    # self.KD = 0.0 + float(sD * (float(maxs) / float(steps)))
+                    # self.KD = float(dmx[0]) + float(sD * (float(dmx[1]) / float(steps)))
                     #print ("getting tuned response: " + str(self.KP) + ", " +
                     #str(self.KI) + ", " + str(self.KD))
                     # print str(sP) + ", " + str(sI) + ", " + str(sD)
-                    this_points = self.do_sim(time_constant, steady_state_gain)
+                    (this_points, insqer) = self.do_sim(time_constant, steady_state_gain)
                     points.append(this_points)
                     (a, b) = self.count_maxima(this_points)
                     maxima_count.append(a)
+                    ise.append(insqer)
                     first_xs.append(b)
                     tuning_hist.append([self.KP, self.KI, self.KD])
-                    prog = ((sP * steps) + sI) * 100 / (steps ** 2)
-                    sys.stdout.write(('\r[ {0} ] {1}% [ KP={2}, KI={3}]').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog, self.KP, self.KI))
+                    prog = int(((sP * steps) + sI) * 100 / (steps ** 2))
+                    sys.stdout.write(('\r[ {0} ] {1}% [ KP={2:.3f}, KI={3:.3f}]').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog, self.KP, self.KI))
                     sys.stdout.flush()
 
-        print "Optimising..."
+        print "\nOptimising..."
         for i in range(0, len(points)):
             if (maxima_count[i] > 0 and maxima_count[i] < 5):
                 pass
@@ -158,18 +148,49 @@ class PIDcontroller(object):
             if (first_xs[i] < smallest_x):
                 at_indx = i
                 smallest_x = first_xs[i]
-        self.KP, self.KI, self.KD = tuning_hist[at_indx]
-        #return tuning_hist[at_indx]
+        
+        
+        smallest_ise = 1000000
+        ise_at = 0
+        for i in range(0, len(ise)):
+            if ise[i] < smallest_ise:
+                smallest_ise = ise[i]
+                ise_at = i
+
+        (a, b, c) = tuning_hist[at_indx]
+        print "GEO TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c)
+
+        (a, b, c) = tuning_hist[ise_at]
+        print "ISE TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c)
+        
+        if (ise_tuning):
+            self.KP, self.KI, self.KD = tuning_hist[ise_at]
+        else:
+            self.KP, self.KI, self.KD = tuning_hist[at_indx]
+
+        if (ise_tuning):
+            return (tuning_hist[at_indx], ise[at_indx])
+        else:
+            return (tuning_hist[ise_at], ise[ise_at])
         #return (points[at_indx], tuning_hist, at_indx)
 
-    def do_sim(self, time_constant, steady_state_gain):
+    def do_sim(self, time_constant, steady_state_gain, length=100, manual_sample_time=0.1):
+        # save controller settings and change it for the simulation
+        ts = self.set_point
+        m_on = self.manual_sample
+        self.manual_sample = True
+        st = self.sample_time
+        self.sample_time = manual_sample_time
         self.set_point = 1
         resp = [[0.0, 0.0], [0.0, 0.0]]
         y = [0.0, 0.0]
+
         # reset memory
-        self.ca = [0.0, 0.0, 0.0]
-        self.e = [0.0, 0.0, 0.0]
-        for i in range(0, 100):
+        self.reset_memory()
+        ise = 0.0
+    
+        # simulate!
+        for i in range(0, length):
             y[0] = y[1]
 
             y[1] = (((float(time_constant) - float(self.sample_time)) /
@@ -177,10 +198,24 @@ class PIDcontroller(object):
             + ((float(steady_state_gain) * float(self.sample_time)) /
             float(time_constant)) * float(self.ca[2]))
 
-            self.get_control_action(y[1], 0.1)
+            self.get_control_action(y[1])
             resp.append([i, y[1]])
+            try:
+                ise += (self.e[2] ** 2)
+            except OverflowError:
+                ise += 10000
             # print y[1]
-        return resp
+
+        # return settings to the way they were
+        self.set_point = ts
+        self.sample_time=st
+        self.manual_sample = m_on
+        return (resp, ise)
+
+    def reset_memory(self):
+        self.ca = [0.0, 0.0, 0.0]
+        self.e = [0.0, 0.0, 0.0]
+
 
     def count_maxima(self, points):
         gradient = 0
@@ -209,22 +244,64 @@ class PIDcontroller(object):
 
 
 if __name__ == "__main__":
-    #a = PIDcontroller(KP=30.0, KI=468.75, KD=0, set_point=200.0)
-    a = PIDcontroller(KP=0.01, KI=0.001, KD=0, set_point=200.0, sample_time=0.0001)
-    #a.tune(0.072, 0.21, 50, 50)
-    print "Model controller tuned:"
+    f = plt.figure(figsize=(8,8))
+    ax = f.add_subplot(111)
+
+    a = PIDcontroller(KP=0.10, KI=0.20, KD=0, set_point=200.0, sample_time=0.01)
+    ise = 9001.0
+    print "Model controller pre-tuned:"
     print "Kp: " + str(a.KP)
     print "Ki: " + str(a.KI)
     print "Kd: " + str(a.KD)
-    print str(a.get_control_action(400.0))
-    #resp, tuning, index = a.tune(2, 10, 10, 10)
-    #print str(tuning[index])
-    #resp_y = [0] * 2
-    #resp_x = [0] * 2
-    #for i in range(0, len(resp)):
-    #    resp_x.append(resp[i][0])
-    #    resp_y.append(resp[i][1])
-    #plt.plot(resp_x, resp_y)
-    #plt.show()
+    print "ISE: " + str(ise)
+
+    # # # # FIRST SIM RESPONSE # # # # 
+    ys = [0] * 0
+    pvs = [0] * 0
+    cur_ca = 0.0
+    cur_pv = 78
+    t_len = 10
+    xs = [0] * 0
+    xs.append(0)
+    ys.append((4.292 * float(cur_pv)) + 144.927)
+    for i in range(1, int(t_len / a.sample_time) + 1):
+        cur_ca = a.get_control_action((4.292 * float(cur_pv)) + 144.927)
+        cur_pv += cur_ca
+        
+        if cur_pv < 0:
+            cur_pv = 0
+        elif cur_pv > 128:
+            cur_pv = 128
+
+        ys.append((4.292 * float(cur_pv)) + 144.927)
+        pvs.append(cur_pv)
+        # sleep(0.1)
+        prog = int((i) * 100 / (t_len / a.sample_time))
+        sys.stdout.write(('\r[ {0} ] {1}%').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog))
+        sys.stdout.flush()
+        xs.append(i * a.sample_time)
+
+    # check against simulated response
+    #r, ise = a.do_sim(0.072, 4.687, length=t_len)
+    
+    #s_xs = [0] * 0
+    #s_ys = [0] * 0
+
+    #for i in range(0, len(r)):
+    #    s_xs.append(r[i][0])
+    #    s_ys.append(r[i][1])
+
+    # # # # PLOT # # # # 
+    ax.plot(xs, ys, label="KP={0}, KI={1}, KD={2}".format(a.KP, a.KI, a.KD))
+    #ax.plot(s_xs, s_ys, 'g')
+
+    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+    ax.set_ylabel("$Response,\ RPM$\n", ha='center', va='center', fontsize=24)
+
+    # # # # SAVE PLOT # # # # 
+    print "\nsaving plot"
+    plt.legend()
+    plt.savefig("./figresp.png")
+    plt.close(f)
 
     #TODO: AUTO MODEL
