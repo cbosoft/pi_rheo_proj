@@ -2,11 +2,11 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{7526} % last proper build on Mon 13 March 2017 at 20:22:20
+\def\thewords{7526} % last proper build on Mon 13 March 2017 at 23:01:36
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
-\def\cbh{}%\large\bfseries !!! ??? !!! \normalsize\normalfont}
+\def\cbh{\large\bfseries !!! ??? !!! \normalsize\normalfont}
 
 % Imports
 \usepackage{graphicx}
@@ -40,7 +40,7 @@
 \setlength{\fboxsep}{0pt}  % separator length around figure boxes
 \setlength{\fboxrule}{0pt}  % rule width around figures
 
-\def\achapter{preamble}  % set the command "achapter" to  the name of the current section
+\def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
 \def\rpilong{Raspberry Pi}
 \def\rpi{Raspberry Pi}
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -123,6 +123,8 @@
 
 	%%%%%%%%%%%%%%%%%%% Main Content Settings
 	\pagenumbering{roman}
+	\setcounter{page}{0}
+	\begin{center}\newpage \end{center}
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY PREAMBLE
 	% Summary Page
@@ -130,13 +132,13 @@
 	\addcontentsline{toc}{chapter}{Summary}
 	\def\achapter{Summary}
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
-	\newpage
+	\newpage \begin{center} \large \space \normalsize \end{center}
 	
 	% Contents Page
+	\newpage
 	\def\achapter{Contents}
 	\tableofcontents
-	\noindent \space \br \space \br \space \br \space \br \space \br \space \br \space \br 
-	\begin{center}\vfill \large [blank page] \normalsize \vfill \end{center}
+	\newpage \begin{center} \large \space \normalsize \end{center}
 	% Acknowledgements
 	\chapter*{Acknowledgements}
 	\addcontentsline{toc}{chapter}{Acknowledgements}

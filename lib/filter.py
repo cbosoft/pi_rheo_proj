@@ -3,11 +3,6 @@
 #
 # A library containing different filtering/smoothing methods
 #
-# Smoothing: using all information surrounding a data point to obtain its true value
-#
-# Filtering: using information from before and including the current data point to obtain its true value
-#
-# Predicting: using information preceding the current data point to obtian its true value
 
 # imports
 import numpy as np
@@ -17,36 +12,38 @@ from scipy.ndimage import filters
 import scipy.optimize as op
 import matplotlib.pyplot as plt
 
-def ssqe(sm, s, npts):
-	return np.sqrt(np.sum(np.power(s-sm,2)))/npts
-
-def testGauss(x, y, s, npts):
+def gaussian(x, y):
 	b = gaussian(39, 10)
-	#ga = filtfilt(b/b.sum(), [1.0], y)
 	ga = filters.convolve1d(y, b/b.sum())
-	plt.plot(x, ga)
-	print "gaerr", ssqe(ga, s, npts)
 	return ga
 
-def testButterworth(nyf, x, y, s, npts):
+def butterworth(nyf, x, y):
 	b, a = butter(4, 1.5/nyf)
 	fl = filtfilt(b, a, y)
-	plt.plot(x,fl)
-	print "flerr", ssqe(fl, s, npts)
 	return fl
  
-def testWiener(x, y, s, npts):
-	wi = wiener(y, mysize=29, noise=0.5)
-	plt.plot(x,wi)
-	print "wieerr", ssqe(wi, s, npts)
+def wiener(y, sample_size=29, noise_magnitude=0.5):
+	wi = wiener(y, mysize=sample_size, noise=noise_magnitude)
 	return wi
  
-def testSpline(x, y, s, npts):
-	sp = UnivariateSpline(x, y, s=240)
-	plt.plot(x,sp(x))
-	print "splerr", ssqe(sp(x), s, npts)
+def spline(x, y, samples=240):
+	sp = UnivariateSpline(x, y, s=samples)
 	return sp(x)
-
+    
+def filter(x, y, method="wiener"):
+    output = [0] * 0
+    if method == "wiener":
+        output = wiener(y)
+    elif method == "gaussian":
+        output = gaussian(x, y)
+    elif method == "butter":
+        output = butterworth(0.5, x, y)
+    elif method == "spline":
+        output = spline(x, y)
+    else:
+        output = y
+    return output
+    
 if __name__ == "__main__":
     # test script for testing
     
@@ -65,10 +62,7 @@ if __name__ == "__main__":
         s.append(float(splt[2]))
     
     # Apply filter
-    g = testGauss(t, s, 0.9, len(t))
-    #b = testButterworth(45, t, s, 1, len(t))
-    w = testWiener(t, s, 1, len(t))
-    b = testSpline(t, s, 1, len(t))
+    c = filter(t, s)
     
     # Set up figure
     f = plt.figure(figsize=(8,8))
@@ -76,9 +70,7 @@ if __name__ == "__main__":
 
     # Plot data and trendline
     ax.plot(t, s, 'b', color=(0,0,1,0.2))
-    #ax.plot(t, g, 'r')
-    #ax.plot(t, b, 'g')
-    ax.plot(t, w, 'b')
+    ax.plot(t, c, 'b')
 
     ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
@@ -87,6 +79,7 @@ if __name__ == "__main__":
 
     # Show plot
     print "saving plot"
+    #plt.show()
     plt.savefig("./figjamtest.png")
     plt.close(f)
 
