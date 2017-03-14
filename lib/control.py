@@ -6,6 +6,8 @@
 #
 # Uses the valocity discrete time algorithm for control action.
 #
+# (TODO: Continuous time implementation?)
+#
 
 # Imports
 from time import time
