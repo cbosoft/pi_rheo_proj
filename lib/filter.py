@@ -5,9 +5,9 @@
 #
 
 # imports
-import numpy as np
-from scipy.interpolate import UnivariateSpline
-from scipy.signal import wiener, filtfilt, butter, gaussian, freqz
+import numpy as np  # for maths
+from scipy.interpolate import UnivariateSpline  # for splining
+from scipy.signal import wiener, filtfilt, butter, gaussian  # for 
 from scipy.ndimage import filters
 import scipy.optimize as op
 import matplotlib.pyplot as plt
