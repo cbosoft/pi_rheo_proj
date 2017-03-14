@@ -41,8 +41,8 @@
 \setlength{\fboxrule}{0pt}  % rule width around figures
 
 \def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
-\def\rpilong{Raspberry Pi}
-\def\rpi{Raspberry Pi}
+\def\rpilong{Raspberry Pi }
+\def\rpi{Raspberry Pi }
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 % TEMPLATES
 
@@ -64,6 +64,8 @@
 		\fbox{\includegraphics[scale=SCALE]{IMAGE LOCATION}}
 		\caption{CAPTION}
 		\label{FIGURE REF}
+		%optional:
+		\footnotesize [MORETEXT]
 	\end{figure} \newline  \noindent
 
 %%%BULLET POINT LIST
@@ -408,13 +410,16 @@
 	
 	\subsection*{Noise Filter} % last edited 13/3/2017
 	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms can be applied. \br
-	There are several different types of filtering algorithm: frequency filtering, probability filtering, and graphical smoothing. The first remose noise of a particular frequency while leaving other frequencies in - useful for readings where
+	The filtering algorithm used in the filter function, is a low pass filter Butterworth function. This is implemented in python using several packages; numpy is used for performing mathematical operations in python, and scipy is used for scientific manipulations of data. \br
+	There is a function in the \texttt{scipy.signal} library which creates a Butterworth filter and another scipy function, \texttt{filtfilt} which can be used to apply the created filter. This is packaged together in a function (" \texttt{filter}") within the filter package, taking in the noisy data, and outputting a filtered version. \br
+	The Butterworth filter is \cbh \br %what is it?
+	The filter parameters were altered until the filterred response for a series of test data closely matched the expected result - indicating that the filter was working optimally. These parameters are set as default in the \texttt{filter} function, but can be changed if desired. \cbh \br % A=?!!?!?!? B=!?!??!
 	
 	\subsection*{Motor} % last edited 13/3/2017
 	This class uses the ADC class the read in the current speed and current draw of the motor. The digital potentiometer class is used to control the voltage supply to the motor as well. The overall goal of the motor class is to manage every aspect of the motor, and to record as much relevant data as possible. \br
 	%self, max_speed=0, min_speed=0, startnow=False, adc_channels=[0, 1], adc_vref=3.3, poll_logging=True, log_dir="./dat+plot", log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"], log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1
 	The class is initialised with several optional variables; most are used by the motor class itself while some are for setting up the ADC class, and some are for setting up the digital potentiometer.\br
-	\large Motor-Relevant Arguments \normalsize
+	Motor-relevant arguments:
 	\begin{itemize}
 %		\item \texttt{min\_speed} - Unused
 %       \item \texttt{max\_speed} - Unused
@@ -427,7 +432,24 @@
 		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(317.666, -146.947)} by default.
 		\item \texttt{cvf} = "current-voltage-function", tuple representing the two coefficients in a linear (1D) fit equation for the relationship between the motor's current draw and the voltage read from the HES current sensor via the ADC. \cbh by default.
 	\end{itemize}
-	The motor class, once set up, can be used to set the value on the digital potentiometer (thus setting its own supply voltage), can read in its speed (using the ADC), and it can calculate its power usage (using the ADC). \br
+	The motor class, once set up, can be used to set the value on the digital potentiometer (thus setting its own supply voltage), can read in its speed (using the ADC), and it can calculate its current draw (using the ADC). \br
+	
+	\subsection*{Post Processing and Results}
+	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor class records the speed, the supply voltage, and the supply current. This can then be used to calculate the total electrical power into the motor (Equation \ref{eqnelecpow}). Equations \ref{eqnmechpow} and \ref{eqnmoteff} can be used to calculate the torque (\(T,\ Nm\)), knowing the rotational rate (\(\omega,\ rad.s^{-1}\)), the input electrical power (\(P_e,\ W\)), along with the characteristic curves of the motor. The characteristic curves of the motor are graphs of the motor's efficiency and power draw vs load. This can be used to calculate the efficiency at a given power load.
+	\begin{equation}
+		P_e = I \times V
+		\label{eqnelecpow}
+	\end{equation}
+	\begin{equation}
+		P_m = T \times \omega
+		\label{eqnmechpow}
+	\end{equation}
+	\begin{equation}
+		\eta_m = \frac{P_m}{P_e}
+		\label{eqnmoteff}
+	\end{equation}
+	With the torque and the rotational rate known, the next step is to calculate the shear stress and the strain rate.
+	
 	
 	
 
@@ -468,13 +490,13 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 %	\end{figure} \newline  \noindent
 
 	\subsection*{Speed Measurement}
-	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car [CITE?]. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using a slow-motion camera to film the rotation and gauge the actual rotational speed, compared with the value obtained using the dynamo.
-%	\begin{figure}[!htb]
-%		\centering
-%		\fbox{\includegraphics[scale=0.3]{figures/figspeedvval.png}}
-%		\caption{Read Speed and Actual Speed vs Potentiometer Value}
-%		\label{figdynocheck}
-%	\end{figure} \newline  \noindent
+	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo.
+	\begin{figure}[!htb]
+		\centering
+		\fbox{\includegraphics[scale=0.3]{figures/figspeedvval.png}}
+		\caption{Read Speed and Actual Speed vs Potentiometer Value}
+		\label{figdynocheck}
+	\end{figure} \newline  \noindent
 	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well. This uses little of the computing power of the Raspberry Pi as all it has to do to obtain the rotational rate is read a value in from an ADC and perform a simple multiplication; thus this can be performed accurately and at high frequency - well suited to the required purposes.\br
 	In order to confirm the accuracy of readings, several videos were taken (at 120fps). The speed was set at a constant value for 10 second periods before lowering during filming, allowing the speed at different potentiometer values to be recorded. A mark was made on the rotating cylinder and as this mark passed a certain point, a counter was increased. After the 10 second period, the counter total represented the number of rotations in 10 seconds, the speed in RPM can be calculated by multiplying by 6. This was repeated several times with several different recordings to ensure the resulting correlation was correct. \br
 	%To decipher whether this method was quick enough, the motor was set at a single speed, and the speed was recorded at different set intervals. The standard deviation of the resulting speed curves was taken for each interval. Ideally, these should all be the same and equal to zero. %WHAT?
@@ -494,6 +516,7 @@ The circuit was deemed to be satisfactory if it could achieve quick and reliable
 	
 	\subsection*{Motor Characteristic Curves}
 	% Efficiency (powout/powin) as function of torque (load) and rate
+	
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -672,6 +695,29 @@ As previously mentioned, code written in a programming language is usually compi
 To conclude this section,  programming languages are varied and have different advantages and disadvantages. The correct programming language must be chosen for the correct situation.
 
 \subsection{B -  Signal Noise Reduction}
+Analogue readings of real world data can be corrupted by noise. Noise can appear due to fluctuations in atmospheric conditions, electrical supply, or thermodynamic fluctuation in the reading material (to name a few). For the data to be useful, there must be some provision for reducing the noise. Signal filters can be used to reduce the amount of noise, these can be hardware or software filters. Both represent the same concepts, but in different implementations. Hardware implementation is in continuous time, while software uses discrete time approximations of the same models and functions as hardare filtering. Discussed here are software filtering techniques. \br
+
+% notes -->>
+% transform based signal processing methods
+%	"express a signal in terms of a combination of a set of elementary signals [... that can be easily analysed]"
+% source-filter model based signal processing
+%	use a model to obtain the true form of the signal - expressing the predictable structures of the signal, expected patterns.
+%	sensitive to deviations from the model
+%	used in voice recognition, telephony, video encoding, high-res spectral analysis
+% bayesian statistical model based signal processing
+%	uses cost-weighted (bayesian philosophical) probability to obtain a model of the "statistical average" values
+% neural networks XX
+% <<-- notes from wileyadvsignproc.pdf
+
+% from messing around, butterworth seems to give the best representation of the data as noiselessly and as correct as possible.
+\begin{figure}[!htb]
+	{\centering
+	\fbox{\includegraphics[scale=0.35]{figures/fig_filter_demons.png}}
+	\caption{Butterworth Filter Demonstration}
+	\label{figfilterdemon}}
+	%optional:
+	{\footnotesize Actual data readings (faint blue) were passed through a Butterworth filter to obtain a noise-reduced signal (bright blue).\newline {\bfseries a)} Graph of a steady increase in motor supply voltage, excpeted result is a series of 11 steps.\newline {\bfseries b)} Graph showing speed variance with a random intermittent load applied to the motor (an approximation of a shear thickening fluid)\newline {\bfseries c)} Fourier Transform of the response in b); faint blue line shows the fourier transform of the raw (noisy) data, birght blue shows the filtered response, clearly showing the effect of the filter on the resulting data.}
+\end{figure}
 %Appendix Bibliography
 
 \end{document}
