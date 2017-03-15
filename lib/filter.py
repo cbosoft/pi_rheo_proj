@@ -31,37 +31,64 @@ def splinef(x, y, samples=240):
 	return sp(x)
     
 def filter(x, y, method="butter", A=0.314, B=0.314):
+    """
+    Filter for filtering noise out from a signal.
+    
+    Arguments:
+    x - The x data for the singal (usually time)
+    y - The noisy signal data
+    method - Which filter to use. "butter" by default.
+    A, B - Parameters of the filter to be used. Pre-set by default to most optimal. Not recommended to be changed.
+    
+    Returns:
+    A list of filtered y-values, the same length as the input data.
+    """
+
     use_A = True
     use_B = True
 
     if A == 0.314:
         use_A = False
+
     if B == 0.314:
         use_B = False
 
     output = [0] * 0
+
     if method == "wiener":
+
         output = wienerf(y)
+
     elif method == "gaussian":
+
         if not use_A:
             A = 39
 
         if not use_B:
             B = 10
-
+        
         output = gaussianf(x, y, A, B)
+
     elif method == "butter":
+
         if not use_A:
             A = 2
 
         if not use_B:
             B = 0.05
 
-        output = butterworthf(x, y, A=2, B=0.05)
+        output = butterworthf(x, y, A, B)
+
     elif method == "spline":
+
         output = splinef(x, y)
+
     else:
+
         output = y
+    
     return output
+    
+    
 
     

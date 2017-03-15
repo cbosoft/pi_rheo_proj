@@ -32,7 +32,9 @@ class PIDcontroller(object):
 
     # class initialisation method
     def __init__(self, KP=0, KI=0, KD=0, sample_time="AUTO", set_point=0):
+
         print "CONTROLLER INITIALISING"
+
         if str(sample_time) == "AUTO":
             print "    auto_sample ON"
             self.manual_sample = False
@@ -64,7 +66,7 @@ class PIDcontroller(object):
     def get_control_action(self, u_val):
         # Control action is a function of the k parameters, the previous
         # control actions, the previous errors, and the sample time
-
+        
         # Get actual time between samples
         if (self.manual_sample == False):
             if (self.time_of_last == 0):
@@ -250,60 +252,64 @@ if __name__ == "__main__":
     ax = f.add_subplot(111)
 
     a = PIDcontroller(KP=0.10, KI=0.20, KD=0, set_point=200.0, sample_time=0.01)
-    ise = 9001.0
-    print "Model controller pre-tuned:"
-    print "Kp: " + str(a.KP)
-    print "Ki: " + str(a.KI)
-    print "Kd: " + str(a.KD)
-    print "ISE: " + str(ise)
+    ise = "n/a"
+    print "AUTO TUNE OFF, USING PRE-TUNING::"
+    print "    Kp: " + str(a.KP)
+    print "    Ki: " + str(a.KI)
+    print "    Kd: " + str(a.KD)
+    print "    ISE: " + str(ise)
 
-    # # # # FIRST SIM RESPONSE # # # # 
-    ys = [0] * 0
-    pvs = [0] * 0
-    cur_ca = 0.0
-    cur_pv = 78
-    t_len = 10
-    xs = [0] * 0
-    xs.append(0)
-    ys.append((4.292 * float(cur_pv)) + 144.927)
-    for i in range(1, int(t_len / a.sample_time) + 1):
-        cur_ca = a.get_control_action((4.292 * float(cur_pv)) + 144.927)
-        cur_pv += cur_ca
-        
-        if cur_pv < 0:
-            cur_pv = 0
-        elif cur_pv > 128:
-            cur_pv = 128
-
+    if (False):
+        # # # # FIRST SIM RESPONSE # # # # 
+        ys = [0] * 0
+        pvs = [0] * 0
+        cur_ca = 0.0
+        cur_pv = 78
+        t_len = 10
+        xs = [0] * 0
+        xs.append(0)
         ys.append((4.292 * float(cur_pv)) + 144.927)
-        pvs.append(cur_pv)
-        # sleep(0.1)
-        prog = int((i) * 100 / (t_len / a.sample_time))
-        sys.stdout.write(('\r[ {0} ] {1}%').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog))
-        sys.stdout.flush()
-        xs.append(i * a.sample_time)
+        for i in range(1, int(t_len / a.sample_time) + 1):
+            cur_ca = a.get_control_action((4.292 * float(cur_pv)) + 144.927)
+            cur_pv += cur_ca
+            
+            if cur_pv < 0:
+                cur_pv = 0
+            elif cur_pv > 128:
+                cur_pv = 128
 
-    # check against simulated response
-    #r, ise = a.do_sim(0.072, 4.687, length=t_len)
+            ys.append((4.292 * float(cur_pv)) + 144.927)
+            pvs.append(cur_pv)
+            # sleep(0.1)
+            prog = int((i) * 100 / (t_len / a.sample_time))
+            sys.stdout.write(('\r[ {0} ] {1}%').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog))
+            sys.stdout.flush()
+            xs.append(i * a.sample_time)
+
+        # check against simulated response
+        #r, ise = a.do_sim(0.072, 4.687, length=t_len)
+        
+        #s_xs = [0] * 0
+        #s_ys = [0] * 0
+
+        #for i in range(0, len(r)):
+        #    s_xs.append(r[i][0])
+        #    s_ys.append(r[i][1])
+
+        # # # # PLOT # # # # 
+        ax.plot(xs, ys, label="KP={0}, KI={1}, KD={2}".format(a.KP, a.KI, a.KD))
+        #ax.plot(s_xs, s_ys, 'g')
+
+        ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+        ax.set_ylabel("$Response,\ RPM$\n", ha='center', va='center', fontsize=24)
+
+        # # # # SAVE PLOT # # # # 
+        print "\nsaving plot"
+        plt.legend()
+        plt.savefig("./figresp.png")
+        plt.close(f)
     
-    #s_xs = [0] * 0
-    #s_ys = [0] * 0
-
-    #for i in range(0, len(r)):
-    #    s_xs.append(r[i][0])
-    #    s_ys.append(r[i][1])
-
-    # # # # PLOT # # # # 
-    ax.plot(xs, ys, label="KP={0}, KI={1}, KD={2}".format(a.KP, a.KI, a.KD))
-    #ax.plot(s_xs, s_ys, 'g')
-
-    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Response,\ RPM$\n", ha='center', va='center', fontsize=24)
-
-    # # # # SAVE PLOT # # # # 
-    print "\nsaving plot"
-    plt.legend()
-    plt.savefig("./figresp.png")
-    plt.close(f)
-
-    #TODO: AUTO MODEL
+    if (True):
+        cur = 400.0
+        print "TESTING:"
+        print "    set_point = {0}\n    current_speed = {1}\n    control_action = {2}".format(a.set_point, cur, a.get_control_action(cur))

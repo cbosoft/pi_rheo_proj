@@ -23,6 +23,7 @@ else:
     r = "/" + r
 
 mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./logs" + r)
+#mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./logs" + r, filtering="butter")
 controller = cl.PIDcontroller(KP=1, KI=1, sample_time=0.1)
 # Get setpoint
 print "Enter set point motor speed (in RPM):"
@@ -55,7 +56,10 @@ try:
         # compare with set point & get control action (thank you controller library)
         delta_pv = controller.get_control_action(cur_speed)
         # apply control action
-        mot.pot.set_resistance(mot.pot.lav + delta_pv)
+        nu_ca = mot.pot.lav + delta_pv
+        if nu_ca < 0: nu_ca = 0
+        print ("applying control action: dPV = {0}, ca = {1}".format(delta_pv, nu_ca))
+        mot.pot.set_resistance(int(nu_ca))
         # wait
         time.sleep(0.1)
     mot.clean_exit()

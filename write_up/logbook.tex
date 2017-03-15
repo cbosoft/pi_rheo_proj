@@ -295,31 +295,28 @@
 		\mon
 		\item Still having issues with (my) PID controller. Looked at how other peopple have achieved PID control in python (and how it differs from my own solution)
 		\item Looked into the different methods of noise reduction/filtering/smoothing:
-		\subitem Moving average (MAV); exponential decay MAV; Gaussian weighted smoothing; 
+		\subitem Moving average (MAV); exponential decay weighted MAV (gaussian); 
 		\subitem Butterworth filter; Wiener probability filter; spline smoothing
 		\item Wrote more of the report.
 		\tue
 		\item Researched signal processing theory and methods.
 		\item Started writing up signal processing theory.
+		\wed
+		\item Noticed that the dynamo is no longer reading values as nicely as before - perhaps the lack of a protection diode has fried the OpAmp? Will add diode, replace OpAmp
+		\item Belay last, seems to be working alright now. Will have to keep an eye on that.
+		\item Took preliminary torque readings. Seems to be okay, a little noise though.
 	\end{itemize}
 	\newpage
 	\chapter{Considerations/To-do list}
 	\begin{itemize}
-		\item calibrate motor speed control circuit (ie get min speed, max speed, and speed(voltage))
-		\item test that speed is being detected properly (use reference tachometer/second method to detect the speed (record a video of the motor spinning? Is that acceptable?))
 		\item peclet number?
 		\item wall slip?
 		\subitem wall slip is often avoided by "roughening" the walls of the viscometer
 		\subitem even if the fluid slips, this gives useful information about the fluid (although this data cannot be used to give viscosity, that would not be sensible)
 		\subitem slip is less likely to occur in molecular fluids (water, glycerol) and more likely to occur in suspensions of colloids/granules (as particles get bigger, the surface (e.g. glass) is less "grippy" - its relative roughness decreases)
-		\item noise in circuit?
-		\item voltage is spd
-		\item current is torque
 		\item density matching
 		\item refractive index matching
 		\item test control system working
-		\item calibrate motor control
-		\item correlate shear stress/rate with voltage/rotation/current
 		\item check rpi results against rheometer results for different mixtures of glycerol and water (check it works at high and low viscosities)
 	\end{itemize}
 	

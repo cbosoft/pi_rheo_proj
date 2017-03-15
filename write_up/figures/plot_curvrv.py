@@ -1,10 +1,15 @@
+import sys
+
+sys.path.append("./../../lib/")
+
 import matplotlib.pyplot as plt
 import numpy as np
 from glob import glob
+import filter
 
 # Read csv
 
-log = "./../../lib/test scripts/logs/cur_read_get.csv"
+log = "./../../logs/std_sweep.csv"
 
 print "opening log {0}".format(log)
 datf = open(log, "r")
@@ -31,6 +36,8 @@ for i in range(2, len(datl) - 2):
     cr.append(float(splt[3]))
     st.append(float(splt[0]) - tz)
     pv.append(int(splt[4]))
+
+crf = filter.filter(st, filter.filter(st, cr, method="butter"), method="gaussian")
 
 for p in pv:
     if p == 0:
@@ -68,37 +75,32 @@ for p in pv:
     elif p == 128:
         cu.append(0.82)
 
-mav_l = 2
-# max_l = 20000
-max_l = len(speed) - (mav_l - 1)
+max_l = 650
 
-for i in range(mav_l - 1, len(speed)):
-    rt = 0.0
-    for j in range(0, mav_l):
-        rt += speed[i - j]
-    mav.append(rt / mav_l)
-
-# current reading v current actual #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
 # Set up figure
-f = plt.figure(figsize=(8,8))
-ax = f.add_subplot(111)
+f = plt.figure(figsize=(16,8))
+ax = f.add_subplot(121)
 
-# Plot data and trendline
-z = np.polyfit(st, cu, 1)
-tl = np.poly1d(z)
-
-ax.plot(st[:int(0.8 * len(cu))], cu[:int(0.8 * len(cu))])
-#ax.plot(cr, cu)
-ax.plot(st, tl(st), 'r--', label="$Trendline, CUR = {0:.3f}CR + {1:.3f}$".format(z[0], z[1]))
-#ax2 = ax.twinx()
-
-#ax2.plot(st[(len(st) - len(mav)):(max_l + (len(st) - len(mav)))], mav[:max_l], '-', label="$Recorded\ Speed\ (Moving\ Average)$")
+# Plot data and trendline 1: CRF vs CU
+coeffs = np.polyfit(crf[:max_l], cu[:max_l], 1)
+xl = np.array([2.3, 2.4])
+fit = coeffs[-2] * xl + coeffs[-1]
+ax.plot(crf[:max_l], cu[:max_l], 'o')
+ax.plot((xl[:max_l]), (fit[:max_l]), 'r--', label="$Trendline, CUR = {0:.3f}CR + {1:.3f}$".format(coeffs[-2], coeffs[-1]))
 
 ax.set_xlabel("\n $Current\ Sensor\ Reading,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Current,\ A$\n", ha='center', va='center', fontsize=24)
+plt.legend(loc=4)
 
-plt.title("$Moving\ Average\ Samples:\ {0}$".format(mav_l))
-plt.legend()
+ax2 = f.add_subplot(122)
+
+# Plot data 2: CR, CRF vs st
+ax2.plot(st, cr, color=(0,0,1,0.5))
+ax2.plot(st, crf, 'b')
+ax2.set_ylim([2.1, 2.6])
+ax2.set_ylabel("$Current\ Sensor\ Reading,\ V$\n", ha='center', va='center', fontsize=24)
+ax2.set_xlabel("\n$Time,\ s$", ha='center', va='center', fontsize=24)
+
 # Show plot
 print "saving plot"
 plt.savefig("./figcurreadcal.png")

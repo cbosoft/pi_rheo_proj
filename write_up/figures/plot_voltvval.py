@@ -3,7 +3,7 @@ import numpy as np
 from glob import glob
 
 # Read csv
-datf = open("./../../lib/test scripts/logs/smallx4.csv", "r")
+datf = open("./../../logs/pulley_test/smallx4.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -25,7 +25,7 @@ for i in range(2, len(datl) - 2):
     pv.append(int(splt[4]))
 
 # Read csv
-datf = open("./../../lib/test scripts/logs/voltvval.csv", "r")
+datf = open("./../../logs/voltvval.csv", "r")
 datl = datf.readlines()
 datf.close()
 

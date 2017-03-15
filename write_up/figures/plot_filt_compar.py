@@ -56,7 +56,7 @@ if __name__ == "__main__":
     # load up some noisy data
     flt = [0.0] * 1
     # intermittent load
-    x, y, flt[0] = filterff("./../../lib/test scripts/logs/intermittent_load.csv", filter_method=method, A=10, B=0.01)
+    x, y, flt[0] = filterff("./../../logs/intermittent_load_short.csv", filter_method=method, A=10, B=0.01)
     
     for i in range(0, 10):
         flt.append(filter(x, y, method="butter", A=(2 + i), B=(0.01 * (i + 1))))
@@ -71,9 +71,10 @@ if __name__ == "__main__":
 
     # Plot data and trendline
     ax.plot(x, y, 'b', color=(0,0,1,0.2))
-    for i in range(0, 10):
-        print "A={0}, B={1}, plotting...".format((100*i), i)
-        ax.plot(x, filter(x, y, method="butter", A=(100*i), B=i))
+    for i in range(2, 3):
+        for j in range(8, 9):
+            print "A={0}, B={1}, plotting...".format((i), (0.01 * j))
+            ax.plot(x, filter(x, y, method="butter", A=(i), B=(0.01 * j)))
 
     ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)

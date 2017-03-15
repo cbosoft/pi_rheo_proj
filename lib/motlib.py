@@ -9,6 +9,7 @@ import time
 import os
 import thread as td
 import RPi.GPIO as gpio
+import filter
 from glob import glob
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
@@ -22,12 +23,18 @@ class motor(object):
     # Logging
     poll_logging = True  # Will log every (i_poll_rate)s if this is True
     log_dir = "./dat+plot"  # where the logged data should be saved
-    log_titles = ["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"]
+    log_titles = ["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7-bit" "Filtered Dynamo Reading/V"]
     i_poll_rate = 0.1  # How often data is polled, should not be less than span
     
     # Speed calc
     speed = 0.0  # Output value
     svf = [1.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
+    
+    # Filtering
+    filtlen = 500  # number of samples to "remember" for filtering purposes
+    spds = [0.0] * 0  # used to hold the last (filtlen) samples
+    tims = [0.0] * 0  # time data for ^
+    filtering = "NONE"
 
     # Current calc
     current = 0.0 # Read current in A
@@ -44,14 +51,23 @@ class motor(object):
     def __init__(self, max_speed=0, min_speed=0,
     startnow=False, adc_channels=[0, 1], adc_vref=3.3,
     poll_logging=True, log_dir="./dat+plot",
-    log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"],
-    log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1):
+    log_titles=["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7bit", "Filtered Dynamo Reading/V"],
+    log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1,
+    filtering="NONE", filter_samples=100):
 
         # Set calibration variables
         self.max_speed = max_speed
         self.min_speed = min_speed
         self.svf = svf
         self.cvf = cvf
+        
+        # Filtering
+        if filtering == "NONE":
+            self.filtering = "NONE" 
+        else:
+            self.filtering = filtering
+        
+        if not filtering == "NONE": self.filtlen = filter_samples
 
         # Set sensor variables
         self.pot = dp()
@@ -102,24 +118,40 @@ class motor(object):
         while (self.poll_running):
             # self.get_power()  # get electrical power supplied to motor
             
+            # At the third tone, the time will be...
+            t = time.time()
+            
             # Get speed
             volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1])]
             self.speed = self.svf[0] * volts[0] + self.svf[1]
+            # if desired, apply filtering to input
+            if not (self.filtering == "NONE"):
+                self.update_filt_hist(volts[0], t)
+		
+                if (len(self.tims) >= 50):
+                    self.speed = filter.filter(self.tims, self.spds, method=self.filtering)[-1]
             
             # Get current
-            self.current = self.cvf[0] * volts[1] + self.cvf[1]
+            # self.current = self.cvf[0] * volts[1] + self.cvf[1]
             
             # Power = Current x Supply Voltage
             # Supply voltage is calculable from the potentiometer value (POTVAL/127) * (10.5 - 2.8) + 2.8 = SUPPLY VOLTAGE
-            self.power = (((self.pot.lav / 127) * (10.5 - 2.8)) + 2.8) * self.current
+            # self.power = (((self.pot.lav / 127) * (10.5 - 2.8)) + 2.8) * self.current
 
             if (self.poll_logging):
-                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4}, {5} \n").format(time.time(), volts[0], self.speed, volts[1], self.pot.lav, self.power))
+                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4} \n").format(t, volts[0], volts[1], self.pot.lav, self.speed))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
 
         print("Motor polling has halted.")
+
+    def update_filt_hist(self, spd, tim):
+        if (len(self.spds) + 1) > self.filtlen:
+            self.spds = self.spds[1:]
+            self.tims = self.tims[1:]
+        self.spds.append(spd)
+        self.tims.append(tim)
 
     def get_speed(self):
         if (self.poll_running):

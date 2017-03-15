@@ -66,9 +66,9 @@ if __name__ == "__main__":
 
     # load up some noisy data
     # normal run (1)
-    x1, y1, f1 = filterff("./../../lib/test scripts/logs/cur_read_get.csv", filter_method=method)
+    x1, y1, f1 = filterff("./../../logs/std_sweep.csv", filter_method=method)
     # intermittent load
-    x2, y2, f2 = filterff("./../../lib/test scripts/logs/intermittent_load.csv", filter_method=method)
+    x2, y2, f2 = filterff("./../../logs/intermittent_load_short.csv", filter_method=method)
     
     print "plotting"
     # Set up figure
