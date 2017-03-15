@@ -30,42 +30,80 @@ class PIDcontroller(object):
     sample_time = 0.1  # time between runs, in seconds
     manual_sample = False
 
+    loud = False
+    
     # class initialisation method
     def __init__(self, KP=0, KI=0, KD=0, sample_time="AUTO", set_point=0):
-
-        print "CONTROLLER INITIALISING"
-
+        '''
+        object = control.PIDcontroller(**kwargs)
+        
+        Initialise PID controller class.
+        
+        Controller uses discrete-time PID controller.
+        
+        Must be tuned before use, this can be done manually (manually setting the values of KP, Ki, and KD), or automatically (using the PIDcontroller.tune function) if you have a 1st order model of the process.
+        
+        kwargs:
+        KP - Controller proportional gain. Default is 0.
+        KI - Controller integral gain. Default is 0.
+        KD - Controller derivative gain. Default is 0.
+        sample_time - Length of time interval between samples. Default is "AUTO" - sample_time is automatically calculated.
+        set_point - the "goal" for the control system. Default is 0
+        '''
+        
+        ifl("CONTROLLER INITIALISING")
         if str(sample_time) == "AUTO":
-            print "    auto_sample ON"
+            ifl("    auto_sample ON")
             self.manual_sample = False
         else:
-            print "    auto_sample OFF"
+            ifl("    auto_sample OFF")
             self.sample_time = sample_time
             self.manual_sample = True
 
-        print "    set_point {0:.1f}".format(set_point)
+        ifl("    set_point {0:.1f}".format(set_point))
         self.set_point = set_point
         
-        print "    KP {0:.1f}".format(KP)
+        ifl("    KP {0:.1f}".format(KP))
         self.KP = KP        
-        print "    KI {0:.1f}".format(KI)
+        ifl("    KI {0:.1f}".format(KI))
         self.KI = KI        
-        print "    KD {0:.1f}".format(KD)
+        ifl("    KD {0:.1f}".format(KD))
         self.KD = KD
 
-    # simple method that moves values up in array
     def shift_arrs(self):
-        temp = self.ca[1]
-        self.ca[1] = self.ca[2]
-        self.ca[0] = temp
-        temp = self.e[1]
-        self.e[1] = self.e[2]
-        self.e[0] = temp
+        '''
+        shift_arrs()
+        
+        Shifts the stored error and control actions down. Required by the PID algorithm implementation.
+        '''
+        
+        self.ca = self.ca[1:]
+        self.e = self.e[1:]
+        self.ca.append(0)
+        self.e.append(0)
 
-    # get required control action
+    def ifl(self, mesg):
+        '''
+        ilf(mesg)
+        
+        if loudness is turned on (if self.load is True), mesg is printed to stdout.
+        
+        mesg - (string) message to (maybe) print
+        '''
+        
+        if self.loud: print mesg
+    
     def get_control_action(self, u_val):
-        # Control action is a function of the k parameters, the previous
-        # control actions, the previous errors, and the sample time
+        '''
+        get_control_action(u_val)
+        
+        Gets the appropriate control action, based upon tuning,
+        the previous control actions and errors, and the sample_time.
+        
+        u_val - (float) the controller input
+        
+        returns: (float) the recommended change to the current control action (delta control action)
+        '''
         
         # Get actual time between samples
         if (self.manual_sample == False):
@@ -94,6 +132,26 @@ class PIDcontroller(object):
         return self.ca[2]
 
     def tune(self, time_constant, steady_state_gain, steps=20, pmx=(0.0, 1.0),imx=(0.0, 1.0), dmx=(0.0, 1.0), ise_tuning=True):
+        '''
+        tune(time_constant, steady_state_gain, **kwargs)
+        
+        Tunes the controller parameters based upon a specified first order model.
+        
+        The model is a first order transfer function of the form:
+        
+            Y(s) / U (s) = SSG / (TC * s + 1)
+        
+        Required arguments:
+        time_constant - model time constant
+        steady_state_gain - model steady_state_gain
+        
+        kwargs:
+        steps - the number of iterations to make over each parameter. Total number of iterations is steps^3. Default is 20.
+        pmx - (tuple float), "Proportional Min maX", the range of proportional gain values iterated over. Default is (0.0, 1.0).
+        imx - (tuple float), range of integral gain values to iterate over. Default is (0.0, 1.0).
+        dmx - (tuple float), range of derivative gain values to iterate over. Default is (0.0, 1.0).
+        '''
+        
         # for each possible tuning arrangement...
         # gets response to a unit step at t=0
 
@@ -179,6 +237,23 @@ class PIDcontroller(object):
         #return (points[at_indx], tuning_hist, at_indx)
 
     def do_sim(self, time_constant, steady_state_gain, length=100, manual_sample_time=0.1):
+        '''
+        do_sim(time_constant, steady_state_gain, **kwargs)
+        
+        Uses the tuned parameters to simulate the controllers responses to a step change in set point.
+        
+        The model is a first order transfer function of the form:
+        
+            Y(s) / U (s) = SSG / (TC * s + 1)
+        
+        Required arguments:
+        time_constant - model time constant
+        steady_state_gain - model steady_state_gain
+        
+        kwargs:
+        length - the number of samples to calculate response for. Default is 100.
+        manual_sample_time - if the controller is using manual sample times, the value set here will be used for the sample time. Default is 0.1.
+        '''
         # save controller settings and change it for the simulation
         ts = self.set_point
         m_on = self.manual_sample
@@ -217,11 +292,30 @@ class PIDcontroller(object):
         return (resp, ise)
 
     def reset_memory(self):
+        '''
+        reset_memory()
+        
+        Causes the script to forget the previous control actions and errors - starts a fresh.
+        '''
+        
         self.ca = [0.0, 0.0, 0.0]
         self.e = [0.0, 0.0, 0.0]
 
 
     def count_maxima(self, points):
+        '''
+        count_maxima(points)
+        
+        Counts the number of maxima in a response curve.
+        
+        Required arguments:
+        points - (list float) a list of the responses.
+        
+        returns:
+        [maxima_count, first_max_x]
+        maxima_count - number of maxima in the response.
+        first_max_x - list index of the location of the first maxima.
+        '''
         gradient = 0
         last_gradient = 0
         first_max_x = 0.0
