@@ -1,5 +1,3 @@
-# not sure if working?
-
 import sys
 
 sys.path.append('./../../lib')

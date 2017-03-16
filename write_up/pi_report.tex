@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8151} % last proper build on Wed 15 March 2017 at 15:41:23
+\def\thewords{8757} % last proper build on Thu 16 March 2017 at 18:01:05
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -243,7 +243,7 @@
 		}
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
-	\end{figure} \newline  \noindent
+	\end{figure} %\newline  \noindent
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}. \cbh \br %(Information about the CR: how accurate can it be, what is it usually used for)
 	The cone-and-plate rheometer \cbh \br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
@@ -310,8 +310,8 @@
 	\end{figure} \newline \noindent
 	%\subsection*{Couette Cell} % last edited 14/3/2017
 	% TODO :: UNCERTAINTIES IN MEASUREMENTS, MEASUREMENTS
-	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of [40]mm, a height of [\cbh], and a thickness of approx. 2mm. The cylinder has been glued to a metal plate which holds it in place. \br
-	The inner cylinder is a perspex cylinder built onto the motor's shaft. The cylinder is 30.13mm in diameter, and []mm in height. There is a thinner section of the cylinder at the top of the main cylinder, which is used as a pulley for the belt to hold on to (see Figure \ref{expdia}). This part of the cylinder has a diameter of []mm and is []mm in height.\br
+	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of 44.151mm, and inner diameter of 39.111mm, a height of 39.753mm. The cylinder has been glued to a metal plate which holds it in place. \br
+	The inner cylinder is a perspex cylinder built onto the motor's shaft. The cylinder is 30.215mm in diameter and 46.795mm in height. There is a thinner section of the cylinder at the top of the main cylinder, which is used as a pulley for the belt to hold on to (see Figure \ref{expdia}). This part of the cylinder has a diameter of []mm and is []mm in height.\cbh \br
 	The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand is also used to hold the dynamo in position.
 	%\subsection*{Electronics} % last edited 14/3/2017
 	The electronic circuits were built onto breadboards. This allowed for simple and quick alterations to be made to the circuitry during development. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the raspberry pi to the breadboard circuitry.
@@ -326,23 +326,16 @@
 		\caption{Schematic Diagram of Electronic Circuits}
 		\label{circfull}
 	\end{figure}
-
-
+	\cbh %diagram is missing SPI links
 
 	\subsection*{\textit{Motor Speed Detection}} % last edited 13/3/2017
 	%Dynamo
-	The speed of the motor was gauged using a second motor acting as a dynamo (see Figure \ref{circspeeddet} for a schematic of the electronic circuit). The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
-	%\begin{figure}[!htb]
-	%	\centering
-	%	\fbox{\includegraphics[scale=0.4]{images/blank.png}}
-	%	\caption{Circuit Schematic Diagram: Motor Speed Detection}
-	%	\label{circspeeddet}
-	%\end{figure}
+	The speed of the motor was gauged using a second motor acting as a dynamo. The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
 	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read.
 	
 
 	\subsection*{\textit{Motor Speed Control}} % last edited 7/3/2017
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10,000\ \Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3000\ \Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
@@ -355,24 +348,8 @@
 		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
 	\end{equation}\newline \noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. \newline
-	%\begin{figure}[!htb]
-	%	\centering
-	%	\fbox{\includegraphics[scale=0.2]{images/circdigpotclose.png}}
-	%	\caption{Circuit Schematic Diagram: Digital Potentiometer Detail}
-	%	\label{circdigpotclose}
-	%\end{figure} \newline  \noindent
-	%\begin{figure}[!htb]
-	%	\centering
-	%	\fbox{\includegraphics[width=\textwidth]{images/circspeedcontr.png}}
-	%	\caption{Circuit Schematic Diagram: Motor Speed Control ADD RESISTOR NAMES}
-	%	\label{circspeedcontr}
-	%\end{figure} \newline  \noindent
-
-
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. 
 	%\subsection{\textit{PEND Input Processing}}
-
-
 
 	\section{Software} % last edited 13/3/2017
 	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.\br
@@ -388,9 +365,10 @@
 		\item Motor \newline
 		This class makes use of the digital potentiometer class to control the voltage supplied to the motor, the ADC class to read in the speed of the motor and the current drawn by the motor. This data is logged at a set rate to be used in calculating the viscosity.
 		\item Noise Filter \newline
-		Not a class, but a collection of functions and classes that can be used to reduce noise in read data.
+		Not a class, but a collection of functions that can be used to reduce noise in read data.
 	\end{itemize}
 	Full copies of the software source code can be found in Appendix 1.
+	
 	%Section detail
 	\subsection*{Digital Potentiometer} % last edited 13/3/2017
 	% Description
@@ -399,10 +377,12 @@
 	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the "\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: "\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.\br
 	To set the resistance on the potentiometer, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. Then it uses the spidev package to send this value to the correct register on the potentiometer, causing it to alter its resistance.
 	%What else to include?
+	
 	\subsection*{ADC} % last edited 13/3/2017
 	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. Again, just as before, multiple instances can be used in conjunction to manage reading data from different ADCs connected to the \rpi at the same time. \br
 	The initialisation function for the ADC class has two parameters, both optional. The first is a chip select parameter (used to tell spidev which device we are trying to communicate with on the SPI network) which has a value of 1 by default. The second parameter is the value of the reference voltage (\texttt{vref}), 3.3 by default, used to calculate the voltage read in by the ADC from the 10-bit value read from the ADC. \br
 	Usage of the class is very simple: the "\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the "\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.
+	
 	\subsection*{Control} % last edited 13/3/2017
 	This class is primarily a discrete-time implementation of the PID algorithm, also known as the velocity algorithm (Equation \ref{eqdiscpid}).\br
 	The initialisation function for this class accepts five optional arguments:
@@ -427,11 +407,10 @@
 	The filtering algorithm used in the filter function, is a low pass filter Butterworth function. This is implemented in python using several packages; numpy is used for performing mathematical operations in python, and scipy is used for scientific manipulations of data. \br
 	There is a function in the \texttt{scipy.signal} library which creates a Butterworth filter and another scipy function, \texttt{filtfilt} which can be used to apply the created filter. This is packaged together in a function (" \texttt{filter}") within the filter package, taking in the noisy data, and outputting a filtered version. \br
 	The Butterworth filter is \cbh \br %what is it?
-	The filter parameters were altered until the filterred response for a series of test data closely matched the expected result - indicating that the filter was working optimally. These parameters are set as default in the \texttt{filter} function, but can be changed if desired. \cbh % A=?!!?!?!? B=!?!??!
+	The filter parameters were altered until the filtered response for a series of test data closely matched the expected result - indicating that the filter was working optimally. These parameters are set as default in the \texttt{filter} function, but can be changed if desired. \cbh % A=?!!?!?!? B=!?!??!
 	
 	\subsection*{Motor} % last edited 13/3/2017
 	This class uses the ADC class the read in the current speed and current draw of the motor. The digital potentiometer class is used to control the voltage supply to the motor as well. The overall goal of the motor class is to manage every aspect of the motor, and to record as much relevant data as possible. \br
-	%self, max_speed=0, min_speed=0, startnow=False, adc_channels=[0, 1], adc_vref=3.3, poll_logging=True, log_dir="./dat+plot", log_titles=["Time", "Read Voltage", "Speed", "Current", "Pot val", "Power (electrical)"], log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1
 	The class is initialised with several optional variables; most are used by the motor class itself while some are for setting up the ADC class, and some are for setting up the digital potentiometer.\br
 	Motor-relevant arguments:
 	\begin{itemize}
@@ -446,9 +425,9 @@
 		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(317.666, -146.947)} by default.
 		\item \texttt{cvf} = "current-voltage-function", tuple representing the two coefficients in a linear (1D) fit equation for the relationship between the motor's current draw and the voltage read from the HES current sensor via the ADC. \cbh by default.
 	\end{itemize}
-	The motor class, once set up, can be used to set the value on the digital potentiometer (thus setting its own supply voltage), can read in its speed (using the ADC), and it can calculate its current draw (using the ADC). \br
+	The motor class, once set up, can be used to set the supply to a motor (using a digital potentiometer), can read in the motor's speed and calculate its current draw (using the ADC).
 	
-	\subsection*{Post Processing and Results}
+	\subsection*{Post Processing and Results} % edited 15/3/2017
 	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor class records the speed, the supply voltage, and the supply current. This can then be used to calculate the total electrical power into the motor (Equation \ref{eqnelecpow}). Equations \ref{eqnmechpow} and \ref{eqnmoteff} can be used to calculate the torque (\(T,\ Nm\)), knowing the rotational rate (\(\omega,\ rad.s^{-1}\)), the input electrical power (\(P_e,\ W\)), along with the characteristic curves of the motor. The characteristic curves of the motor are graphs of the motor's efficiency and power draw vs load. This can be used to calculate the efficiency at a given power load.
 	\begin{equation}
 		P_e = I \times V
@@ -463,14 +442,49 @@
 		\label{eqnmoteff}
 	\end{equation}
 	With the torque and the rotational rate known, the next step is to calculate the shear stress and the strain rate.
+	%page 76 thescfors!!!!!
+	The strain rate is calculated from the rotational speed. \cbh
+	%NAVIER-STOKES EQUATION- DERIVE DERIV DERIVE!!
 	
+	\section{Calibration} % edited 16/3/2017
+	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
-	
+	\subsection*{Dynamo Calibration}
+	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, first the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to do this so that sensor readings were logged at the same time. At each voltage level, the speed was read several times using a contact tachometer until five readings were taken that agreed with each other. This was repeated for each voltage level. The logged data was examined to see the dynamo voltage readings. The noisy data was filtered using the \texttt{filter} package and then compared to the speed readings taken from the tachometer. The actual speed was plotted against the dynamo reading and a one dimensional fit was taken to give a function of dynamo output voltage that gives the rotational rate of the motor; Equation \ref{eqnspdvvr}.
+	\begin{equation}
+	v_m = 317.666 \times {V_D} - 146.947
+	\label{eqnspdvvr}
+	\end{equation}
+	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts.
+	\subsection*{HES Calibration}
+	The goal for this was to find a function fo the HES voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current supply was read (from a multimeter placed in the circuit) at different supply voltages. There was some variance of current draw with motor speed (roughly between 0.5A and 1A). The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output and a trendline was fit to give Equation \ref{eqncurvcr}.
+	\begin{equation}
+	I_{ms} = 3.580 \times {V_{HES}} - 7.784
+	\label{eqncurvcr}
+	\end{equation}
+	Where \(I_{ms}\) is the motor supply current, in Amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
+	\subsection*{Motor Efficiency Calibration}
+	The goal for this experiment was to find out how the efficiency of the motor varies with load and supply voltage. Different supply voltages will result in different 2D efficiency curves (Efficiency vs Torque) - the resulting graph is a surface plot. This was achieved by using the motor as a winch to lift a weight from the ground using a pulley system. The data was logged over a 500ms period during this lifting process to calculate the acceleration of the weight (using Equation \ref{eqnaccel}). The torque evolved by the motor can then be calculated using Equations \ref{eqnfma} and \ref{eqntfr}. This process was repeated for different supply voltages and for different weights.
+	\begin{equation}
+	A = \frac{V - V_0}{\Delta t}
+	\label{eqnaccel}
+	\end{equation}
+	\begin{equation}
+	F = M \times A
+	\label{eqnfma}
+	\end{equation}
+	\begin{equation}
+	T = F \times r
+	\label{eqntfr}
+	\end{equation}
+	Where \(V\) and \(V_0\) are the speed of the motor, expressed in \(m/s\), \(\Delta t\) is the time between speed readings in \(s\), \(A\) is the acceleration of the weight in \(m/{s^2}\), \(F\) is the force imposed upon the weight in \(N\), \(M\) is the mass of the weight being lifted, \(T\) is the torque evolved by the motor in \(Nm\), and \(r\) is the radius of the inner cylinder, in \(m\).\br
+	With the torque known for a variety of masses and voltages, the input power was calculated using Equation \ref{elecpow} and the useful power output calculated using Equation \ref{eqnmechpow}. Then the efficiency was calculated for each supply voltage and load using Equation \ref{eqnmoteff}. The resulting 2D surface was plotted and had a 2D equation fit to it, giving the efficiency of the motor depending on the supply voltage and current. \cbh %LOAD? CURRENT? WHAT'S GING ON? 
 
 
 
-	\section{Evaluation}
+	\section{Evaluation} % re write recommended
 	%The project can be split into different sections; design, development, and evaluation. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
+	% The varies aspects of the design were tested to evaluate whether they met the design specifications for speed, and accuracy.
 	
 	\subsection*{Voltage Control} % Add figure
 	The DC motor used in the experiment was able to accept an electrical supply of variable voltage; between 4.5v and 15v. Due to the relatively low speeds required by the shear cell, it was decided that the motor would be controlled in a shifted voltage range, between 2.5v and 10.5v. 
@@ -522,8 +536,9 @@
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). \br
 	\cbh %[RESULTS AND SUCH]
 	
-	\subsection*{Motor Characteristic Curves}
+	\subsection*{Motor Characteristic Curves} % edited 15/3/2017
 	% Efficiency (powout/powin) as function of torque (load) and rate
+	The efficiency, torque, and 
 	
 
 
