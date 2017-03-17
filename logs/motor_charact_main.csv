@@ -1,1 +1,7 @@
-pv,current_read,weight/g,speed_low/rpm,speed_high/rpm,t_low/s,t_high/s,notes
+pv,weight/g,current_read/V,dynamo_read/V
+64,50,2.524,1.087
+64,100,2.487,1.256
+64,200,2.564,0.834
+64,250,2.561,0.6302
+64,300,2.565,0.6481
+64,350,2.566,0.611
