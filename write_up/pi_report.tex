@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8757} % last proper build on Thu 16 March 2017 at 18:01:05
+\def\thewords{5887} % last proper build on Mon 20 March 2017 at 18:36:39
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -17,6 +17,7 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{subcaption}
+\usepackage[norefeq, prefix]{nomencl}
 
 % Unused packages
 %\usepackage{placeins}
@@ -24,16 +25,13 @@
 %\usepackage[comma,authoryear]{natbib}
 %\usepackage{lipsum}
 
-% Settings
+% Preamble
+\makenomenclature
+\renewcommand{\nomlabel}[1]{\hfil #1\hfil}
+\nomenclature[a  a]{Symbol}{Description\hfill Units}
+
 \geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}  % Sets the mnargins
-
-%\patchcmd{\chapter}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}  % not sure?
-%\patchcmd{\section}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
-%\patchcmd{\subsection}{\thispagestyle{plain}}{\thispagestyle{plain}}{}{}
-
 \setcounter{secnumdepth}{0}  % removes the numbering from toc entires
-
-%\renewcommand{\theequation}{\arabic{equation}}  % not sure?
 
 \renewcommand\UrlFont{\rmfamily\itshape}  % sets URL font to normal font (rather than code font)
 
@@ -43,6 +41,7 @@
 \def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
 \def\rpilong{Raspberry Pi }
 \def\rpi{Raspberry Pi }
+
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 % TEMPLATES
 
@@ -83,12 +82,12 @@
 	\renewcommand{\headrulewidth}{0.4pt}  % weight of the header rule (set to 0 for no line)
 	\renewcommand{\footrulewidth}{0.4pt}  % height of the footer rule (set to 0 for no line)
 %	\fancyhead[L]{\atitle}  % Header left is title
-	\fancyhead[LE]{\achapter}  % Header left is name of chapter
-	\fancyhead[RO]{\shorttitle}  % Header left is name of chapter
-	\fancyhead[RE]{\theauthor}  % Header right is author name
-	\fancyhead[LO]{University of Strathclyde Chemical Engineering}
-	\fancyfoot[LO]{\today}  % Footer left is date
-	\fancyfoot[RO,LE]{\thepage}  % Footer right is page number
+	\fancyhead[LE]{\achapter}  % Header left (even) is name of chapter
+	\fancyhead[RO]{\shorttitle}  % Header right (odd) is report title
+	\fancyhead[RE]{\theauthor}  % Header right (even) is author name
+	\fancyhead[LO]{University of Strathclyde Chemical Engineering} % Header left (odd) is uni callout
+	\fancyfoot[LO]{\today}  % Footer left (odd) is date
+	\fancyfoot[RO,LE]{\thepage}  % Footer right (left on even) is page number
 }
 \pagestyle{plain}
 
@@ -115,10 +114,10 @@
 			This project is submitted in partial fulfilment of the regulations governing the award of \\
 			Degree of MEng in Chemical Engineering at the University of Strathclyde
 			\vskip2cm
-			Your name: Christopher Boyle \hfill Date: \today
+			Author: Christopher Boyle \hfill Date: \today \newline
 			\vskip1cm
-			Organisation: University of Strathclyde, Department of Chemical \& Process Engineering\newline% \newline
-			In-house Supervisor: Dr. Leo Lue \newline% \newline
+			Organisation: University of Strathclyde, Department of Chemical \& Process Engineering \newline
+			%In-house Supervisor: Dr. Leo Lue \newline% \newline
 			Academic Supervisor: Dr. Leo Lue
 		\end{flushleft}
 	\end{titlepage}
@@ -164,129 +163,14 @@
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
                                                                
-	\chapter*{Introduction}
+	\chapter*{Introduction} % section last edited 20/3/2017
 	\addcontentsline{toc}{chapter}{Introduction}
 	\def\achapter{Introduction}
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
-	%History of what is being done, what is used to do it, how it is done.
+	[summary]\br
+	[background motivation]\br
+	[conclusion]
 
-
-
-	\section{Laboratory Automation and Process Control} % section last edited 13/3/2017
-	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 1,000,000 observations and hypotheses per day \cite{backontorobsci}. \cbh %safety? toxic environs?
-	\br
-	Laboratory automation emerged in the late 19th century, with siphons and controlled flow of water used to automate various processes. As technology advanced and electronics became more prevalent, the options for automation in the laboratory increased. Automatic titration equipment (using photo-cells to detect a colour change) were revolutionary in their ability to accurately and consistently record results, especially for difficult to discern colour changes \cite{backlabautohisto}. \br
-	Process control can be thought of as the industrial mirror of laboratory automation which has developed along a similar path starting with mechanical analogue device, moving into electronically assisted technology and then, with the advent of computer technology, process control became the marriage of digital and analogue systems it is today \cite{backautocontrolhisto}.
-	Process control is an inherent area of process design; the process (whatever it may be) has parameters which must be controlled so that the process continues under the design paramters; at the correct temperature, pressure, etc. Process control has historically been achieved through the use of analogue equipment, using pressurised air to send and receive signals from process equipment. Modern process control is achieved through the use of computers and digital electronics, where the analogue measured signals are converted into digital signals, so that a computer can understand the data. The controller applies an algorithm to calculate the control action required to maintain the desired value of the variable. The modern digital controller can deal with almost any form of input, guarding against a wide variety of disturbances. If it can be measured, it can be controlled.\br
-	At the heart of the modern controller is the control algorithm. This is the calculation which determines what change to the control output needs to be made (the control action). Control algorithms vary with application. The most commonly used algorithm is the Proportional-Integral-Derivative algorithm (PID control), consisting of three sections which can be turned off or on depending on the needs of the situation:
-	\begin{itemize}
-	\item Proportional control increases the control action proportional to the size of the error (the difference between the set point and the measured value). This is easy to tune and set up, however it suffers from offset bias. This bias arise from the control action being balanced out in the process by the error such that the control action is not sufficient to change the process to compensate for the error. The error will remain, and the controller will do no more to correct for it, thus an offset is sustained. This must be manually corrected for.
-	\item Integral control increases the control action depending on the integral of the error with respect to time (the longer the error goes on, the higher the control action). Integral action is useful to eliminate the offset bias of proportional control.
-	\item Finally, derivative control increases control action with the derivative of the error with respect to time, so a quickly rising error is met with a large change in control action. Derivative action is difficult to tune and highly sensitive to noise in the circuit - this means it is rarely used. If it is used, it requires some form of noise filter on the signal and careful tuning. The most common version of the PID algorithm only uses proportional and integral action (no derivative) - the PI controller. PI control allows for easy tuning and quick response, without the difficulties of derivative action, or the offset bias of proportional control.
-	\end{itemize}
-	Each control element has an associated gain parameter which affects how strongly that element is represented in the control action. These parameters must be set properly before controller can be used. This is done in a process called tuning. There are a variety of methods for tuning the controller, most commonly used is the Ziegler-Nichols method, involving tuning the controller such that the measured value oscillates in a sustained way. Then using the period of oscillation along with other measured parameters to decide on the optimum controller tuning. After tuning using a method such as Ziegler-Nichols it is often required to tweak the tuning manually to obtain the most effective controller for the situation. This is done mostly by trial and error. Trial and error tuning can also be used to fully tune the device, although this would take a long time to do by hand. \br
-	The controller device itself is a small computer, reading input from the instruments and then applying the algorithm to determine how it should alter the process. These small computers are called "microcontrollers". A microcontroller chip is a small re-programmable computer which reads input from, and outputs data to an electronic circuit \cite{backwhatismc}. Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions. \br
-	
-%	\begin{figure}[h!]
-%	\centering
-%	\fbox{\includegraphics[scale=0.5]{images/mcudia.png}}	\caption{Microcontroller Block Diagram (taken from  \cite{mcudia})}
-%	\label{mcudia}
-%	\end{figure}
-
-	
-
-
-	\section{Raspberry Pi} % section last edited 3/3/2017
-	\noindent
-	Microcontrollers are commonly used in education to teach computer programming \cite{backmcedu1, backmcedu2}. However, it was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
-	\begin{figure}[!htb]
-	\centering
-	\fbox{\includegraphics[scale=0.3]{images/annotpidia.png}} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
-	\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
-	\label{pidia}
-	\end{figure} \newline% \noindent
-	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. The quad core processor enables better multi-threaded operation for software running on the Raspberry Pi, meaning that big cumbersome programs can run much more efficiently than before. In addition, the increase in memory and CPU clock frequency means there is overall a massive performance boost. Operations like compiling a large program (for example OpenCV, the Open Source Computer Vision Library) which could take over 9 hours \cite{pipowercompold} on the Raspberry Pi 1, takes little over an hour and a half \cite{pipowercompnew} on the latest model.\br
-	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). \br
-	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins (e.g.  pins 1,2 and 4), some are ground (e.g. 6, 9, and 14), and most are GPIO pins (e.g. 3, 5, and 7). Each GPIO pin can be either low or high. This can be set in different ways; resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and can be turned on or off via software. \newline
-	\begin{figure}[!htb]
-	\centering
-	\fbox{\includegraphics[scale=0.2]{images/gpiopinout.png}}
-	\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
-	\label{gpiopinout}
-	\end{figure} \newline  \noindent
-	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \br
-	The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
-	
-	\section{Rheometry} % last edited 8/3/2017
-	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products are have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it shears(\(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
-	\begin{equation}
-	\mu = \frac{\tau}{\dot{\gamma}}
-	\label{eqnvisco}
-	\end{equation}
-	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate (the speed of the deformation) or the shear stress (the force behind the deformation). Newtonian fluids (like water) have a viscosity which is independent of the shear stress - proportional only to the shear rate. Some fluids have time-dependant viscosities: thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied, and rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress: shear-thinning fluids have a viscosity that appears to decrease with increased stress, and shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
-	\begin{figure}[!htb]
-		\centering
-		\fbox{
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
-				\caption{Shear Thinning}
-				\label{figshearthin}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
-				\caption{Shear Thickening}
-				\label{figshearthick}
-			\end{subfigure}
-			%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
-		}
-		\label{figshearthinthick}
-		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
-	\end{figure} %\newline  \noindent
-	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
-	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}. \cbh \br %(Information about the CR: how accurate can it be, what is it usually used for)
-	The cone-and-plate rheometer \cbh \br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
-	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. In this scenario, \cbh
-	constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder.
-	
-	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}.
-	The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
-	\cbh \br
-	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \cbh \br % cite!
-	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
-	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE). \br
-	Hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
-	% "Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br	
-	%flow, shear, jam frequency %TODO
-	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
-	\newline \newline \noindent
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
-		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
-		\label{cforscracks}
-	\end{figure} \newline  \noindent
-	
-
-	\section{This Project} % last edited 3/3/2017
-	This project aims to design, build, and test a control system for a bespoke jamming-focussed experimental rheometer. \cbh %douche-y title m9
-	The experiment itself aims to gather more information about the statistical probability of the occurrence of a jam and how the shear stress affects this. \br
-	The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to either a constant shear force, or a constant shear rate. 
-	%To find out how the formation of the cracks on the fluid's surface during shear correlate with the occurrence of discontinuous shear thickening, a camera will be aimed at the surface of the shearing fluid throughout the course of the experiment. The camera will be optically magnified using lenses placed in front of the aperture and will record images, which can later be processed using image recognition software to detect the formation of the cracks. \newline \newline \noindent
-	By knowing the power sent to the motor, as well as its efficiency and rotational speed, the strain rate and stress imposed upon the fluid in the rheomter can be calculated and thus used to obtain the rheology of the fluid - how the viscosity varies with time and stress. \br
-	The experimental set-up will be controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice for the controller to this process. Software will be developed for the Raspberry Pi to read in the motor's speed and the PEND's voltage reading, record it accurately and to control the rotational speed of the motor. In addition, the Raspberry Pi can be used to automate the experimental process by automatically altering experimental parameters in-between runs while logging all the relevant data during runs. The Pi can also be set up with a web interface, allowing monitoring of the experiment from remote locations, further reducing the manual workload on lab technicians. \br
-	Hardware was be developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the motor, the electrical power supplied to the motor, the current shear stress observed within the fluid, and the presence of 'cracks' on the surface of the fluid.\br
-	Software will be developed to facilitate the accurate reading of information from the experiment, as well as control of the experimental parameters. There are two general operating modes; constant shear rate (or rotational speed), and constant shear stress (or torque). The former is relatively simple to do. By recording the motor's rotational speed and comparing with a set point, the speed can easily be held at a fixed point (thus a constant shear rate is achieved). The output torque is fixed in a similar way, using feedback from the process to fix the torque from the motor.
-
-	%\chapter*{Description of the Organisation} % last edited 3/3/2017
-	%\addcontentsline{toc}{chapter}{Description of the Organisation}
-	%\label{chap:doo}
-	%\def\achapter{Description of the Organisation}
-	%In this section, you should show a good understanding of the organisation. Details may include the type of organisation, management structure, products, and markets catered for. Mention your position in the organisation.
-	%The University of Strathclyde is a well respected technical university based in Glasgow, UK. The University is big and has lots of shiny metal walls. There are undergraduate students, postgraduate students, teaching assistants, lecturers, doctors, and professors here. There is research done here. I study here. You work here.
-	
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
@@ -333,25 +217,52 @@
 	
 
 	\subsection*{\textit{Motor Speed Control}} % last edited 7/3/2017
+	%Nomenclature in this section:
 	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
-	\end{equation}\newline
+	\end{equation}
 	\begin{equation}
 		V_{min} = V_{in}\times \frac{R_2}{R_2 + R_{pot}}
 		\label{eqnminvol}
-	\end{equation}\newline
+	\end{equation}
 	\begin{equation}
 		V_{max} = V_{in}\times \frac{R_2 + R_{pot}}{R_2 + R_{pot}} = V_{in}
 		\label{eqnmaxvol}
-	\end{equation}\newline \noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this. Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. 
+	\end{equation}
+	
+	\nomenclature[aV ]{$V_{out}$}{Voltage output \hfill $V$}
+	\nomenclature[aV ]{$V_{in}$}{Voltage input \hfill $V$}
+	\nomenclature{$R_{AW}$}{Resistance between potentiometer wiper and A terminal\hfill $\Omega$}
+	\nomenclature{$R_{WB}$}{Resistance between potentiometer terminal B and wiper\hfill $\Omega$}
+	\nomenclature{$R_{pot}$}{Resistance between terminals A and B on the potentiometer\hfill $\Omega$}
+	\nomenclature{$R_{AW}$}{Resistance value ofthe resistor between B terminal on the potentiometer and ground\hfill $\Omega$}
+	
+	\noindent
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this.\br
+	The 7-bit has 128 possible configurations ($2^7 = 128$). Therefore the potentiometer terminal B-wiper resistance will increase by $78 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
+	
+	\begin{equation}
+	V_{wiper} = V_{AB}\times \frac{3k\Omega + \left(78\Omega \times pv\right)}{13k\Omega}
+	\label{eqnpotres}
+	\end{equation}
+	
+	\nomenclature[aV ]{$V_{wiper}$}{Voltage level at the digital potentiometer output \hfill $V$}
+	\nomenclature[aV ]{$V_{AB}$}{Voltage accross the potentiometer terminals\hfill $V$}
+	
+	\begin{equation}
+	V_{ms} = 0.0631 \times pv + 2.423
+	\label{eqnmotsupvol}
+	\end{equation}
+	
+	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $V$}
+	%Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. 
 	%\subsection{\textit{PEND Input Processing}}
 
-	\section{Software} % last edited 13/3/2017
+	\section{Software} % last edited 13/3/2017 %uml?
 	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.\br
-	The hardware designed for this project makes heavy use of the SPI protocol - a kind of serial communication. The SPI protocol can be accessed in a python environment by using the SpiDev package \cite{srcspidev}. This package makes functions available to create a connection to an SPI device, to send data, and to receive data. This package is used to set the resistance on the digital potentiometer, and to read signal information from the analogue to digital converter. \br
+	The hardware designed for this project makes heavy use of the SPI protocol - a kind of serial communication. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. This package makes functions available to create a connection to an SPI device, to send data, and to receive data. This package is used to set the resistance on the digital potentiometer, and to read signal information from the analogue to digital converter. \br
 	The software is organised into different classes:
 	\begin{itemize}
 		\item Digital Potentiometer \newline 
@@ -397,13 +308,25 @@
 	ca = \pm K_C \left(\Delta \epsilon (k) + \frac{\Delta t_s}{\tau _I}\epsilon (k) + \tau _D \frac{\Delta \epsilon(k) - \Delta \epsilon(k - 1)}{\Delta t_s}\right)
 	\label{eqdiscpid}
 	\end{equation}
+	
+	\nomenclature{$K_C$}{Controller gain}
+	\nomenclature[g]{$\epsilon (k)$}{Error between the set point and controller input}
+	\nomenclature[g]{$\Delta\epsilon (k)$}{Change in error}
+	\nomenclature{$k$}{Discrete time sample number}
+	\nomenclature[g]{$\tau_I$}{Integral time constant}
+	\nomenclature[g]{$\tau_D$}{Derivative time constant}
+	\nomenclature[g]{$\Delta t_s$}{Sample time}
+	\nomenclature{$K_P$}{Proportional action gain}
+	\nomenclature{$K_I$}{Integral action gain}
+	\nomenclature{$K_D$}{Derivative action gain}
+	\noindent
 	Mentioned in Chapter 1 are the PID parameters; KP, KI, and KD. These are not absent from Equation \ref{eqdiscpid}, just hidden: \(KP = K_C\), \(KI = \frac{K_C}{\tau _I}\), and \(KD = K_C * \tau _D\).\br
 	Function "\texttt{get\_control\_action}" is used to obtain the control action in response to the input. This function takes a single argument, the value of the controlled variable (controller input). Then, python's "\texttt{time}" package is used to calculate, accurately, the time between now and the previous call of the function to give the accurate sample time (\(\Delta t_s\)) used in the velocity algorithm. The function then simply applies Equation \ref{eqdiscpid} to obtain the control action best suited to maintain the desired set point.
 	
 	\subsection*{Noise Filter} % last edited 13/3/2017
 	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms can be applied. \br
 	The filtering algorithm used in the filter function, is a low pass filter Butterworth function. This is implemented in python using several packages; numpy is used for performing mathematical operations in python, and scipy is used for scientific manipulations of data. \br
-	There is a function in the \texttt{scipy.signal} library which creates a Butterworth filter and another scipy function, \texttt{filtfilt} which can be used to apply the created filter. This is packaged together in a function (" \texttt{filter}") within the filter package, taking in the noisy data, and outputting a filtered version. \br
+	There is a function in the \texttt{scipy.signal} library which creates a Butterworth filter and another scipy function, \texttt{filtfilt} which can be used to apply the created filter. This is packaged together in a function ("\texttt{filter}") within the filter package, taking in the noisy data, and outputting a filtered version. \br
 	The Butterworth filter is \cbh \br %what is it?
 	The filter parameters were altered until the filtered response for a series of test data closely matched the expected result - indicating that the filter was working optimally. These parameters are set as default in the \texttt{filter} function, but can be changed if desired. \cbh % A=?!!?!?!? B=!?!??!
 	
@@ -426,57 +349,116 @@
 	The motor class, once set up, can be used to set the supply to a motor (using a digital potentiometer), can read in the motor's speed and calculate its current draw (using the ADC).
 	
 	\subsection*{Post Processing and Results} % edited 15/3/2017
-	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor class records the speed, the supply voltage, and the supply current. This can then be used to calculate the total electrical power into the motor (Equation \ref{eqnelecpow}). Equations \ref{eqnmechpow} and \ref{eqnmoteff} can be used to calculate the torque (\(T,\ Nm\)), knowing the rotational rate (\(\omega,\ rad.s^{-1}\)), the input electrical power (\(P_e,\ W\)), along with the characteristic curves of the motor. The characteristic curves of the motor are graphs of the motor's efficiency and power draw vs load. This can be used to calculate the efficiency at a given power load.
+	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor python class records the speed, the supply voltage (the potentiometer value), and the supply current. This can be used to calculate the torque output from the motor. Knowing the torque and the rotational rate, the shear stress, strain rate, and the viscosity can be calculated. The torque output (\(T\)) from a DC motor can be found using Equation \ref{eqntcomplex} \cite[p.~111-112]{backdcmotor}. At a load high enough that the motor can no longer spin, the torque output is the stall torque (\(T_s\)). At no load, the speed is at its highest and is called the no-load speed (\(\omega_N\)). By applying this information Equation \ref{eqntcomplex} becomes Equation \ref{eqntlesscomplex}.
 	\begin{equation}
-		P_e = I \times V
-		\label{eqnelecpow}
+	T = \frac{k_v V_a}{r_a} - \frac{{{k_v}^2} \omega}{r_a}
+	\label{eqntcomplex}
 	\end{equation}
-	\begin{equation}
-		P_m = T \times \omega
-		\label{eqnmechpow}
-	\end{equation}
-	\begin{equation}
-		\eta_m = \frac{P_m}{P_e}
-		\label{eqnmoteff}
-	\end{equation}
-	With the torque and the rotational rate known, the next step is to calculate the shear stress and the strain rate.
-	%page 76 thescfors!!!!!
-	The strain rate is calculated from the rotational speed. \cbh
-	%NAVIER-STOKES EQUATION- DERIVE DERIV DERIVE!!
 	
-	\section{Calibration} % edited 16/3/2017
-	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
+	\nomenclature{$T$}{Motor torque\hfill $Nm$}
+	\nomenclature[g]{$\omega$}{Motor rotational speed\hfill $rad s^{-1}$}
+	\nomenclature{$k_v$}{EMF created in motor armature \hfill $N/m$}
+	\nomenclature[aV ]{$V_a$}{Motor armature volume\hfill $m^3$}
+	\nomenclature{$r_a$}{Motor armature radius\hfill $m$}
+	
+	\begin{equation}
+	T = T_s - \frac{T_s}{\omega_N} \omega
+	\label{eqntlesscomplex}
+	\end{equation}
+	
+	\nomenclature{$T_s$}{Motor stall torque\hfill $Nm$}
+	\nomenclature[g]{$\omega_N$}{Motor no-load speed\hfill $rad s^{-1}$}
+	
+	\noindent
+	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed and stall torque in terms of the value sent to the potentiometer (\(PV\)), which dictates the supply voltage.
+	\begin{equation}
+	v_{NL} = 4.292 \times pv + 144.927
+	\label{eqnsvemp}
+	\end{equation}
+	
+	\nomenclature{$v_{NL}$}{Motor rotational speed\hfill $RPM$}
+	\nomenclature{$pv$}{Potentiometer value\hfill }
+	
+	\begin{equation}
+	T_s = A \times pv + B
+	\label{eqntsemp}
+	\end{equation}
+	\cbh \br
+	Speed here (\(S_{NL}\)) is in RPM.
+	Combining Equations \ref{eqnsvemp} and \ref{eqntsemp} with Equation \ref{eqnmechpofsp} yields an equation for motor torque as a function of rotational speed and potentiometer value, Equation \ref{eqnmottsvsp}.
+	\begin{equation}
+	T = A \times pv + B \left(- \frac{\omega}{0.01138 pv + 0.3844} \right)
+	\label{eqnmottsvsp}
+	\end{equation}
+	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
+	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. This is assuming the strain rate as a function of position in the gap is linear, as it should be in ideal Couette flow. \cbh \br %source? Navier-stokes?
+	\begin{equation}
+	\dot{\gamma} = \frac{\omega}{r_o - r_i}
+	\label{eqnavsr}
+	\end{equation}
+	
+	\nomenclature[g]{$\dot{\gamma}$}{Shear rate\hfill $s^{-1}$}
+	\nomenclature{$r_i$}{Inner cylinder radius\hfill $m$}
+	\nomenclature{$r_o$}{Outer cylinder radius\hfill $m$}
+	
+	\noindent
+	In a couette cell, shear stress is a force applied over the surface area of the inner cylinder $\left(2\pi r_i L\right)$, and torque is this force multiplied by a distance (inner cylinder radius: \(r_i\)). Therefore shear stress can be calculated from the torque using Equation \ref{eqnstresstorque}.
+	\begin{equation}
+	\tau = \frac{T}{2\pi{r_i}^2L}
+	\label{eqnstresstorque}
+	\end{equation}
+	
+	\nomenclature[g]{$\tau$}{Shear stress\hfill $Nm^{-2}$}
+	
+	\section{Calibration} % edited 20/3/2017
+%	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
 	\subsection*{Dynamo Calibration}
 	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, first the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to do this so that sensor readings were logged at the same time. At each voltage level, the speed was read several times using a contact tachometer until five readings were taken that agreed with each other. This was repeated for each voltage level. The logged data was examined to see the dynamo voltage readings. The noisy data was filtered using the \texttt{filter} package and then compared to the speed readings taken from the tachometer. The actual speed was plotted against the dynamo reading and a one dimensional fit was taken to give a function of dynamo output voltage that gives the rotational rate of the motor; Equation \ref{eqnspdvvr}.
+	
 	\begin{equation}
 	v_m = 317.666 \times {V_D} - 146.947
 	\label{eqnspdvvr}
 	\end{equation}
+	
+	\nomenclature{$v_m$}{Motor rotational speed\hfill $RPM$}
+	\nomenclature[aV ]{$V_D$}{Dynamo output voltage\hfill $V$}
+	
+	\noindent
 	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts.
+	
 	\subsection*{HES Calibration}
 	The goal for this was to find a function fo the HES voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current supply was read (from a multimeter placed in the circuit) at different supply voltages. There was some variance of current draw with motor speed (roughly between 0.5A and 1A). The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output and a trendline was fit to give Equation \ref{eqncurvcr}.
 	\begin{equation}
 	I_{ms} = 3.580 \times {V_{HES}} - 7.784
 	\label{eqncurvcr}
 	\end{equation}
+	
+	\nomenclature{$I_{ms}$}{Motor supply current\hfill $A$}
+	\nomenclature{$V_{HES}$}{Hall effect sensor output voltage\hfill $V$}
 	Where \(I_{ms}\) is the motor supply current, in Amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
-	\subsection*{Motor Efficiency Calibration}
-	The goal for this experiment was to find out how the efficiency of the motor varies with load and supply voltage. Different supply voltages will result in different 2D efficiency curves (Efficiency vs Torque) - the resulting graph is a surface plot. This was achieved by using the motor as a winch to lift a weight from the ground using a pulley system. The data was logged over a 500ms period during this lifting process to calculate the acceleration of the weight (using Equation \ref{eqnaccel}). The torque evolved by the motor can then be calculated using Equations \ref{eqnfma} and \ref{eqntfr}. This process was repeated for different supply voltages and for different weights.
-	\begin{equation}
-	A = \frac{V - V_0}{\Delta t}
-	\label{eqnaccel}
-	\end{equation}
-	\begin{equation}
-	F = M \times A
-	\label{eqnfma}
-	\end{equation}
-	\begin{equation}
-	T = F \times r
-	\label{eqntfr}
-	\end{equation}
-	Where \(V\) and \(V_0\) are the speed of the motor, expressed in \(m/s\), \(\Delta t\) is the time between speed readings in \(s\), \(A\) is the acceleration of the weight in \(m/{s^2}\), \(F\) is the force imposed upon the weight in \(N\), \(M\) is the mass of the weight being lifted, \(T\) is the torque evolved by the motor in \(Nm\), and \(r\) is the radius of the inner cylinder, in \(m\).\br
-	With the torque known for a variety of masses and voltages, the input power was calculated using Equation \ref{elecpow} and the useful power output calculated using Equation \ref{eqnmechpow}. Then the efficiency was calculated for each supply voltage and load using Equation \ref{eqnmoteff}. The resulting 2D surface was plotted and had a 2D equation fit to it, giving the efficiency of the motor depending on the supply voltage and current. \cbh %LOAD? CURRENT? WHAT'S GING ON? 
+	
+	\subsection*{Empirical Speed and Stall Torque Relationships}
+		
+	 The empirical relationship between speed and potentiometer value (Equation \ref{eqnsvemp}) was found by measuring the rotational rate of the motor using a tachometer at different potentiometer values, and using software (mathematical python package "\texttt{numpy}") to fit a leaner equation to the data. The stall torque relationship (Equation \ref{eqntsemp}) was similarly obtained by measuring the stall torque at different potentiometer values and then fitting a linear equation to the results.\br 
+	
+	
+%	\subsection*{Motor Efficiency Calibration}
+%	The goal for this experiment was to find out how the efficiency of the motor varies with load and supply voltage. Different supply voltages will result in different 2D efficiency curves (Efficiency vs Torque) - the resulting graph is a surface plot. This was achieved by using the motor as a winch to lift a weight from the ground using a pulley system. The data was logged over a 500ms period during this lifting process to calculate the acceleration of the weight (using Equation \ref{eqnaccel}). The torque evolved by the motor can then be calculated using Equations \ref{eqnfma} and \ref{eqntfr}. This process was repeated for different supply voltages and for different weights.
+%	\begin{equation}
+%	A = \frac{V - V_0}{\Delta t}
+%	\label{eqnaccel}
+%	\end{equation}
+%	\begin{equation}
+%	F = M \times A
+%	\label{eqnfma}
+%	\end{equation}
+%	\begin{equation}
+%	T = F \times r
+%	\label{eqntfr}
+%	\end{equation}
+%	Where \(V\) and \(V_0\) are the speed of the motor, expressed in \(m/s\), \(\Delta t\) is the time between speed readings in \(s\), \(A\) is the acceleration of the weight in \(m/{s^2}\), \(F\) is the force imposed upon the weight in \(N\), \(M\) is the mass of the weight being lifted, \(T\) is the torque evolved by the motor in \(Nm\), and \(r\) is the radius of the inner cylinder, in \(m\).\br
+%	With the torque known for a variety of masses and voltages, the input power was calculated using Equation \ref{elecpow} and the useful power output calculated using Equation \ref{eqnmechpow}. Then the efficiency was calculated for each supply voltage and load using Equation \ref{eqnmoteff}. The resulting 2D surface was plotted and had a 2D equation fit to it, giving the efficiency of the motor depending on the supply voltage and current. \cbh %LOAD? CURRENT? WHAT'S GING ON? 
 
 
 
@@ -534,10 +516,6 @@
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). \br
 	\cbh %[RESULTS AND SUCH]
 	
-	\subsection*{Motor Characteristic Curves} % edited 15/3/2017
-	% Efficiency (powout/powin) as function of torque (load) and rate
-	The efficiency, torque, and 
-	
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -553,52 +531,18 @@
 	\chapter*{Review}
 	\addcontentsline{toc}{chapter}{Review}
 	\def\achapter{Review}
+	%lit review, history
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
-
-	\chapter*{Nomenclature}
+	\newpage
 	\addcontentsline{toc}{chapter}{Nomenclature}
 	\def\achapter{Nomenclature}
 	%List all the symbols in alphabetical order, with Greek symbols at the end
-	%Maybe also include a glossary of terms?
-	\begin{center}
-		\begin{tabular}{|c|l|}
-			\hline
-			\rule{1cm}{0pt}\textbf{Symbol}\rule{1cm}{0pt} & \rule{4cm}{0pt}\textbf{Description}\rule{4cm}{0pt} \\
-			\hline
-			\( R_{1} \) & Voltage divider resistor 1 resistance, ohms \\
-			\hline
-			\( R_{2} \) & Voltage divider resistor 2 resistance, ohms \\
-			\hline
-			\( R_{AW} \) & Potentiometer resistance between the wiper and the "A" terminal, ohms \\
-			\hline
-			\( R_{pot} \) & Potentiometer resistance, ohms \\
-			\hline
-			\( R_{WB} \) & Potentiometer resistance between the wiper and the "B" terminal, ohms \\
-			\hline
-			\( V_{out} \) & Voltage output from the potentiometer voltage divider, volts\\
-			\hline
-			\( V_{in} \) & Voltage input to the potentiometer voltage divider, volts\\
-			\hline
-			& \\
-			\hline
-			& \\
-			\hline
-			& \\
-			\hline
-			& \\
-			\hline
-			& \\
-			\hline
-			\( \mu \) & Viscosity, in Pa.s\\
-			\hline
-			\( \sigma \) & Shear Stress, in Pa\\
-			\hline
-		\end{tabular}
-	\end{center}
+	\printnomenclature[1.5cm]
 	
+%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%Main Bibliography
 	\newpage
 	\addcontentsline{toc}{chapter}{Bibliography}
