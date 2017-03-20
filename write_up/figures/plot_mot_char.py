@@ -81,12 +81,17 @@ if __name__ == "__main__":
     # Set up figure
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
-    plt.title("$a)\ Efficiency\ vs\ Torque$\n", fontsize=24)
+#    plt.title("$a)\ Efficiency\ vs\ Torque$\n", fontsize=24)
 
-    # Plot data and trendline
-    ax.plot(to, ef, 'bx')
-    ax.set_xlabel("\n $Torque,\ Nm$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Efficiency$\n", ha='center', va='center', fontsize=24)
+    # Plot data
+    #ax.plot(to, ef, 'bx')
+    #ax.set_xlabel("\n $Torque,\ Nm$", ha='center', va='center', fontsize=24)
+    #ax.set_ylabel("$Efficiency$\n", ha='center', va='center', fontsize=24)
+
+    # Plot data
+    ax.plot(pv, sv, 'bx')
+#    ax.set_xlabel("\n $Torque,\ Nm$", ha='center', va='center', fontsize=24)
+#    ax.set_ylabel("$Efficiency$\n", ha='center', va='center', fontsize=24)
 
     # Show plot
     print "saving plot"
