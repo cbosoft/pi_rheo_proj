@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8498} % last proper build on Tue 21 March 2017 at 18:01:41
+\def\thewords{8492} % last proper build on Tue 21 March 2017 at 18:59:37
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -249,7 +249,8 @@
 		}
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
-	\end{figure} %\newline  \noindent
+	\end{figure}
+	\noindent
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
 	The cone-and-plate rheometer consists of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate.\br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
@@ -260,7 +261,7 @@
 	\br
 	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \br
 	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
-	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE). \br
+	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases. \br
 	%The equivalence of particles to hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
@@ -281,7 +282,7 @@
 
 
 	\section{Hardware Setup} % last edited 7/3/2017
-	The experiment is based around a Couette cell consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (model 970D161) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets the rotational speed and reads the torque load on the motor. This is used to calculate the viscosity of the fluid. Motor speed is read in using a secondary motor acting as a dynamo. The dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
+	The experiment is based around a Couette cell consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (model 970D161) while the outer cylinder is fixed. The motor is controlled by a Raspberry Pi, which sets the rotational speed and reads the torque load on the motor. This is used to calculate the viscosity of the fluid. Motor speed is read in using a secondary motor acting as a dynamo. The dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
 	%A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. 
 	Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
@@ -533,6 +534,8 @@
 	
 	\nomenclature{$I_{ms}$}{Motor supply current\hfill $A$}
 	\nomenclature{$V_{HES}$}{Hall effect sensor output voltage\hfill $V$}
+	
+	\noindent
 	Where \(I_{ms}\) is the motor supply current, in Amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
 	\subsection*{Empirical Relationships} %re-write? purpose?
