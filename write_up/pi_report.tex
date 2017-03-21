@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8514} % last proper build on Tue 21 March 2017 at 16:16:49
+\def\thewords{8498} % last proper build on Tue 21 March 2017 at 18:01:41
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -17,7 +17,8 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage{subcaption}
-\usepackage[norefeq, prefix]{nomencl}
+\usepackage{nomencl}
+\usepackage{calc}
 
 % Unused packages
 %\usepackage{placeins}
@@ -39,15 +40,19 @@
 \setlength{\fboxsep}{0pt}  % separator length around figure boxes
 \setlength{\fboxrule}{0pt}  % rule width around figures
 
-\def\achapter{shorttitle}  % set the command "achapter" to  the name of the current section
+\def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
 
-\def\otherchap#1{
+\def\nc#1{
 	\addtocounter{chapter}{1} 
 	\def\achapter{\arabic{chapter} #1}
 	\addcontentsline{toc}{chapter}{\achapter} 
+	\chapter*{\arabic{chapter} #1} 
+}
+\def\jc#1{
+	\def\achapter{#1}
+	\addcontentsline{toc}{chapter}{\achapter} 
 	\chapter*{\achapter} 
-	}
-
+}
 \def\rpilong{Raspberry Pi }
 \def\rpi{Raspberry Pi }
 
@@ -138,7 +143,7 @@
 	
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% MAIN BODY PREAMBLE
 	% Summary Page
-	\otherchap{Summary} % last edited 14/3/2017
+	\jc{Summary} % last edited 14/3/2017
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
 	% WHAT WE DID
 	A couette cell rotating rheometer was constructed, with the inner cylinder rotated by an electric motor. The rheometer was controlled by a Raspberry Pi computer using its GPIO ports to interact with electronic sensors and other hardware. \br
@@ -154,7 +159,7 @@
 	\tableofcontents
 	%\newpage \begin{center} \large \space \normalsize \end{center}
 	% Acknowledgements
-	\otherchap{Acknowledgements}
+	\jc{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
 	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project. At every turn, he was there with new ideas and fresh ideas to keep me going. \br
 	%Dr. Mark Haw - allowing the use of his research room
@@ -168,7 +173,7 @@
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
                                                                
-	\otherchap{Introduction} % section last edited 20/3/2017
+	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
 	% Non-newtonian fluids exhibit interesting rheological properties: their viscosity can alter with shear stress (rheopectic) or time.\br
 	Jamming is a special form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared.\br
@@ -181,7 +186,7 @@
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
-	\otherchap{Background} % section last edited 21/3/2017
+	\nc{Background} % section last edited 21/3/2017
 	\section{Laboratory Automation and Process Control}
 	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by Aberystwyth University can make over a million observations and hypotheses per day \cite{backontorobsci}. 
 	\br
@@ -247,19 +252,16 @@
 	\end{figure} %\newline  \noindent
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
-	The cone-and-plate rheometer \cbh \br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
-	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. In this scenario, \cbh
-	constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder.
+	The cone-and-plate rheometer consists of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate.\br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
+	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
 	
 	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}.
-	The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
-	\cbh \br
-	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \cbh \br % cite!
+	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
+	\br
+	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \br
 	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
 	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases (CITE). \br
-	Hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
-	% "Normal" fluids (like water) exhibit Newtonian behaviour, this means that the rate of shear (how fast they deform) is directly proportional to the shear stress imposed upon them, with the constant of proportionality being the viscosity of the fluid\cite[p.~252]{schadict}. Multiphase suspensions can exhibit non-Newtonian viscous behaviour, where this direct relationship is not found \cite[p.~255-256]{schadict}. Some exhibit a shear-thickening behaviour: as the shear stress is increased, the shear rate decreases faster than in newtonian behaviour and others exhibit shear thinning .  Continuous shear thickening (shown in Figure \ref{figshearthick})  is an increase in the apparent viscosity. Discontinuous shear thickening is a sudden and extreme increase in the apparent viscosity of the fluid and is closely related to jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br	
+	%The equivalence of particles to hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
 	%flow, shear, jam frequency %TODO
 	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	\newline \newline \noindent
@@ -273,15 +275,15 @@
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
-	\otherchap{Description of the Work}
+	\nc{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially.
 
 
 
 	\section{Hardware Setup} % last edited 7/3/2017
-	The experiment is based around a Couette cell (CITE), consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (SERNO) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets its speed and reads in the torque load on the motor. This is used to calculate the viscosity of the fluid. 
-	Motor speed is read in using a secondary motor acting as a dynamo. This dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
-	A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. Figure \ref{expdia} gives a diagram of the set-up.\newline
+	The experiment is based around a Couette cell consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (model 970D161) while the outer cylinder is fixed. The motor is controlled by a raspberry pi, which sets the rotational speed and reads the torque load on the motor. This is used to calculate the viscosity of the fluid. Motor speed is read in using a secondary motor acting as a dynamo. The dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
+	%A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. 
+	Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
 	\centering
 	\fbox{\includegraphics[scale=0.3]{images/exp_set_up.png}} % https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fexp_set_up.xml
@@ -312,9 +314,9 @@
 	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read.
 	
 
-	\subsection*{\textit{Motor Speed Control}} % last edited 7/3/2017
+	\subsection*{\textit{Motor Speed Control}} % last edited 21/3/2017
 	%Nomenclature in this section:
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can electronically adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal Aand the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as teh bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
+	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal A and the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as the bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
