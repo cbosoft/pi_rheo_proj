@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("./../../lib/")
+sys.path.append("./../../bin/")
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -86,7 +86,7 @@ coeffs = np.polyfit(crf[:max_l], cu[:max_l], 1)
 xl = np.array([2.3, 2.4])
 fit = coeffs[-2] * xl + coeffs[-1]
 ax.plot(crf[:max_l], cu[:max_l], 'o')
-ax.plot((xl[:max_l]), (fit[:max_l]), 'r--', label="$Trendline, CUR = {0:.3f}CR + {1:.3f}$".format(coeffs[-2], coeffs[-1]))
+ax.plot((xl[:max_l]), (fit[:max_l]), 'r--', label="$I_{2} = {0:.3f}V_{3} + {1:.3f}$".format(coeffs[-2], coeffs[-1], "{ms}", "{HES}"))
 
 ax.set_xlabel("\n $Current\ Sensor\ Reading,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Current,\ A$\n", ha='center', va='center', fontsize=24)
@@ -103,6 +103,6 @@ ax2.set_xlabel("\n$Time,\ s$", ha='center', va='center', fontsize=24)
 
 # Show plot
 print "saving plot"
-plt.savefig("./figcurreadcal.png")
+plt.savefig("./fig_hes_cal.png")
 plt.close(f)
 

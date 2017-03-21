@@ -2,7 +2,7 @@
 
 import sys
 
-sys.path.append('./../../lib')
+sys.path.append('./../../bin')
 
 from filter import filter
 import numpy as np
@@ -107,5 +107,5 @@ if __name__ == "__main__":
     # Show plot
     print "saving plot"
     #plt.show()
-    plt.savefig("./fig_filter_demons.png")
+    plt.savefig("./fig_filt_demonstra.png")
     plt.close(f)

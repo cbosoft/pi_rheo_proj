@@ -1,14 +1,12 @@
 import sys
 
-sys.path.append('./../../lib')
+sys.path.append('./../../bin')
 
 from filter import filter
 import numpy as np
-from scipy.interpolate import UnivariateSpline
-from scipy.signal import wiener, filtfilt, butter, gaussian, freqz
-from scipy.ndimage import filters
 import scipy.optimize as op
 import matplotlib.pyplot as plt
+
 
 def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
     # load up some noisy data
@@ -82,5 +80,5 @@ if __name__ == "__main__":
     # Show plot
     print "saving plot"
     #plt.show()
-    plt.savefig("./fig_filter_{0}_compare.png".format(method))
+    plt.savefig("./fig_filt_compar.png")
     plt.close(f)

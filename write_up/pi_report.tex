@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{5819} % last proper build on Mon 20 March 2017 at 20:26:57
+\def\thewords{8514} % last proper build on Tue 21 March 2017 at 16:16:49
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -32,7 +32,7 @@
 
 
 \geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}  % Sets the mnargins
-\setcounter{secnumdepth}{0}  % removes the numbering from toc entires
+%\setcounter{secnumdepth}{0}  % removes the numbering from toc entires
 
 \renewcommand\UrlFont{\rmfamily\itshape}  % sets URL font to normal font (rather than code font)
 
@@ -40,7 +40,14 @@
 \setlength{\fboxrule}{0pt}  % rule width around figures
 
 \def\achapter{shorttitle}  % set the command "achapter" to  the name of the current section
-\def\otherchap#1{\addtocounter{chapter}{1} \chapter*{#1} \addcontentsline{toc}{chapter}{#1} \def\achapter{#1}}
+
+\def\otherchap#1{
+	\addtocounter{chapter}{1} 
+	\def\achapter{\arabic{chapter} #1}
+	\addcontentsline{toc}{chapter}{\achapter} 
+	\chapter*{\achapter} 
+	}
+
 \def\rpilong{Raspberry Pi }
 \def\rpi{Raspberry Pi }
 
@@ -164,24 +171,19 @@
 	\otherchap{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
 	% Non-newtonian fluids exhibit interesting rheological properties: their viscosity can alter with shear stress (rheopectic) or time.\br
-	This project aims to design, build, and test a control system for a bespoke rheometer (focussed on recording the time variance of rheological properties).
-	The experiment itself aims to gather more information about the statistical probability of the occurrence of a jam and how the shear stress affects this. \br
-	The experimental process consists of two concentric cylinders, the inner of which is attached to a DC motor and can be rotated. The gap between the two cylinders will be filled with a colloidal suspension. As the inner cylinder is rotated, the suspension will be subject to either a constant shear force, or a constant shear rate. 
-	By knowing the power sent to the motor, as well as its efficiency and rotational speed, the strain rate and stress imposed upon the fluid in the rheomter can be calculated and thus used to obtain the rheology of the fluid - how the viscosity varies with time and stress. \br
-	The experimental set-up will be controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice for the controller to this process. Software will be developed for the Raspberry Pi to read in the motor's speed and the PEND's voltage reading, record it accurately and to control the rotational speed of the motor. In addition, the Raspberry Pi can be used to automate the experimental process by automatically altering experimental parameters in-between runs while logging all the relevant data during runs. The Pi can also be set up with a web interface, allowing monitoring of the experiment from remote locations, further reducing the manual workload on lab technicians. \br
-	Hardware was be developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the motor, the electrical power supplied to the motor, the current shear stress observed within the fluid, and the presence of 'cracks' on the surface of the fluid.\br
-	Software will be developed to facilitate the accurate reading of information from the experiment, as well as control of the experimental parameters. There are two general operating modes; constant shear rate (or rotational speed), and constant shear stress (or torque). The former is relatively simple to do. By recording the motor's rotational speed and comparing with a set point, the speed can easily be held at a fixed point (thus a constant shear rate is achieved). The output torque is fixed in a similar way, using feedback from the process to fix the torque from the motor.
-	[background motivation]\br
+	Jamming is a special form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared.\br
+	This project aims to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
+	The hardware was controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice to control this process. Software was developed to take readings from sensors (giving the rotational speed and current supply) and record it. Further, software will be used to maintain a set rotational speed (or supply torque).\br
+	Hardware was developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the inner cylinder in the couette cell, and the current supplied to the motor. This information, along with the supply voltage, is used to calculate the viscosity of the fluid.\br
 	[conclusion]
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
-	\otherchap{Literature Review} % section last edited 20/3/2017
+	\otherchap{Background} % section last edited 21/3/2017
 	\section{Laboratory Automation and Process Control}
-	%summ back mot, struct, conc
-	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by the team at Aberystwyth University can make over 1,000,000 observations and hypotheses per day \cite{backontorobsci}. \cbh %safety? toxic environs?
+	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by Aberystwyth University can make over a million observations and hypotheses per day \cite{backontorobsci}. 
 	\br
 	Laboratory automation emerged in the late 19th century, with siphons and controlled flow of water used to automate various processes. As technology advanced and electronics became more prevalent, the options for automation in the laboratory increased. Automatic titration equipment (using photo-cells to detect a colour change) were revolutionary in their ability to accurately and consistently record results, especially for difficult to discern colour changes \cite{backlabautohisto}. \br
 	Process control can be thought of as the industrial mirror of laboratory automation which has developed along a similar path starting with mechanical analogue device, moving into electronically assisted technology and then, with the advent of computer technology, process control became the marriage of digital and analogue systems it is today \cite{backautocontrolhisto}.
@@ -194,15 +196,6 @@
 	\end{itemize}
 	Each control element has an associated gain parameter which affects how strongly that element is represented in the control action. These parameters must be set properly before controller can be used. This is done in a process called tuning. There are a variety of methods for tuning the controller, most commonly used is the Ziegler-Nichols method, involving tuning the controller such that the measured value oscillates in a sustained way. Then using the period of oscillation along with other measured parameters to decide on the optimum controller tuning. After tuning using a method such as Ziegler-Nichols it is often required to tweak the tuning manually to obtain the most effective controller for the situation. This is done mostly by trial and error. Trial and error tuning can also be used to fully tune the device, although this would take a long time to do by hand. \br
 	The controller device itself is a small computer, reading input from the instruments and then applying the algorithm to determine how it should alter the process. These small computers are called "microcontrollers". A microcontroller chip is a small re-programmable computer which reads input from, and outputs data to an electronic circuit \cite{backwhatismc}. Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions. \br
-	
-	%	\begin{figure}[h!]
-	%	\centering
-	%	\fbox{\includegraphics[scale=0.5]{images/mcudia.png}}	\caption{Microcontroller Block Diagram (taken from  \cite{mcudia})}
-	%	\label{mcudia}
-	%	\end{figure}
-	
-	
-	
 	
 	\section{Raspberry Pi} % section last edited 3/3/2017
 	\noindent
@@ -253,7 +246,7 @@
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure} %\newline  \noindent
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
-	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}. \cbh \br %(Information about the CR: how accurate can it be, what is it usually used for)
+	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
 	The cone-and-plate rheometer \cbh \br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
 	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. In this scenario, \cbh
 	constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder.
@@ -473,24 +466,23 @@
 	\nomenclature[g]{$\omega_N$}{Motor no-load speed\hfill $rad s^{-1}$}
 	
 	\noindent
-	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed and stall torque in terms of the value sent to the potentiometer (\(PV\)), which dictates the supply voltage.
+	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed and stall torque in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
 	\begin{equation}
 	v_{NL} = 4.292 \times pv + 144.927
 	\label{eqnsvemp}
 	\end{equation}
 	
-	\nomenclature{$v_{NL}$}{Motor rotational speed\hfill $RPM$}
+	\nomenclature{$v_{NL}$}{Motor rotational speed, no loading\hfill $RPM$}
 	\nomenclature{$pv$}{Potentiometer value\hfill }
 	
 	\begin{equation}
-	T_s = A \times pv + B
+	T_s = 0.169 \times I_{ms} + 0.038
 	\label{eqntsemp}
 	\end{equation}
 	\cbh \br
-	Speed here (\(S_{NL}\)) is in RPM.
 	Combining Equations \ref{eqnsvemp} and \ref{eqntsemp} with Equation \ref{eqnmechpofsp} yields an equation for motor torque as a function of rotational speed and potentiometer value, Equation \ref{eqnmottsvsp}.
 	\begin{equation}
-	T = A \times pv + B \left(- \frac{\omega}{0.01138 pv + 0.3844} \right)
+	T = 0.169 \times I_{ms} + 0.038 \left(1 - \frac{\omega}{0.01138 pv + 0.3844} \right)
 	\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
@@ -558,13 +550,13 @@
 		\fbox{
 			\begin{subfigure}[t]{0.45\textwidth}
 				\centering
-				\includegraphics[scale=0.3]{figures/figvoltvval.png}
+				\includegraphics[scale=0.3]{figures/fig_supplyvolt_v_val.png}
 				\caption{Motor Supply Voltage vs. Potentiometer Value}
 				\label{figvoltvval}
 			\end{subfigure}
 			\begin{subfigure}[t]{0.45\textwidth}
 				\centering
-				\includegraphics[scale=0.3]{figures/figspeedvval.png}
+				\includegraphics[scale=0.3]{figures/fig_speed_v_val.png}
 				\caption{Read Speed and Actual Speed Comparison}
 				\label{figdynocheck}
 			\end{subfigure}
@@ -681,7 +673,7 @@ The line graph of speed against potentiometer value should display two lines whi
 		\fbox{
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
-			\includegraphics[scale=0.35]{figures/figsenshisto.png}
+			\includegraphics[scale=0.35]{figures/fig_hes_histo.png}
 			\caption{Histogram Plot of \newline Sensor Input Interval Time}
 			\label{figsenshisto}
 		\end{subfigure}
@@ -761,7 +753,7 @@ Analogue readings of real world data can be corrupted by noise. Noise can appear
 % from messing around, butterworth seems to give the best representation of the data as noiselessly and as correct as possible.
 \begin{figure}[!htb]
 	{\centering
-	\fbox{\includegraphics[scale=0.35]{figures/fig_filter_demons.png}}
+	\fbox{\includegraphics[scale=0.35]{figures/fig_filt_demonstra.png}}
 	\caption{Butterworth Filter Demonstration}
 	\label{figfilterdemon}}
 	%optional:

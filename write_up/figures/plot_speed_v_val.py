@@ -45,7 +45,7 @@ tl = np.poly1d(z)
 # Plot data and trendline
 ax.plot(pv[4:], av_spd[4:], 'bx-', label="$Actual\ Motor\ Speed$")
 ax.plot(read_pv, read_speed, 'g^', label='$Read\ Motor\ Speed$')
-ax.plot(pv, tl(pv), 'r--', label="$Fit\ Line:\ SPD = {0:.3f}PV + {1:.3f}$".format(z[0], z[1]))
+ax.plot(pv, tl(pv), 'r--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
 
 ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
@@ -54,9 +54,7 @@ plt.legend(loc=2)
 
 
 # Show plot
-plt.savefig("./figspeedvval.png")
-
-# Todo: include read motor speed on graph (as opposed to just actual motor speed)
+plt.savefig("./fig_speed_v_val.png")
 
 
 plt.close(f)
@@ -72,7 +70,7 @@ tl = np.poly1d(z)
 
 # Plot data
 ax.plot(pv, av_volt, "o", label="$Motor\ Voltage$")
-ax.plot(pv, tl(pv), 'r--', label="$Trendline, VOL = {0:.3f}PV + {1:.3f}$".format(z[0], z[1]))
+ax.plot(pv, tl(pv), 'r--', label="$V_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{ms}"))
 
 ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Average\ Supply\ Voltage,\ V$\n", ha='center', va='center', fontsize=24)
@@ -81,4 +79,4 @@ plt.legend()
 
 
 # Show plot
-plt.savefig("./figvoltvval.png")
+plt.savefig("./fig_supplyvolt_v_val.png")

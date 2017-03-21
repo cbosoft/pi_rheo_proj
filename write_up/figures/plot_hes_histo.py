@@ -63,4 +63,4 @@ def histo(log_path, out_fig, xlabel, ylabel, colour="blue"):
     return (high, popval)
 
 if __name__ == "__main__":
-    histo("./../../logs/hall_histo_bad.csv", "./figsenshisto.png", r"$Interval, ms$", r"$Occurance$")
+    histo("./../../logs/hall_histo_bad.csv", "./fig_hes_histo.png", r"$Interval, ms$", r"$Occurance$")
