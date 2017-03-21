@@ -338,11 +338,11 @@
 	\nomenclature{$R_{AW}$}{Resistance value ofthe resistor between B terminal on the potentiometer and ground\hfill $\Omega$}
 	
 	\noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path the circuit takes through the circuit, the higher the number, the higher the resistance between the A terminal and the wiper, \(R_{AW}\). When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this.\br
-	The 7-bit has 128 possible configurations ($2^7 = 128$). Therefore the potentiometer terminal B-wiper resistance will increase by $78 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path taken through the circuit, the higher the number, the higher \(R_{WB}\) will be. When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this.\br
+	A 7-bit number has a maximum value of 127 ($2^7 - 1 = 128$). Therefore the potentiometer terminal B-wiper resistance will increase by $78.7 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
 	
 	\begin{equation}
-	V_{wiper} = V_{AB}\times \frac{3k\Omega + \left(78\Omega \times pv\right)}{13k\Omega}
+	V_{wiper} = V_{AB}\times \frac{3k\Omega + \left(78.7\Omega \times pv\right)}{13k\Omega}
 	\label{eqnpotres}
 	\end{equation}
 	
@@ -350,15 +350,15 @@
 	\nomenclature[aV ]{$V_{AB}$}{Voltage accross the potentiometer terminals\hfill $V$}
 	
 	\begin{equation}
-	V_{ms} = 0.0631 \times pv + 2.423
+	V_{ms} = 0.0636 \times pv + 2.423
 	\label{eqnmotsupvol}
 	\end{equation}
 	
 	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $V$}
-	%Similarly, when \(R_{AW}\) decreases, the voltage in the bottom half of the divider will increase and so will the voltage across the motor. The resistors included in addition to the digital potentiometer set the minimum and maximum values for the voltage across the motor, the minimum voltage is where the wiper resistance is essentially zero, so Equation \ref{eqnvoldiv} becomes Equation \ref{eqnminvol}. For maximum voltage, the wiper is set as high as possible (\(R_{WB} = R_{pot}\)) and Equation \ref{eqnvoldiv} becomes Equation \ref{eqnmaxvol}. 
+
 	%\subsection{\textit{PEND Input Processing}}
 
-	\section{Software} % last edited 13/3/2017 %uml?
+	\section{Software} % last edited 13/3/2017 %uml for diagram?
 	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.\br
 	The hardware designed for this project makes heavy use of the SPI protocol - a kind of serial communication. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. This package makes functions available to create a connection to an SPI device, to send data, and to receive data. This package is used to set the resistance on the digital potentiometer, and to read signal information from the analogue to digital converter. \br
 	The software is organised into different classes:
@@ -382,7 +382,7 @@
 	This class enables the software to interact with the digital potentiometer (model MCP4131) using the SPI protocol. This class makes use of the spidev package to enable SPI communication. The class contains a function to set a value on the resistor (as an integer number between 0 and 127), and is set up such that multiple digital potentiometers can be included on the same circuit.\br
 	% Usage
 	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the "\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: "\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.\br
-	To set the resistance on the potentiometer, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. Then it uses the spidev package to send this value to the correct register on the potentiometer, causing it to alter its resistance.
+	To set the potentiometer resistance, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. The spidev package is used to send this value to the correct register on the potentiometer, causing it to alter its resistance.
 	%What else to include?
 	
 	\subsection*{ADC} % last edited 13/3/2017
@@ -507,7 +507,7 @@
 	
 	\nomenclature[g]{$\tau$}{Shear stress\hfill $Nm^{-2}$}
 	
-	\section{Calibration} % edited 20/3/2017
+	\section{Calibration} % edited 20/3/2017 %RE STRUCTURE! Merge upwards?
 %	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
 	\subsection*{Dynamo Calibration}
@@ -535,9 +535,8 @@
 	\nomenclature{$V_{HES}$}{Hall effect sensor output voltage\hfill $V$}
 	Where \(I_{ms}\) is the motor supply current, in Amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
-	\subsection*{Empirical Speed and Stall Torque Relationships}
-		
-	 The empirical relationship between speed and potentiometer value (Equation \ref{eqnsvemp}) was found by measuring the rotational rate of the motor using a tachometer at different potentiometer values, and using software (mathematical python package "\texttt{numpy}") to fit a leaner equation to the data. The stall torque relationship (Equation \ref{eqntsemp}) was similarly obtained by measuring the stall torque at different potentiometer values and then fitting a linear equation to the results.\br 
+	\subsection*{Empirical Relationships} %re-write? purpose?
+	 The empirical relationship between speed and potentiometer value (Equation \ref{eqnsvemp}) was found by measuring the rotational rate of the motor using a tachometer at different potentiometer values, and using software (mathematical python package "\texttt{numpy}") to fit a leaner equation to the data. The stall torque relationship (Equation \ref{eqntsemp}) was similarly obtained by measuring the stall torque and current draw at different supply voltages and then fitting a linear equation to the results.\br 
 
 	\section{Evaluation} % re write recommended
 	%The project can be split into different sections; design, development, and evaluation. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
