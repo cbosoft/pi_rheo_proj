@@ -2,13 +2,14 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{7843} % last proper build on Wed 22 March 2017 at 17:36:39
+\def\thewords{6284} % last proper build on Wed 22 March 2017 at 20:55:14
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
 \def\cbh{\large\bfseries !!! ??? !!! \normalsize\normalfont}
 
 % Imports
+\usepackage{fancyvrb}
 \usepackage{graphicx}
 \usepackage[a4paper]{geometry}
 \usepackage{fancyhdr}
@@ -38,8 +39,8 @@
 
 \renewcommand\UrlFont{\rmfamily\itshape}  % sets URL font to normal font (rather than code font)
 
-\setlength{\fboxsep}{0pt}  % separator length around figure boxes
-\setlength{\fboxrule}{0pt}  % rule width around figures
+\setlength{\fboxsep}{2pt}  % separator length around figure boxes
+\setlength{\fboxrule}{1pt}  % rule width around figures
 
 \def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
 
@@ -75,7 +76,7 @@
 
 	\begin{figure}[!htb]
 		\centering
-		\fbox{\includegraphics[scale=SCALE]{IMAGE LOCATION}}
+		\includegraphics[scale=SCALE]{IMAGE LOCATION}
 		\caption{CAPTION}
 		\label{FIGURE REF}
 		%optional:
@@ -151,7 +152,9 @@
 	% WHY WE DID IT
 	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
 	% HOW IT TURNED OUT
-	The rheometer was evaluated by using it to measure the rheometry of various known solutions of water and glycerol. The rheometer's accuracy gauges by comparing the result with that from standard lab equipment. The rheometer [worked well/did not work well]. \cbh
+	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment. \br
+	Work in progress. Conclusion to follow.
+	%not finished, cannot conclude
 	\newpage \begin{center} \large \space \normalsize \end{center}
 	
 	% Contents Page
@@ -176,7 +179,6 @@
                                                                
 	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
-	% Non-newtonian fluids exhibit interesting rheological properties: their viscosity can alter with shear stress (rheopectic) or time.\br
 	Jamming is a special form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared.\br
 	This project aims to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
 	The hardware was controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice to control this process. Software was developed to take readings from sensors (giving the rotational speed and current supply) and record it. Further, software will be used to maintain a set rotational speed (or supply torque).\br
@@ -187,78 +189,39 @@
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
-	\nc{Background} % section last edited 21/3/2017
-	\section{Laboratory Automation and Process Control}
-	Laboratory automation involves the design and implementation of robotic systems which are able to conduct laboratory experiments automatically, reducing the workload of human scientists and technicians \cite{backwhatisauto}. This includes the use of machine learning and AI to interpret results and create hypotheses \cite{backlitrevai, backbaconauto, backlabauto}. The motivation for this is eaasy to see, "Robot Scientists" can be used to conduct experiments with little to no human supervision and can take in a vast number of measurements. The "Adam" Robot Scientist developed by Aberystwyth University can make over a million observations and hypotheses per day \cite{backontorobsci}. 
-	\br
-	Laboratory automation emerged in the late 19th century, with siphons and controlled flow of water used to automate various processes. As technology advanced and electronics became more prevalent, the options for automation in the laboratory increased. Automatic titration equipment (using photo-cells to detect a colour change) were revolutionary in their ability to accurately and consistently record results, especially for difficult to discern colour changes \cite{backlabautohisto}. \br
-	Process control can be thought of as the industrial mirror of laboratory automation which has developed along a similar path starting with mechanical analogue device, moving into electronically assisted technology and then, with the advent of computer technology, process control became the marriage of digital and analogue systems it is today \cite{backautocontrolhisto}.
-	Process control is an inherent area of process design; the process (whatever it may be) has parameters which must be controlled so that the process continues under the design paramters; at the correct temperature, pressure, etc. Process control has historically been achieved through the use of analogue equipment, using pressurised air to send and receive signals from process equipment. Modern process control is achieved through the use of computers and digital electronics, where the analogue measured signals are converted into digital signals, so that a computer can understand the data. The controller applies an algorithm to calculate the control action required to maintain the desired value of the variable. The modern digital controller can deal with almost any form of input, guarding against a wide variety of disturbances. If it can be measured, it can be controlled.\br
-	At the heart of the modern controller is the control algorithm. This is the calculation which determines what change to the control output needs to be made (the control action). Control algorithms vary with application. The most commonly used algorithm is the Proportional-Integral-Derivative algorithm (PID control), consisting of three sections which can be turned off or on depending on the needs of the situation:
-	\begin{itemize}
-		\item Proportional control increases the control action proportional to the size of the error (the difference between the set point and the measured value). This is easy to tune and set up, however it suffers from offset bias. This bias arise from the control action being balanced out in the process by the error such that the control action is not sufficient to change the process to compensate for the error. The error will remain, and the controller will do no more to correct for it, thus an offset is sustained. This must be manually corrected for.
-		\item Integral control increases the control action depending on the integral of the error with respect to time (the longer the error goes on, the higher the control action). Integral action is useful to eliminate the offset bias of proportional control.
-		\item Finally, derivative control increases control action with the derivative of the error with respect to time, so a quickly rising error is met with a large change in control action. Derivative action is difficult to tune and highly sensitive to noise in the circuit - this means it is rarely used. If it is used, it requires some form of noise filter on the signal and careful tuning. The most common version of the PID algorithm only uses proportional and integral action (no derivative) - the PI controller. PI control allows for easy tuning and quick response, without the difficulties of derivative action, or the offset bias of proportional control.
-	\end{itemize}
-	Each control element has an associated gain parameter which affects how strongly that element is represented in the control action. These parameters must be set properly before controller can be used. This is done in a process called tuning. There are a variety of methods for tuning the controller, most commonly used is the Ziegler-Nichols method, involving tuning the controller such that the measured value oscillates in a sustained way. Then using the period of oscillation along with other measured parameters to decide on the optimum controller tuning. After tuning using a method such as Ziegler-Nichols it is often required to tweak the tuning manually to obtain the most effective controller for the situation. This is done mostly by trial and error. Trial and error tuning can also be used to fully tune the device, although this would take a long time to do by hand. \br
-	The controller device itself is a small computer, reading input from the instruments and then applying the algorithm to determine how it should alter the process. These small computers are called "microcontrollers". A microcontroller chip is a small re-programmable computer which reads input from, and outputs data to an electronic circuit \cite{backwhatismc}. Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions. \br
-	
-	\section{Raspberry Pi} % section last edited 3/3/2017
-	\noindent
-	Microcontrollers are commonly used in education to teach computer programming \cite{backmcedu1, backmcedu2}. However, it was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.3]{images/annotpidia.png}} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
-		\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
-		\label{pidia}
-	\end{figure} \newline% \noindent
-	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. The quad core processor enables better multi-threaded operation for software running on the Raspberry Pi, meaning that big cumbersome programs can run much more efficiently than before. In addition, the increase in memory and CPU clock frequency means there is overall a massive performance boost. Operations like compiling a large program (for example OpenCV, the Open Source Computer Vision Library) which could take over 9 hours \cite{pipowercompold} on the Raspberry Pi 1, takes little over an hour and a half \cite{pipowercompnew} on the latest model.\br
-	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). \br
-	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins (e.g.  pins 1,2 and 4), some are ground (e.g. 6, 9, and 14), and most are GPIO pins (e.g. 3, 5, and 7). Each GPIO pin can be either low or high. This can be set in different ways; resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and can be turned on or off via software. \newline
-	\begin{figure}[!htb]
-		\centering
-		\fbox{\includegraphics[scale=0.2]{images/gpiopinout.png}}
-		\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
-		\label{gpiopinout}
-	\end{figure} \newline  \noindent
-	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \br
-	The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
-	
-	\section{Rheometry} % last edited 8/3/2017
-	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products are have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it shears(\(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
+	\nc{Background} % section last edited 22/3/2017	
+	\section*{Rheometry} % last edited 8/3/2017
+	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it shears(\(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
 	\begin{equation}
 	\mu = \frac{\tau}{\dot{\gamma}}
 	\label{eqnvisco}
 	\end{equation}
-	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate (the speed of the deformation) or the shear stress (the force behind the deformation). Newtonian fluids (like water) have a viscosity which is independent of the shear stress - proportional only to the shear rate. Some fluids have time-dependant viscosities: thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied, and rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress: shear-thinning fluids have a viscosity that appears to decrease with increased stress, and shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
+	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate or the shear stress. Newtonian fluids (like water) have a viscosity which is independent of the shear stress - proportional only to the shear rate. Some fluids have time-dependant viscosities: thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied, and rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress: shear-thinning fluids have a viscosity that appears to decrease with increased stress, and shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
 	\begin{figure}[!htb]
 		\centering
-		\fbox{
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
-				\caption{Shear Thinning}
-				\label{figshearthin}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
-				\caption{Shear Thickening}
-				\label{figshearthick}
-			\end{subfigure}
-			%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
-		}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
+			\caption{Shear Thinning}
+			\label{figshearthin}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
+			\caption{Shear Thickening}
+			\label{figshearthick}
+		\end{subfigure}
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure}
 	\noindent
-	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
+	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheometers use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
 	The cone-and-plate rheometer consists of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate.\br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
-	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of shear rate between the cylinders. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
+	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of shear rate between the cylinders. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
 	
-	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
+	\section*{Colloidal Suspensions and Jamming} % last edited 8/3/2017
+	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
 	\br
 	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \br
 	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
@@ -269,7 +232,7 @@
 	\newline \newline \noindent
 	\begin{figure}[!htb]
 		\centering
-		\fbox{\includegraphics[scale=0.4]{images/cfors_cracks.png}}
+		\includegraphics[scale=0.4]{images/cfors_cracks.png}
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
@@ -287,10 +250,10 @@
 	%A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. 
 	Figure \ref{expdia} gives a diagram of the set-up.\newline
 	\begin{figure}[!htb]
-	\centering
-	\fbox{\includegraphics[scale=0.3]{images/exp_set_up.png}} % https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fexp_set_up.xml
-	\caption{Diagram of the Experimental Apparatus}
-	\label{expdia}
+		\centering
+		\includegraphics[scale=0.3]{images/exp_set_up.png} % https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fexp_set_up.xml
+		\caption{Diagram of the Experimental Apparatus}
+		\label{expdia}
 	\end{figure} \newline \noindent
 	% TODO :: UNCERTAINTIES IN MEASUREMENTS, MEASUREMENTS
 	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of 44.151mm, and inner diameter of 39.111mm, a height of 39.753mm. The cylinder has been glued to a metal plate which holds it in place. \br
@@ -303,7 +266,7 @@
 	The electronic circuits attached to the Raspberry Pi can be split into two distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, and the motor speed control converts a digital signal into rotation of the motor. See Figure \ref{circfull} for an overall diagram of the circuit.
 	\begin{figure}[!htb]
 		\centering
-		\fbox{\includegraphics[scale=0.3]{images/circfull.png}}
+		\includegraphics[scale=0.3]{images/circfull.png}
 		%https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fcircfull.xml
 		\caption{Schematic Diagram of Electronic Circuits}
 		\label{circfull}
@@ -364,7 +327,7 @@
 	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.
 		\begin{figure}[!htb]
 			\centering
-			\fbox{\includegraphics[scale=0.25]{images/codemap.png}}
+			\includegraphics[scale=0.25]{images/codemap.png}
 			\caption{Class Diagram}
 			\label{figcladia}
 		\end{figure} \newline  \noindent
@@ -433,7 +396,7 @@
 	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms were be applied. \br
 	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter, using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.\br	\begin{figure}[!htb]
 		\centering
-		\fbox{\includegraphics[scale=0.4]{figures/fig_butter.png}}
+		\includegraphics[scale=0.4]{figures/fig_butter.png}
 		\caption{Frequency Domain Signal Reponse To Butterworth Function}
 		\label{figbutter}
 		\footnotesize Butterworth function response with default as in "\texttt{filter.py}" (4$^{th}$ order, 0.0127 Hz cut-off frequency).
@@ -471,8 +434,8 @@
 	\subsection*{Post Processing and Results} % edited 15/3/2017
 	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor python class records the time, speed, supply voltage (potentiometer value), and supply current which is used to calculate the torque output from the motor. Knowing the torque and the rotational rate, the shear stress, strain rate, and the viscosity can be calculated. The torque output (\(T\)) from a DC motor can be found using Equation \ref{eqntcomplex} \cite[p.~111-112]{backdcmotor}. At a load high enough that the motor can no longer spin, the torque output is the stall torque (\(T_s\)). At no load, the speed is at its highest and is called the no-load speed (\(\omega_N\)). By applying this information Equation \ref{eqntcomplex} becomes Equation \ref{eqntlesscomplex}.
 	\begin{equation}
-	T = \frac{k_v V_a}{r_a} - \frac{{{k_v}^2} \omega}{r_a}
-	\label{eqntcomplex}
+		T = \frac{k_v V_a}{r_a} - \frac{{{k_v}^2} \omega}{r_a}
+		\label{eqntcomplex}
 	\end{equation}
 	
 	\nomenclature{$T$}{Motor torque\hfill $Nm$}
@@ -482,8 +445,8 @@
 	\nomenclature{$r_a$}{Motor armature radius\hfill $m$}
 	
 	\begin{equation}
-	T = T_s - \frac{T_s}{\omega_N} \omega = T_s \left(1 - \frac{\omega}{\omega_N}\right)
-	\label{eqntlesscomplex}
+		T = T_s - \frac{T_s}{\omega_N} \omega = T_s \left(1 - \frac{\omega}{\omega_N}\right)
+		\label{eqntlesscomplex}
 	\end{equation}
 	
 	\nomenclature{$T_s$}{Motor stall torque\hfill $Nm$}
@@ -498,14 +461,14 @@
 	\noindent
 	Combining Equations \ref{eqnsvemp} and \ref{eqntsemp} with Equation \ref{eqntlesscomplex} yields an equation for motor torque as a function of rotational speed and potentiometer value, Equation \ref{eqnmottsvsp}.
 	\begin{equation}
-	T = 0.169 \times I_{ms} + 0.038 \left(1 - \frac{\omega}{0.01138 pv + 0.3844} \right)
-	\label{eqnmottsvsp}
+		T = \left(0.169 \times I_{ms} + 0.038\right) \left(1 - \frac{\omega}{0.01138 pv + 0.3844} \right)
+		\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
 	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. This is assuming the strain rate as a function of position in the gap is linear, as it is in ideal Couette flow.
 	\begin{equation}
-	\dot{\gamma} = \frac{\omega}{r_o - r_i}
-	\label{eqnavsr}
+		\dot{\gamma} = \frac{\omega}{r_o - r_i}
+		\label{eqnavsr}
 	\end{equation}
 	
 	\nomenclature[g]{$\dot{\gamma}$}{Shear rate\hfill $s^{-1}$}
@@ -515,8 +478,8 @@
 	\noindent
 	In a couette cell, shear stress is a force applied over the surface area of the inner cylinder $\left(2\pi r_i L\right)$, and torque is this force multiplied by a distance (inner cylinder radius: \(r_i\)). Therefore shear stress can be calculated from the torque using Equation \ref{eqnstresstorque}.
 	\begin{equation}
-	\tau = \frac{T}{2\pi{r_i}^2L}
-	\label{eqnstresstorque}
+		\tau = \frac{T}{2\pi{r_i}^2L}
+		\label{eqnstresstorque}
 	\end{equation}
 	
 	\nomenclature[g]{$\tau$}{Shear stress\hfill $Nm^{-2}$}
@@ -531,8 +494,8 @@
 	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The clean dynamo data was then compared to the speed readings taken from the tachometer, the \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}.
 	
 	\begin{equation}
-	v_m = 317.666 \times {V_D} - 146.947
-	\label{eqnspdvvr}
+		v_m = 317.666 \times {V_D} - 146.947
+		\label{eqnspdvvr}
 	\end{equation}
 	
 	\nomenclature{$v_m$}{Motor rotational speed\hfill $RPM$}
@@ -550,8 +513,8 @@
 	\subsection*{HES Calibration}
 	The goal for this was to find a function of the HES output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output. A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqncurvcr}.
 	\begin{equation}
-	I_{ms} = 3.580 \times {V_{HES}} - 7.784
-	\label{eqncurvcr}
+		I_{ms} = 3.580 \times {V_{HES}} - 7.784
+		\label{eqncurvcr}
 	\end{equation}
 	
 	\nomenclature{$I_{ms}$}{Motor supply current\hfill $A$}
@@ -582,30 +545,21 @@
 	To test the efficacy of the voltage control circuit, the voltage was varied using the digital potentiometer and compared with the theoretical result from Equation \ref{eqnmotsupvol}. The resulting data (plotted in Figure \ref{voltvval}) shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
 		\centering
-		\fbox{
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.3]{figures/fig_supplyvolt_v_val.png}
-				\caption{Voltage Control Check}
-				\label{figvoltvval}
-			\end{subfigure}
-			\begin{subfigure}[t]{0.45\textwidth}
-				\centering
-				\includegraphics[scale=0.3]{figures/fig_speed_v_val.png}
-				\caption{Speed Reading Check}
-				\label{figdynocheck}
-			\end{subfigure}
-			%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
-		}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_supplyvolt_v_val.png}
+			\caption{Voltage Control Check}
+			\label{figvoltvval}
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_speed_v_val.png}
+			\caption{Speed Reading Check}
+			\label{figdynocheck}
+		\end{subfigure}
 		\label{figspeecal}
 		\caption{Speed and Voltage Evaluations}
 	\end{figure} \newline  \noindent
-%	\begin{figure}[!htb]
-%		\centering
-%		\fbox{\includegraphics[scale=0.3]{figures/figvoltvval.png}}
-%		\caption{Motor Voltage Supply vs. Potentiometer Value}
-%		\label{figvoltvval}
-%	\end{figure} \newline  \noindent
 
 	\subsection*{Speed Measurement} % last edited 14/3/2017
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
@@ -618,7 +572,7 @@
 	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with the actual values obtained with a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
 	\begin{figure}[!htb]
 		\centering
-		\fbox{\includegraphics[scale=0.4]{figures/fig_hes_cal.png}}
+		\includegraphics[scale=0.4]{figures/fig_hes_cal.png}
 		\caption{Current Sensor Evaluation Results}
 		\label{figcurevalres}
 	\end{figure} % redo experiment? :(
@@ -673,6 +627,8 @@
 
 
 \chapter*{Appendices}
+%appendix preamble
+
 \addcontentsline{toc}{chapter}{Appendices}
 \def\achapter{Appendices}
 \pagenumbering{alph}
@@ -681,80 +637,246 @@
 \setcounter{section}{1}
 
 \newcounter{apsec}
-\setcounter{apsec}{1}
+\setcounter{apsec}{0}
+\newcounter{apsubsec}
 \def\apsect#1{
-	\section{\arabic{apsec}\hskip0.5cm #1}
 	\addtocounter{apsec}{1}
+	\section{\arabic{apsec}\hskip0.5cm #1}
+	\setcounter{apsubsec}{1}
+}
+\def\apsubsect#1{
+	\subsection*{\arabic{apsec}\Alph{apsubsec} \hskip0.5cm #1}
+	\addtocounter{apsubsec}{1}
 }
 
-\apsect{Source Code} \label{apxsrc}
-As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to debug. The source code for each class section, as well as the filtering library, is included here.
-\subsection*{A - ADC}
-\begin{verbatim}
-INSERT_FROM("./../lib/adc.py")
-\end{verbatim}
-\subsection*{B - Digital Potentiometer}
-\begin{verbatim}
-INSERT_FROM("./../lib/dig_pot.py")
-\end{verbatim}
-\subsection*{C - Motor}
-\begin{verbatim}
-INSERT_FROM("./../lib/motor.py")
-\end{verbatim}
-\subsection*{D - Control}
-\begin{verbatim}
-INSERT_FROM("./../lib/control.py")
-\end{verbatim}
-\subsection*{E - Filtering}
-\begin{verbatim}
-INSERT_FROM("./../lib/filter.py")
-\end{verbatim}
-\apsect{Design Process Discussion}
-\subsection*{A - Voltage Control}
-\subsection*{B - Measuring Speed}
-The rotational speed of the motor needed to be able to be measured both accurately and frequently (at least 40 times every second - data gathered at most every 25ms). The final design used to meet this specification made use of a dynamo linked up to the motor to gauge the speed of rotation (see Description of Work, page \pageref{chap:dow}). Discussed here are two methods which were considered for use, but were not able to meet the specification.\br 
-The first design prototyped for use as a speed sensor was a Hall Effect Sensor coupled with a magnet. The set up was such that every rotation, the magnet would trigger the hall effect sensor and the \rpi would see this trigger as a new revolution. By recording the time between revolution triggers, it would be possible to calculate the rotational speed of the motor. The design was tested for compliance by altering the potentiometer value, thus varying the supply voltage and rotational speed of the motor. The rotations were read in by the sensor, the time of each detection was logged, along with a running log of the speed (recorded every 0.1s). The potentiometer value was held for 10 seconds to allow any dynamic responses in the speed to settle away. If there are any dynamic elements to the motor's speed as a result of a change in voltage, it would show in the results as an altered initial value after a change, which quickly settles to a constant value after  a period of time. The data recorded was evaluated using a histogram plot of the interval times between detected rotations, and a line plot of the measured speed (using both methods) against potentiometer value. \newline \newline \noindent
-The histogram should be a single straight line indicating no variation in interval time. If there is found to be small variation in the time, this could be small variation in the supply voltage due to changes in the electrical mains - this would be the main disturbance the control system is working to defend against. Small variation can also be explained away as a leftover between potentiometer value changes with little to no impact on the overall data. Large variation in interval time indicates that something is not right, either with the circuit or the software. It is more likely to be a software error or a limitation of the Raspberry Pi itself rather than a circuit design issue due to the digital nature of the sensor - it can only be on or off. It is unlikely that the sensor is giving a false positive part way through a revolution, or a false negative. \newline \newline \noindent
-The line graph of speed against potentiometer value should display two lines which are almost exact copies of each other and are easy to describe lines, preferably linear.\br
-	\begin{figure}[!htb]
-		\centering
-		\fbox{
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/fig_hes_histo.png}
-			\caption{Histogram Plot of \newline Sensor Input Interval Time}
-			\label{figsenshisto}
-		\end{subfigure}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/placeholderfig.png}
-			\caption{Motor Rotational Speed vs. \newline Digital Potentiometer Value}
-			\label{figspeedvval}
-		\end{subfigure}
-		}
-		\label{fig2speeds}
-		\caption{Speed Calibration Results}
-	\end{figure} \newline  \noindent
-	The histogram shows that the intervals are not a constant value (Figure \ref{figsenshisto}). The interval variance is not negligible, and by inspecting the raw data, it was found that the sensor was failing to record some rotations (especially noticable at low speeds). After multiple attempts (with different magnet position, different strengths of magnets) the sensor could not be found to work accurately enough. Perhaps there was a fault in the software, perhaps the \rpi was not able to process the information fast enough, or perhaps the hall effect sensor was simply not able to cope with the repeated switching. The second is highly unlikely; the CPU load on the \rpi was checked on several occasions and was found to only be around 3\% of maximum - the Pi was not at all struggling to run the script.\br
-	The speed comparison was [RESULTS2] (Figure \ref{figspeedvval}) therefore this design meets the specified requirements and is suitable for use.
-\apsect{Alternative Designs}
-\subsection*{A - Motor Rotation Rate Measurement}
+\apsect{Source Code}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= \label{apxsrc}
+As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to maintain. The source code for each class section, as well as the filtering library, is included here.
+\apsubsect{ADC Class}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\begin{Verbatim}[frame=single]
+#
+# adc.py
+#
+# Class library, gives support for using the MCP3008 8-channel 10bit ADC
+#
+
+import RPi.GPIO as gpio
+import spidev as spi
+
+
+class MCP3008(object):
+
+	bus = 0     # holds the bus connection
+	cs_pin = 0  # GPIO pin used to select the chip (gpio.BOARD numbering) 
+	            # OR which cs channel to use
+	vref = 3.3  # Reference voltage in use
+	
+	def __init__(self, cs_pin=1, vref=3.3):
+		''' 
+		object = adc.MCP3008(**kwargs)
+		
+		Initialise MCP3008 ADC class object.
+		
+		kwargs:
+		cs_pin - SPI chip select. Default is 1.
+		vref - ADC reference voltage. Default is 3.3.
+		'''
+		
+		# Chip select setup
+		self.cs_pin = cs_pin
+		if (cs_pin > 1):  # using the GPIO pins as chip_select pins
+			gpio.setmode(gpio.BOARD)
+			# chip select is normally high, pulled up by the RPi
+			gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)  
+			gpio.output(self.cs_pin, gpio.HIGH)
+		else:  # using the Pi's built in chip select method
+			pass
+		
+		# Set up bus connection
+		self.bus = spi.SpiDev()
+		
+		# Vref setting
+		self.vref = vref
+	
+	def read_data(self, channel):
+		'''
+		read_data(channel)
+		
+		Converts the voltage (relative to vref) on the specified channel 
+		to a 10-bit number.
+		
+		channel - (int, 0-7) the ADC data channel that is to be read from.
+		
+		returns: (int, 0-1023) 10-bit value representing the voltage level 
+		         on the channel specified.
+		'''
+		
+		self.open()
+		indat = self.bus.xfer2([1, 8 + channel << 4, 0])
+		self.close()
+		return ((indat[1] & 3) << 8) + indat[2]
+	
+	def read_volts(self, channel):
+		'''
+		read_volts(channel)
+		
+		Reads the voltage level on the specified channel.
+		
+		channel - (int, 0-7) the ADC data channel that is to be read from.
+		
+		returns: float representing the voltage level on the channel 
+		         specified.
+		'''
+		
+		dat = self.read_data(channel)
+		volts = (float(dat) / 1024.0) * self.vref
+		return volts
+	
+	def write_byte(self, byte):
+		'''
+		write_byte(byte)
+		
+		byte - the 8 bit command to be sent to the ADC.
+		'''
+		
+		self.open()
+		command = [byte, 0]  # Two bytes; first is command shifted 4 bits
+		                     # second is zero
+		self.bus.writebytes(command)
+		self.close()
+	
+	def open(self):
+		'''
+		open()
+		
+		opens a channel to the SPI device.
+		
+		Must completed by a following close() call.
+		'''
+		
+		if (self.cs_pin > 1):
+			gpio.output(self.cs_pin, gpio.HIGH)
+			self.bus.open(0, 1)
+			self.bus.max_speed_hz = 10000000
+		else:
+			self.bus.open(0, self.cs_pin)
+			self.bus.max_speed_hz = 10000000
+	
+	def close(self):
+		'''
+		close()
+		
+		closes a (previously opened) channel to the SPI device.
+		'''
+		
+		if (self.cs_pin > 1):
+			gpio.output(self.cs_pin, gpio.LOW)
+			self.bus.close()
+		else:
+			self.bus.close()
+\end{Verbatim}
+\apsubsect{Digital Potentiometer Class}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\begin{Verbatim}[frame=single]
+#
+# dig_pot.py
+#
+# provides support for using an MCP4131 digital potentiometer with the raspberry pi
+
+import spidev as spi
+
+class MCP4131(object):
+	'''
+	SPI 10K Digital Potentiometer
+	'''
+	bus = 0  # holds the bus connection to the digital pot
+	lav = 0
+	chip_select = 0
+	
+	def __init__(self, chipselect=0):
+		'''
+		MCP4131()
+		
+		Creates an instance of the MCP4131 class for communicating over SPI 
+		with an MCP4131 digital potentiometer.
+		
+		kwargs:
+		chipselect -  the chip_select address for the MCP4131 chip on the 
+		              SPI network.
+		'''
+		self.bus = spi.SpiDev()
+		self.chip_select = chipselect
+	
+	def set_resistance(self, value):
+		'''
+		set_resistance(value)
+		Sets the value on the potentiometer.
+		
+		value - integer value to set on the potentiometer. The resistance 
+		        betweeen the A terminal and the wiper will vary directly 
+		        with this value.
+		'''
+		self.lav = value
+		self.write_byte(value)
+	
+	def write_byte(self, byte):
+		'''
+		write_byte(byte)
+		
+		Writes the specified byte to the digital potentiometer.
+		
+		byte - the value to send to the potentiometer.
+		'''
+		self.open()
+		command = [0, byte]
+		self.bus.writebytes(command)
+		self.close()
+	
+	def open(self):
+		'''
+		open()
+		
+		Begins communication with the potentiometer.
+		Must be matched by an accompanying "close()"
+		'''
+		self.bus.open(0, self.chip_select)
+		self.bus.max_speed_hz = 10000000
+	
+	def close(self):
+		'''
+		close()
+		
+		Ends communication with the potentiometer.
+		'''
+		self.bus.close()
+\end{Verbatim}
+\apsubsect{Motor Class}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\begin{Verbatim}[frame=single]
+INSERT_FROM("./../bin/motor.py")
+\end{Verbatim}
+\apsubsect{Controller class}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\begin{Verbatim}[frame=single]
+INSERT_FROM("./../bin/control.py")
+\end{Verbatim}
+\apsubsect{Filtering}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\begin{Verbatim}[frame=single]
+INSERT_FROM("./../bin/filter.py")
+\end{Verbatim}
+\apsect{Alternative Designs}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\apsubsect{Motor Rotation Rate Measurement}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \large Hall Effect Sensor \normalsize \br
 A Hall Effect Sensor (HES) is a device which reacts to the presence of a magnetic field. There exist packages containing HESs which can be used to detect the presence of a magnetic field and thus output a digital signal based upon this. The rotational speed of the motor could be detected by attaching a magnet to the rotating cylinder and using an HES (model number US5881) to detect when a magnet passes a point. Using this, the time between the magnet detections can be used to calculate the rotation rate of the motor. \br
 The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to ground. The output pin will be in a high state (0.6v) until the sensor detects the south pole of a magnet, at which point the output will go low (0v). To communicate with the Raspberry Pi, this signal must be converted into 3.3v logic (either a 3.3v high signal or 0v low signal). To achieve this, GPIO pin 23 on the Raspberry Pi was pulled high (set to a high logic signal) and connected through a transistor to ground. Normally, the high input to the transistor allows the flow of current from the GPIO pin to ground, meaning it has a low value. When the hall effect sensor detects a magnet the high signal to the transistor will block the flow of current between the GPIO pin and ground - the GPIO pin will go high. Figure \ref{circhall} shows the schematic of this circuit. \newline
 \begin{figure}[!htb]
 	\centering
-	\fbox{\includegraphics[scale=0.3]{images/circspeeddet.png}}
+	\includegraphics[scale=0.3]{images/circspeeddet.png}
 	\caption{Hall Effect Speed Detector Circuit Diagram}
 	\label{circhall}
 \end{figure} \newline  \noindent
 This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
 \large Light Sensor \normalsize \br
 The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
-\apsect{Further Information}
 
-
-\subsection*{A - Signal Filtering}
+\apsect{Further Information} %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+\apsubsect{Signal Filtering}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 Analogue readings of real world data can be corrupted by noise. Noise can appear due to fluctuations in atmospheric conditions, electrical supply, or thermodynamic fluctuation in the reading material (to name a few). For the data to be useful, there must be some provision for reducing the noise. Signal filters can be used to reduce the amount of noise, these can be hardware or software filters. Both represent the same concepts, but in different implementations. Hardware implementation is in continuous time, while software uses discrete time approximations of the same models and functions as hardare filtering. Discussed here are software filtering techniques. \br
 
 % notes -->>
@@ -772,7 +894,7 @@ Analogue readings of real world data can be corrupted by noise. Noise can appear
 % from messing around, butterworth seems to give the best representation of the data as noiselessly and as correct as possible.
 \begin{figure}[!htb]
 	{\centering
-	\fbox{\includegraphics[scale=0.35]{figures/fig_filt_demonstra.png}}
+	\includegraphics[scale=0.35]{figures/fig_filt_demonstra.png}
 	\caption{Butterworth Filter Demonstration}
 	\label{figfilterdemon}}
 	%optional:
