@@ -78,28 +78,28 @@ for p in pv:
 max_l = 650
 
 # Set up figure
-f = plt.figure(figsize=(16,8))
-ax = f.add_subplot(121)
+f = plt.figure(figsize=(8,8))
+ax = f.add_subplot(111)
 
 # Plot data and trendline 1: CRF vs CU
 coeffs = np.polyfit(crf[:max_l], cu[:max_l], 1)
 xl = np.array([2.3, 2.4])
 fit = coeffs[-2] * xl + coeffs[-1]
 ax.plot(crf[:max_l], cu[:max_l], 'o')
-ax.plot((xl[:max_l]), (fit[:max_l]), 'r--', label="$I_{2} = {0:.3f}V_{3} + {1:.3f}$".format(coeffs[-2], coeffs[-1], "{ms}", "{HES}"))
+ax.plot((xl[:max_l]), (fit[:max_l]), 'r--', label="$I_{2} = {0:.3f}V_{3}\ {1:.3f}$".format(coeffs[-2], coeffs[-1], "{ms}", "{HES}"))
 
 ax.set_xlabel("\n $Current\ Sensor\ Reading,\ V$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$Current,\ A$\n", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$Actual\ Supply\ Current,\ A$\n", ha='center', va='center', fontsize=24)
 plt.legend(loc=4)
 
-ax2 = f.add_subplot(122)
 
-# Plot data 2: CR, CRF vs st
-ax2.plot(st, cr, color=(0,0,1,0.5))
-ax2.plot(st, crf, 'b')
-ax2.set_ylim([2.1, 2.6])
-ax2.set_ylabel("$Current\ Sensor\ Reading,\ V$\n", ha='center', va='center', fontsize=24)
-ax2.set_xlabel("\n$Time,\ s$", ha='center', va='center', fontsize=24)
+# Plot data 2: CR, CRF vs ST
+#ax2 = f.add_subplot(122)
+#ax2.plot(st, cr, color=(0,0,1,0.5))
+#ax2.plot(st, crf, 'b')
+#ax2.set_ylim([2.1, 2.6])
+#ax2.set_ylabel("$Current\ Sensor\ Reading,\ V$\n", ha='center', va='center', fontsize=24)
+#ax2.set_xlabel("\n$Time,\ s$", ha='center', va='center', fontsize=24)
 
 # Show plot
 print "saving plot"

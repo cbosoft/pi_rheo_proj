@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8492} % last proper build on Tue 21 March 2017 at 18:59:37
+\def\thewords{7843} % last proper build on Wed 22 March 2017 at 17:36:39
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -19,6 +19,7 @@
 \usepackage{subcaption}
 \usepackage{nomencl}
 \usepackage{calc}
+\usepackage{autonum}
 
 % Unused packages
 %\usepackage{placeins}
@@ -254,7 +255,7 @@
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheomters use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
 	The cone-and-plate rheometer consists of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate.\br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
-	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
+	The rotational rheometer is based upon the idea of couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of shear rate between the cylinders. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
 	
 	\section{Colloidal Suspensions and Jamming} % last edited 8/3/2017
 	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning (pseudoplastic). Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
@@ -489,19 +490,10 @@
 	\nomenclature[g]{$\omega_N$}{Motor no-load speed\hfill $rad s^{-1}$}
 	
 	\noindent
-	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed and stall torque in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
-	\begin{equation}
-	v_{NL} = 4.292 \times pv + 144.927
-	\label{eqnsvemp}
-	\end{equation}
+	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed (Equation \ref{eqnsvemp}) and stall torque (Equation \ref{eqntsemp}) in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
 	
 	\nomenclature{$v_{NL}$}{Motor rotational speed, no loading\hfill $RPM$}
 	\nomenclature{$pv$}{Potentiometer value\hfill }
-	
-	\begin{equation}
-	T_s = 0.169 \times I_{ms} + 0.038
-	\label{eqntsemp}
-	\end{equation}
 	
 	\noindent
 	Combining Equations \ref{eqnsvemp} and \ref{eqntsemp} with Equation \ref{eqntlesscomplex} yields an equation for motor torque as a function of rotational speed and potentiometer value, Equation \ref{eqnmottsvsp}.
@@ -510,7 +502,7 @@
 	\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
-	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. This is assuming the strain rate as a function of position in the gap is linear, as it should be in ideal Couette flow. \cbh \br %source? Navier-stokes?
+	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. This is assuming the strain rate as a function of position in the gap is linear, as it is in ideal Couette flow.
 	\begin{equation}
 	\dot{\gamma} = \frac{\omega}{r_o - r_i}
 	\label{eqnavsr}
@@ -529,11 +521,14 @@
 	
 	\nomenclature[g]{$\tau$}{Shear stress\hfill $Nm^{-2}$}
 	
-	\section{Calibration} % edited 20/3/2017 %RE STRUCTURE! Merge upwards?
+	With both shear stress and strain rate known, the viscosity of the fluid can be easily calculated using Newton's Viscosity Law, Equation \ref{eqnvisco}:
+	\[\mu = \frac{\tau}{\dot{\gamma}}\]
+	
+	\section{Empirical Calibrations} % last edited 22/3/2017
 %	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
 	\subsection*{Dynamo Calibration}
-	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, first the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to do this so that sensor readings were logged at the same time. At each voltage level, the speed was read several times using a contact tachometer until five readings were taken that agreed with each other. This was repeated for each voltage level. The logged data was examined to see the dynamo voltage readings. The noisy data was filtered using the \texttt{filter} package and then compared to the speed readings taken from the tachometer. The actual speed was plotted against the dynamo reading and a one dimensional fit was taken to give a function of dynamo output voltage that gives the rotational rate of the motor; Equation \ref{eqnspdvvr}.
+	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The clean dynamo data was then compared to the speed readings taken from the tachometer, the \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}.
 	
 	\begin{equation}
 	v_m = 317.666 \times {V_D} - 146.947
@@ -544,10 +539,16 @@
 	\nomenclature[aV ]{$V_D$}{Dynamo output voltage\hfill $V$}
 	
 	\noindent
-	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts.
+	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts. In addition a relationship between the rotational speed and the potentiometer value was found, from the same logged data: Equation \ref{eqnsvemp}.
+	
+	\begin{equation}
+		v_{NL} = 4.292 \times pv + 144.927
+		\label{eqnsvemp}
+	\end{equation}
+	
 	
 	\subsection*{HES Calibration}
-	The goal for this was to find a function fo the HES voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current supply was read (from a multimeter placed in the circuit) at different supply voltages. There was some variance of current draw with motor speed (roughly between 0.5A and 1A). The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output and a trendline was fit to give Equation \ref{eqncurvcr}.
+	The goal for this was to find a function of the HES output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output. A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqncurvcr}.
 	\begin{equation}
 	I_{ms} = 3.580 \times {V_{HES}} - 7.784
 	\label{eqncurvcr}
@@ -557,38 +558,47 @@
 	\nomenclature{$V_{HES}$}{Hall effect sensor output voltage\hfill $V$}
 	
 	\noindent
-	Where \(I_{ms}\) is the motor supply current, in Amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
+	Where \(I_{ms}\) is the motor supply current, in amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
-	\subsection*{Empirical Relationships} %re-write? purpose?
-	 The empirical relationship between speed and potentiometer value (Equation \ref{eqnsvemp}) was found by measuring the rotational rate of the motor using a tachometer at different potentiometer values, and using software (mathematical python package "\texttt{numpy}") to fit a leaner equation to the data. The stall torque relationship (Equation \ref{eqntsemp}) was similarly obtained by measuring the stall torque and current draw at different supply voltages and then fitting a linear equation to the results.\br 
+	\subsection*{Stall Torque}
+	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm will hit the top of a balance. The motor will be stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque can be easily calculated by multiplying this force by the length of the arm.
+	\begin{equation}
+		T_s = 0.169 \times I_{ms} + 0.038
+		\label{eqntsemp}
+	\end{equation}
+	
+	\nomenclature{$g$}{Acceleration due to gravity\hfill $ms^{-2}$}
+	\nomenclature{$L_a$}{Length of motor shaft arm\hfill $m$}
+	\nomenclature{$m_{ba}$}{Mass reading on balance\hfill $kg$}
+	
+	\noindent
+	Mass readings were taken for multiple different current readings (current supply was altered by altering voltage supply). A one dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}.
 
 	\section{Evaluation} % re write recommended
-	%The project can be split into different sections; design, development, and evaluation. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
+	%The project can be split into different sections; design, development, and **evaluation**. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
 	% The varies aspects of the design were tested to evaluate whether they met the design specifications for speed, and accuracy.
 	
-	\subsection*{Voltage Control} % Add figure
-	The DC motor used in the experiment was able to accept an electrical supply of variable voltage; between 4.5v and 15v. Due to the relatively low speeds required by the shear cell, it was decided that the motor would be controlled in a shifted voltage range, between 2.5v and 10.5v. 
-	The low end of that range being 2v less than the motor's minimum voltage was a design artifact, but was later found to adequately power the motor at low speeds. 	%%%%%%<----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-	The circuit was deemed to be satisfactory if it could achieve quick and reliable control over the motor's supply voltage. This was tested by using a script to automatically vary the controlled voltage, and a voltmeter placed in parallel across the motor. The values were recorded for selected values (between 0 and 127, in steps of 16) of the potentiometer, resulting in a correlation between the potentiometer value and the voltage supplied to the motor. The voltage varied linearly with potentiometer value (see figure \ref{figvoltvval}) between the desired minimum and maximum thus proving the circuit to be satisfactory.
+	\subsection*{Voltage Control}
+	To test the efficacy of the voltage control circuit, the voltage was varied using the digital potentiometer and compared with the theoretical result from Equation \ref{eqnmotsupvol}. The resulting data (plotted in Figure \ref{voltvval}) shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
 		\centering
 		\fbox{
 			\begin{subfigure}[t]{0.45\textwidth}
 				\centering
 				\includegraphics[scale=0.3]{figures/fig_supplyvolt_v_val.png}
-				\caption{Motor Supply Voltage vs. Potentiometer Value}
+				\caption{Voltage Control Check}
 				\label{figvoltvval}
 			\end{subfigure}
 			\begin{subfigure}[t]{0.45\textwidth}
 				\centering
 				\includegraphics[scale=0.3]{figures/fig_speed_v_val.png}
-				\caption{Read Speed and Actual Speed Comparison}
+				\caption{Speed Reading Check}
 				\label{figdynocheck}
 			\end{subfigure}
 			%\fbox{\includegraphics[scale=0.25]{figures/fig_shear_behav.png}}
 		}
 		\label{figspeecal}
-		\caption{Speed/Voltage Calibration}
+		\caption{Speed and Voltage Evaluations}
 	\end{figure} \newline  \noindent
 %	\begin{figure}[!htb]
 %		\centering
@@ -599,22 +609,27 @@
 
 	\subsection*{Speed Measurement} % last edited 14/3/2017
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
-	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well. This uses little of the computing power of the Raspberry Pi as all it has to do to obtain the rotational rate is read a value in from an ADC and perform a simple multiplication; thus this can be performed accurately and at high frequency - well suited to the required purposes.\br
-	In order to confirm the accuracy of readings, several videos were taken (at 120fps). The speed was set at a constant value for 10 second periods before filming. Then, every 10 seconds, the potentiometer value is reduced by 8. A mark was made on the rotating cylinder and as this mark passed a certain point, a counter was increased. After the 10 second period, the counter total represented the number of rotations in 10 seconds, the speed in RPM can be calculated by multiplying by 6. This was repeated several times with several different recordings to ensure the resulting correlation was correct.
-	%To decipher whether this method was quick enough, the motor was set at a single speed, and the speed was recorded at different set intervals. The standard deviation of the resulting speed curves was taken for each interval. Ideally, these should all be the same and equal to zero. %WHAT?
-	
-	\subsection*{Speed Calibration} % Rework
-	There are several parameters that need to be calculated before the motor can be used in the rheometer. The torque and efficiency characteristic curves of the motor need to be calculated (OR FOUND??). To find this, the digital potentiometer was set to 0 and initial readings of the speed and voltage were taken. Then the value was incremented, the motor speed and voltage were recorded. This was done for every possible value for the digital potentiometer. Using the recorded information, a relationship was found between efficiency and speed. This allows the torque to be calculated using only the electrical power input to the motor, and the rotational speed of the motor (see Equation \ref{eqntorque}).
-	\begin{equation}
-	\tau = \frac{I \times V \times \eta}{\omega}
-	\label{eqntorque}
-	\end{equation}
+	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.\br
 	
 	\subsection*{Current Sensor}
 	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the current will increase (reverse direction) or decrease (forward direction) this voltage. \br
 	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
-	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). \br
-	\cbh %[RESULTS AND SUCH]
+	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents).\br
+	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with the actual values obtained with a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
+	\begin{figure}[!htb]
+		\centering
+		\fbox{\includegraphics[scale=0.4]{figures/fig_hes_cal.png}}
+		\caption{Current Sensor Evaluation Results}
+		\label{figcurevalres}
+	\end{figure} % redo experiment? :(
+	
+	\subsection*{Data Filtering}
+	
+	\subsection*{Rheometry}
+	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation for this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low (\(\approx \mu_{water}\)). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
+	
+	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
+	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
 	
 
 
@@ -662,9 +677,17 @@
 \def\achapter{Appendices}
 \pagenumbering{alph}
 \setcounter{page}{1}
+\setcounter{secnumdepth}{0}
 \setcounter{section}{1}
 
-\section{1 - Source Code} \label{apxsrc}
+\newcounter{apsec}
+\setcounter{apsec}{1}
+\def\apsect#1{
+	\section{\arabic{apsec}\hskip0.5cm #1}
+	\addtocounter{apsec}{1}
+}
+
+\apsect{Source Code} \label{apxsrc}
 As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to debug. The source code for each class section, as well as the filtering library, is included here.
 \subsection*{A - ADC}
 \begin{verbatim}
@@ -686,7 +709,7 @@ INSERT_FROM("./../lib/control.py")
 \begin{verbatim}
 INSERT_FROM("./../lib/filter.py")
 \end{verbatim}
-\section{2 - Design Process Discussion}
+\apsect{Design Process Discussion}
 \subsection*{A - Voltage Control}
 \subsection*{B - Measuring Speed}
 The rotational speed of the motor needed to be able to be measured both accurately and frequently (at least 40 times every second - data gathered at most every 25ms). The final design used to meet this specification made use of a dynamo linked up to the motor to gauge the speed of rotation (see Description of Work, page \pageref{chap:dow}). Discussed here are two methods which were considered for use, but were not able to meet the specification.\br 
@@ -714,7 +737,7 @@ The line graph of speed against potentiometer value should display two lines whi
 	\end{figure} \newline  \noindent
 	The histogram shows that the intervals are not a constant value (Figure \ref{figsenshisto}). The interval variance is not negligible, and by inspecting the raw data, it was found that the sensor was failing to record some rotations (especially noticable at low speeds). After multiple attempts (with different magnet position, different strengths of magnets) the sensor could not be found to work accurately enough. Perhaps there was a fault in the software, perhaps the \rpi was not able to process the information fast enough, or perhaps the hall effect sensor was simply not able to cope with the repeated switching. The second is highly unlikely; the CPU load on the \rpi was checked on several occasions and was found to only be around 3\% of maximum - the Pi was not at all struggling to run the script.\br
 	The speed comparison was [RESULTS2] (Figure \ref{figspeedvval}) therefore this design meets the specified requirements and is suitable for use.
-\section{3 - Alternative Designs}
+\apsect{Alternative Designs}
 \subsection*{A - Motor Rotation Rate Measurement}
 \large Hall Effect Sensor \normalsize \br
 A Hall Effect Sensor (HES) is a device which reacts to the presence of a magnetic field. There exist packages containing HESs which can be used to detect the presence of a magnetic field and thus output a digital signal based upon this. The rotational speed of the motor could be detected by attaching a magnet to the rotating cylinder and using an HES (model number US5881) to detect when a magnet passes a point. Using this, the time between the magnet detections can be used to calculate the rotation rate of the motor. \br
@@ -728,7 +751,7 @@ The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to
 This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
 \large Light Sensor \normalsize \br
 The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
-\section{4 - Further Information}
+\apsect{Further Information}
 
 
 \subsection*{A - Signal Filtering}
