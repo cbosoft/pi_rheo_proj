@@ -49,7 +49,7 @@ def getWords(path):
 
     words = sum(words, [])
                     
-    ignoredList = ["document", "tiny", "scriptsize", "footnotesize", "small", "normalsize", "large", "Large", "LARGE", "huge", "huge", "flushleft", "center", "flushright"]
+    ignoredList = ["document", "tiny", "scriptsize", "footnotesize", "small", "normalsize", "large", "Large", "LARGE", "huge", "huge", "flushleft", "center", "flushright", "br", "apsect", "nc", "jc"]
 
     global wordNos
 
