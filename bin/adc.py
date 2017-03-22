@@ -29,7 +29,7 @@ class MCP3008(object):
         self.cs_pin = cs_pin
         if (cs_pin > 1):  # using the GPIO pins as chip_select pins
             gpio.setmode(gpio.BOARD)
-            gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)  # CS is normally high, pulled up by the RPi
+            gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)  # chip select is normally high, pulled up by the RPi, just like any gpio, its not electrically low
             gpio.output(self.cs_pin, gpio.HIGH)
         else:  # using the Pi's built in chip select method
             pass
@@ -51,12 +51,7 @@ class MCP3008(object):
         returns: (int, 0-1023) 10-bit value representing the voltage level on the channel specified.
         '''
         
-        # tells the ADC which channel to convert
         self.open()
-        #command = [((1 << 3) + channel) << 4] * 1
-        #self.bus.
-        #self.bus.writebytes(command)
-        #indat = self.bus.readbytes(2)
         indat = self.bus.xfer2([1, 8 + channel << 4, 0])
         self.close()
         return ((indat[1] & 3) << 8) + indat[2]
@@ -84,7 +79,7 @@ class MCP3008(object):
         '''
         
         self.open()
-        command = [byte, 0]  # Two bytes; first is command shifted 4 bits, second is blank
+        command = [byte, 0]  # Two bytes; first is command shifted 4 bits, second is zero
         self.bus.writebytes(command)
         self.close()
 
