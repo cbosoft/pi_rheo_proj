@@ -9,12 +9,12 @@
 import sys
 sys.path.append('./..')
 
-import motlib
+import motor
 import time
 import matplotlib.pyplot as plt
 
 print "setting up..."
-mot = motlib.motor(startnow=True, log_dir="./step_test_filt_g", filtering="gaussian", i_poll_rate=0.001)
+mot = motor.motor(startnow=True, log_dir="./step_test_filt_g", filtering="gaussian", i_poll_rate=0.001)
 
 delay = 5000  # delay before step change occurs, ms
 length = 5000  # how long the effects of the step are observed for, ms

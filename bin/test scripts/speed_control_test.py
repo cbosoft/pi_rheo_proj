@@ -7,7 +7,7 @@
 import sys
 sys.path.append('./..')
 
-import motlib
+import motor
 import control as cl
 import time
 
@@ -23,8 +23,8 @@ else:
     r = "./" + r
 
 # Create instance of motor class
-mot = motlib.motor(startnow=True, poll_logging=True, log_dir=r)
-#mot = motlib.motor(startnow=True, poll_logging=True, log_dir=r, filtering="butter")
+mot = motor.motor(startnow=True, poll_logging=True, log_dir=r)
+#mot = motor.motor(startnow=True, poll_logging=True, log_dir=r, filtering="butter")
 
 # Create instance of controller class
 controller = cl.PIDcontroller(KP=1, KI=1, sample_time=0.1)

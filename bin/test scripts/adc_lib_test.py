@@ -7,7 +7,7 @@
 import sys
 sys.path.append('./..')
 
-from adc import MCP3424
+from adc import MCP3008
 import time
 
 adc = MCP3008()

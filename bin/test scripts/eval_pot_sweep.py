@@ -7,7 +7,7 @@
 import sys
 sys.path.append('./..')
 
-import motlib
+import motor
 import time
 
 # Get log directory name
@@ -15,7 +15,7 @@ print "Enter the log directory name:"
 print "(Or leave blank for default)"
 r = raw_input()
 
-mot = motlib.motor(startnow=True, poll_logging=False, log_dir="./logs" + r)
+mot = motor.motor(startnow=True, poll_logging=False, log_dir="./logs" + r)
 
 print "Starting..."
 mot.pot.set_resistance(48)

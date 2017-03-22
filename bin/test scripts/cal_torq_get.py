@@ -2,10 +2,10 @@ import sys
 
 sys.path.append("./..")
 
-import motlib
+import motor
 import time
 
-mot = motlib.motor(startnow=False, log_dir="./torq_get", i_poll_rate=0.001, filtering="gaussian")
+mot = motor.motor(startnow=False, log_dir="./torq_get", i_poll_rate=0.001, filtering="gaussian")
 
 mot.pot.set_resistance(0)
 

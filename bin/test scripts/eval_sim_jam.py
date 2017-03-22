@@ -7,10 +7,10 @@
 import sys
 sys.path.append('./..')
 
-import motlib
+import motor
 import time
 
-mot = motlib.motor(startnow=True, poll_logging=True, log_dir="./jam_test", i_poll_rate=0.001, log_note="jts=0.05")
+mot = motor.motor(startnow=True, poll_logging=True, log_dir="./jam_test", i_poll_rate=0.001, log_note="jts=0.05")
 
 jamming_time_scale = 0.05
 
