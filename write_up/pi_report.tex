@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6284} % last proper build on Wed 22 March 2017 at 20:55:14
+\def\thewords{6341} % last proper build on Thu 23 March 2017 at 14:49:26
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -152,8 +152,8 @@
 	% WHY WE DID IT
 	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
 	% HOW IT TURNED OUT
-	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment. \br
-	Work in progress. Conclusion to follow.
+	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol (Newtonian fluids) as well as the rheology of non-Newtonian mixtures of cornstarch and water. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment, and observing how well the rheometer can pick up the instances of jamming. \br
+	Work in progress. Conclusion and results to follow.
 	%not finished, cannot conclude
 	\newpage \begin{center} \large \space \normalsize \end{center}
 	
@@ -165,9 +165,9 @@
 	% Acknowledgements
 	\jc{Acknowledgements}
 	%It is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
-	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project. At every turn, he was there with new ideas and fresh ideas to keep me going. \br
+	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project.\br
 	%Dr. Mark Haw - allowing the use of his research room
-	I'd also like to thank Christopher Jones help with the lab equipment. Special thanks to Jim Murphy, who made the Couette cylinders himself. \br
+	Special thanks to Jim Murphy, who made the Couette cylinders himself, and I'd also like to thank Christopher Jones help with the lab equipment. \br
 	%Aditi Mukhopadhyay
 	Finally, I'd like to thank the communities of the internet for telling me where I was going wrong, I would still be trying to spin a motor if not for them.
 	
@@ -180,10 +180,14 @@
 	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
 	Jamming is a special form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared.\br
-	This project aims to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
-	The hardware was controlled by a Raspberry Pi 3 Model B. The Raspberry Pi's low cost, low power consumption, and GPIO availability make it a suitable choice to control this process. Software was developed to take readings from sensors (giving the rotational speed and current supply) and record it. Further, software will be used to maintain a set rotational speed (or supply torque).\br
-	Hardware was developed to allow the Raspberry Pi to obtain the most accurate readings from the experiment as possible; the rotational speed of the inner cylinder in the couette cell, and the current supplied to the motor. This information, along with the supply voltage, is used to calculate the viscosity of the fluid.\br
-	[conclusion]
+	This project aimed to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
+	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
+	Raspberry Pis have been widely adopted by the electronic hobbyist groups, used in a wide variety of projects; ranging from simple robotics to home security and automation systems. The latter shows how powerful the Raspberry Pi can be, and how it can be of use in the laboratory. The Raspberry Pi is, via the GPIO ports, high modular in terms of the available hardware. Any amount of sensors can be attached allowing the Raspberry Pi to have access to any amount of information, depending on the needs of the application. \br
+	In this application, the hardware connected to the Raspberry Pi was relatively simply. A programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
+	The rheometer itself is a Couette cell rotating rheomter composed of two cylinders; the outer one is hollow and contains the fluid to be tested, and a solid inner one. The inner cylinder is rotated which shears the fluid. Sensor's were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
+	%Jamming can be observed as a sudden increase in the apparent viscosity, accompanied by a decrease in rotational speed and increase in current drawn by the motor.\br
+	The rheometer was evaluated according to how well it performed as compared to a standard laboratory cone-and-plate rheometer. \br
+	Work in progress. Conclusion and results to follow.
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -214,6 +218,7 @@
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure}
+	
 	\noindent
 	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheometers use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
 	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
@@ -236,7 +241,28 @@
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
 	\end{figure} \newline  \noindent
-
+	
+	\section*{Raspberry Pi}
+	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.3]{images/annotpidia.png} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
+		\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
+		\label{pidia}
+	\end{figure} \newline% \noindent
+	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. \br
+	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. As a tool in research, the Raspberry Pi has been used as a miniature server for researching the traffic patterns in data centres (the Pis were emulating the behaviours of full scale servers) \cite{piglasgowdc}.\br
+	What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). \br
+	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins, some are grounded, most are GPIO pins. Each GPIO pin supports digital signals. Resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and are activated/deactivated programmatically. \newline
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.2]{images/gpiopinout.png}
+		\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
+		\label{gpiopinout}
+	\end{figure} \newline  \noindent
+	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. 
+	%Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \br
+	%The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
@@ -261,9 +287,9 @@
 	The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand also holds the dynamo in position.\br
 	The electronic circuits were built onto breadboards. This allowed for simple and quick alterations to be made to the circuitry during development. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the raspberry pi to the breadboard circuitry.
 	
-	\section{Electronic Circuits} % last edited 7/3/2017
+	\section{Electronic Circuits} % last edited 21/3/2017
 	%in depth description of relevant electronic circuits
-	The electronic circuits attached to the Raspberry Pi can be split into two distinct sections. The motor speed detection circuit converts the rotational speed of the motor to a digital signal, and the motor speed control converts a digital signal into rotation of the motor. See Figure \ref{circfull} for an overall diagram of the circuit.
+	Figure \ref{circfull} is a schematic of the entire electronic circuit. The circuit can be split into two sections: the first consists of an analogue to digital converter and the sensor components, and the second consists of the potentiometer and various driver components required to set the motor's supply voltage.
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.3]{images/circfull.png}
@@ -271,17 +297,16 @@
 		\caption{Schematic Diagram of Electronic Circuits}
 		\label{circfull}
 	\end{figure}
-	\cbh %diagram is missing SPI links
 
-	\subsection*{\textit{Motor Speed Detection}} % last edited 13/3/2017
+	\subsection*{\textit{Sensor Input}} % last edited 21/3/2017
 	%Dynamo
 	The speed of the motor was gauged using a second motor acting as a dynamo. The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
-	There is also a provision for being able to detect the current supplied to the motor. This is achieved using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read.
+	The current supplied to the motor is measured using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read (between 0v and 3.3v).
 	
 
 	\subsection*{\textit{Motor Speed Control}} % last edited 21/3/2017
-	%Nomenclature in this section:
-	The speed of the motor is sent from the Raspberry Pi as a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131), a device which can adjust the resistance between its pins. Within the potentiometer:\(R_{AW}\) is the resistance between terminal A and the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as the bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The Transistor boosts this up to 2A (assuming a conservative gain of hFE = 100).
+	The speed of the motor is controlled by altering the supply voltage to the motor. A higher supply voltage, a higher rotational speed. The Raspberry Pi sends a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131) which then sets its wiper resistance accordingly. The potentiometer is part of a voltage divider, the output voltage of which varies with the potentiometers resistance and therefore can be controlled by the Raspberry Pi.\br
+	Within the potentiometer: \(R_{AW}\) is the resistance between terminal A and the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\ k\Omega \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\ \Omega\), the output would vary between 0v and 5v. While this would also be useful, it limits the resolution of the potentiometer as the bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\ k\Omega \). The digital potentiometer can only handle voltages up to 5v across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2v to 5v up to 2.52v to 10.5v. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20mA. The transistor boosts this up to 2A (hFE = 100).
 	\begin{equation}
 		V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
 		\label{eqnvoldiv}
@@ -324,10 +349,10 @@
 	%\subsection{\textit{PEND Input Processing}}
 
 	\section{Software} % last edited 13/3/2017 %uml for diagram?
-	Software was written to enable the \rpi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is a swathe of software packages available for inclusion. These packages contain pre-written code, meaning that something that has already been done (and done well) does not have to be written again - representing a significant time saving due to not having to debug a whole section of code.
+	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion.
 		\begin{figure}[!htb]
 			\centering
-			\includegraphics[scale=0.25]{images/codemap.png}
+			\includegraphics[scale=0.35]{images/codemap.png}
 			\caption{Class Diagram}
 			\label{figcladia}
 		\end{figure} \newline  \noindent
@@ -347,14 +372,10 @@
 	\end{itemize}
 	Full copies of the software source code can be found in Appendix 1.
 	
-	%Section detail
 	\subsection*{Digital Potentiometer} % last edited 13/3/2017
-	% Description
 	This class enables the software to interact with the digital potentiometer (model MCP4131) using the SPI protocol. This class makes use of the spidev package to enable SPI communication. The class contains a function to set a value on the resistor (as an integer number between 0 and 127), and is set up such that multiple digital potentiometers can be included on the same circuit.\br
-	% Usage
 	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the "\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: "\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.\br
 	To set the potentiometer resistance, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. The spidev package is used to send this value to the correct register on the potentiometer, causing it to alter its resistance.
-	%What else to include?
 	
 	\subsection*{ADC} % last edited 13/3/2017
 	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. Again, just as before, multiple instances can be used in conjunction to manage reading data from different ADCs connected to the \rpi at the same time. \br
@@ -418,8 +439,6 @@
 	The class is initialised with several optional variables; most are used by the motor class itself while some are for setting up the ADC class, and some are for setting up the digital potentiometer.\br
 	Motor-relevant arguments:
 	\begin{itemize}
-%		\item \texttt{min\_speed} - Unused
-%       \item \texttt{max\_speed} - Unused
 		\item \texttt{startnow} - a boolean value indicating whether the speed poll thread should begun now. \texttt{False} by default.
 		\item \texttt{poll\_logging} - a boolean value indicating whether data should be logged by the motor to file. \texttt{True} by default.
 		\item \texttt{log\_note} - a string added to the log file to give more information about the logged data (the test conditions etc). \texttt{"DATETIME"} by default, replaced by the current date and time when the log is written.
@@ -465,9 +484,9 @@
 		\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
-	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. This is assuming the strain rate as a function of position in the gap is linear, as it is in ideal Couette flow.
+	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. The strain rate is the derivative of the velocity of the fluid in the gap. If the velocity varies linearly through the gap (as in ideal Couette flow), then the average derivative will simply be the velocity ($ms^{-1}$) divided by the gap size ($m$).
 	\begin{equation}
-		\dot{\gamma} = \frac{\omega}{r_o - r_i}
+		\dot{\gamma} = \frac{\omega r_i}{r_o - r_i}
 		\label{eqnavsr}
 	\end{equation}
 	
@@ -484,6 +503,7 @@
 	
 	\nomenclature[g]{$\tau$}{Shear stress\hfill $Nm^{-2}$}
 	
+	\noindent
 	With both shear stress and strain rate known, the viscosity of the fluid can be easily calculated using Newton's Viscosity Law, Equation \ref{eqnvisco}:
 	\[\mu = \frac{\tau}{\dot{\gamma}}\]
 	
@@ -542,7 +562,7 @@
 	% The varies aspects of the design were tested to evaluate whether they met the design specifications for speed, and accuracy.
 	
 	\subsection*{Voltage Control}
-	To test the efficacy of the voltage control circuit, the voltage was varied using the digital potentiometer and compared with the theoretical result from Equation \ref{eqnmotsupvol}. The resulting data (plotted in Figure \ref{voltvval}) shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
+	To test the efficacy of the voltage control circuit, the voltage was varied using the digital potentiometer and compared with the theoretical result from Equation \ref{eqnmotsupvol}. The resulting data (plotted in Figure \ref{figvoltvval}) shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
 		\centering
 		\begin{subfigure}[t]{0.45\textwidth}
@@ -566,7 +586,7 @@
 	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.\br
 	
 	\subsection*{Current Sensor}
-	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the current will increase (reverse direction) or decrease (forward direction) this voltage. \br
+	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the voltage will increase (forward direction) or decrease (forward direction). \br
 	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents).\br
 	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with the actual values obtained with a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
@@ -578,9 +598,10 @@
 	\end{figure} % redo experiment? :(
 	
 	\subsection*{Data Filtering}
+	[Blank section]
 	
 	\subsection*{Rheometry}
-	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation for this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low (\(\approx \mu_{water}\)). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
+	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low (\(\approx \mu_{water}\)). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
@@ -593,6 +614,7 @@
 	\addcontentsline{toc}{chapter}{Conclusions}
 	\def\achapter{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
+	[Blank section]
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
@@ -602,6 +624,11 @@
 	\def\achapter{Review}
 	%lit review, history
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
+	The goal of this project was to design, build, and test a rheometer using a Raspberry Pi and open source software.\br
+	Over the course of the project I have learned a lot. Working with the Raspberry Pi has taught me a lot about how computers work, how they communicate, and how they may be used in industrial processes. Data processing and storage has been an important concern; with the Raspberry Pi taking thousands of measurements every second. The Pi only has limited memory available, which can fill up quickly. This was circumvented by saving the data to file, rather than keeping it in memory. \br
+	Another thing I gained a lot of experience with was data processing. Data recorded from sensors was noisy - due to random fluctuations in temperature, air pressure, vibrations, power supply. The noise was reduced using a filtering algorithm. As I was researching noise filtering I learned about the types of filters and how they work, I learned about how different signal domains (like the frequency domain) can be used to remove unwanted parts of the signal.\br
+	[Unfinished section]
+	
 	
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -616,9 +643,9 @@
 	\newpage
 	\addcontentsline{toc}{chapter}{Bibliography}
 	\def\achapter{Bibliography}
+	%\bibliographystyle{unsrt}
+	\bibliographystyle{abbrv}
 	\bibliography{biblio}
-	\bibliographystyle{unsrt}
-	%\bibliographystyle{apalike}
 
 %% APPENDIX %%
 
