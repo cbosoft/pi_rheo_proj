@@ -13,7 +13,7 @@ y = 20 * np.log10(abs(h))
 # Set up figure
 f = plt.figure(figsize=(7, 7))
 ax = f.add_subplot(111)
-plt.title("$4^{th}\ Order\ Butterworth\ Function\ Response$")
+#plt.title("$4^{th}\ Order\ Butterworth\ Function\ Response$")
 # Plot data and trendline
 ax.plot(x, y)
 plt.xscale('log')

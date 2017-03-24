@@ -19,6 +19,7 @@ def create_placeholder(outname="./placeholderfig.png"):
 
 
     # Show plot
+    plt.grid(which='both', axis='both')
     plt.savefig(outname)
 
 if __name__ == "__main__":

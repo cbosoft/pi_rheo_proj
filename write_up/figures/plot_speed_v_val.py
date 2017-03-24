@@ -33,7 +33,7 @@ for i in range(2, len(datl)):
     pv.append(float(splt[0]))
 
 # Read csv
-datf = open("./../../logs/supply_sweep.csv", "r")
+datf = open("./../../logs/long_cal.csv", "r")
 datl = datf.readlines()
 datf.close()
 
@@ -45,26 +45,28 @@ for i in range(2, len(datl) - 2):
     splt = datl[i].split(",", 13)
     rv = float(splt[1])
     #read_speed.append(float(splt[2]))
-    read_speed.append(317.666 * rv - 146.947)
-    read_pv.append(float(splt[4]))
+    read_speed.append(312.806 * rv - 159.196)
+    read_pv.append(float(splt[3]))
 
 filtered_reading = filter(read_pv, read_speed)
 
 # Speed v Value
 # Set up figure
-f = plt.figure(figsize=(10, 10))
+f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Calculate trendline
-z = np.polyfit(pv[4:], av_spd[4:], 1)
+z = np.polyfit(pv, av_spd, 1)
 tl = np.poly1d(z)
 
 # Plot data and trendline
-ax.plot(pv, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
+
 #plt.errorbar(pv, av_spd, yerr=av_spd_err, label="$Actual\ Motor\ Speed$", fmt='bx-', ecolor='g')
 #ax.plot(read_pv, read_speed, 'go', label='$Read\ Motor\ Speed$')
-ax.plot(read_pv, filtered_reading, 'ro', label="$Filtered\ Speed\ Reading$")
-ax.plot(pv, tl(pv), 'r--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
+
+ax.plot(read_pv, filtered_reading, '.', color=(1,0.5,0.5,1), label="$Filtered\ Speed\ Reading$")
+ax.plot(pv, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
+ax.plot(pv, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
 
 ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
@@ -73,6 +75,7 @@ plt.legend(loc=2)
 
 
 # Show plot
+plt.grid(which='both', axis='both')
 plt.savefig("./fig_speed_v_val.png")
 
 
@@ -80,11 +83,11 @@ plt.close(f)
 
 # Voltage v Value
 # Set up figure
-f = plt.figure(figsize=(10, 10))
+f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Calculate trendline
-z = np.polyfit(pv[2:], av_volt[2:], 1)
+z = np.polyfit(pv[2:-2], av_volt[2:-2], 1)
 tl = np.poly1d(z)
 
 # Plot data
@@ -101,4 +104,5 @@ plt.legend(loc=4)
 
 
 # Show plot
+plt.grid(which='both', axis='both')
 plt.savefig("./fig_supplyvolt_v_val.png")

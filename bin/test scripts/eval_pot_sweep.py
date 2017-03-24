@@ -10,20 +10,15 @@ sys.path.append('./..')
 import motor
 import time
 
-# Get log directory name
-print "Enter the log directory name:"
-print "(Or leave blank for default)"
-r = raw_input()
-
-mot = motor.motor(startnow=True, poll_logging=False, log_dir="./logs" + r)
+mot = motor.motor(startnow=True, poll_logging=True, log_dir="./long_sweep", i_poll_rate=0.001)
 
 print "Starting..."
 mot.pot.set_resistance(48)
 time.sleep(0.5)
 try:
     for i in range(0, 17):
-        print "Setting potval to " + str(0 + (i * 8))
-        mot.pot.set_resistance(0 + (i * 8))
+        print "Setting potval to " + str(0 + (i))
+        mot.pot.set_resistance(0 + (i))
         time.sleep(5)
 	r = raw_input("Next")
     mot.clean_exit()

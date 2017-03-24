@@ -49,6 +49,7 @@ def histo(log_path, out_fig, xlabel, ylabel, colour="blue"):
     ax1.set_ylabel(ylabel + "\n", ha='center',
     va='center', fontsize=24)
     
+    plt.grid(which='both', axis='both')
     plt.savefig(out_fig)
     plt.close(f)
     high = 0

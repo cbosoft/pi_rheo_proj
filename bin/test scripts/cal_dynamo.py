@@ -53,8 +53,8 @@ for i in range(1, len(datl)):
     t.append(float(splt[0]))
     st.append(t[i - 1] - t[0])
 
-    rv.append(float(splt[2]))
-    pv.append(int(splt[4]))
+    rv.append(float(splt[1]))
+    pv.append(int(splt[3]))
 
 # Read csv
 datf = open("./../../logs/voltvval.csv", "r")

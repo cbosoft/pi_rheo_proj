@@ -53,8 +53,8 @@ for i in range(2, len(datl) - 2):
     t.append(float(splt[0]))
     st.append(t[i - 1] - t[0])
 
-    cr.append(float(splt[3]))
-    pv.append(int(splt[4]))
+    cr.append(float(splt[2]))
+    pv.append(int(splt[3]))
 
 crf = filter.filter(st, filter.filter(st, cr, method="butter"), method="gaussian")
 

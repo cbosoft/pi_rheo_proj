@@ -1,10 +1,7 @@
 import matplotlib.pyplot as plt
-# import numpy as np
+import numpy as np
 
-#data read from figure 6 {figshearthin}
-# x1 = [10000, 25000, 31000, 40000, 50000, 70000, 88000, 100000, 130000, 160000,
-# 200000, 250000, 300000]
-
+#Shear Thinning Data (Adapted from "A review of the rheology of filled viscoelastic systems" - pg. 15)
 x1 = [120142.42528315245, 134009.23402986198, 153446.9477751839, 
 171157.75619735435, 197703.8744026554, 209258.5019541341, 239610.9391515068, 
 270793.085742764, 291672.6017933288, 331073.25499599, 347373.72355412133, 
@@ -27,6 +24,12 @@ y1 = [38783.282706560174, 37091.06160324516, 35477.23552621477, 33548.4537331352
 1575.6667652095043, 1258.0413223363698, 993.1059237796526, 749.5650293415773, 
 591.7494833356993, 431.76332459351465, 337.05460431213726, 254.37639118101097, 
 200.82786712149294, 163.98794401504693, 148.18873650651528]
+
+# MIS READ Y AXIS
+
+y1 = np.array(y1)
+x1 = np.array(x1)
+y1 = y1 / 150
 
 #data read from figure on second page {figshearthick}
 # x2 = [0.0015, 0.02, 0.15, 0.45, 1.5, 11, 250, 1000, 4000, 10000, 20000]
@@ -61,6 +64,7 @@ ax1.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
 va='center', fontsize=12)
 ax1.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
 va='center', fontsize=12)
+plt.grid(which='both', axis='both')
 plt.savefig("./fig_shear_behav_thin.png")
 
 #plt.clf()
@@ -75,5 +79,6 @@ ax2.set_xlabel(r'$\mathrm{Shear\ Stress},\ \sigma\ (Pa)$', ha='center',
 va='center', fontsize=12)
 ax2.set_ylabel(r'$\mathrm{Viscosity},\ \mu\ (Pa.s)$', ha='center',
 va='center', rotation='vertical', fontsize=12)
+plt.grid(which='both', axis='both')
 plt.savefig("./fig_shear_behav_thick.png")
 

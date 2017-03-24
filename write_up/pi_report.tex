@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6341} % last proper build on Thu 23 March 2017 at 14:49:26
+\def\thewords{6535} % last proper build on Fri 24 March 2017 at 16:54:29
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -208,12 +208,16 @@
 			\includegraphics[scale=0.5]{figures/fig_shear_behav_thin.png}
 			\caption{Shear Thinning}
 			\label{figshearthin}
+			\footnotesize 
+			Viscosity vs. shear stress for a shear-thinning fluid. Glass spheres 15 $\mu$m in diameter suspended in thermoplastic.
 		\end{subfigure}
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
 			\includegraphics[scale=0.5]{figures/fig_shear_behav_thick.png}
 			\caption{Shear Thickening}
 			\label{figshearthick}
+			\footnotesize 
+			Viscosity vs. Shear stress for a shear thickening fluid ($\phi=0.5$, colloidal latex particles dispersed in water). The initial shear thinning region can be seen before the fluid acts Newtonian until the shear stress reaches a critical yield stress and the fluid appears to thicken. At high stress, the fluid once again acts Newtonian.
 		\end{subfigure}
 		\label{figshearthinthick}
 		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
@@ -418,9 +422,12 @@
 	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter, using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.\br	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{figures/fig_butter.png}
-		\caption{Frequency Domain Signal Reponse To Butterworth Function}
+		\caption{Frequency Domain Signal Response To Butterworth Function}
 		\label{figbutter}
-		\footnotesize Butterworth function response with default as in "\texttt{filter.py}" (4$^{th}$ order, 0.0127 Hz cut-off frequency).
+		\begin{subfigure}{0.8\textwidth}
+			\centering
+			{\footnotesize 4$^{th}$ order Butterworth filter response (blue line) with 0.0127 Hz cut-off frequency (green line).}
+		\end{subfigure}
 	\end{figure}\noindent
 	\begin{equation}
 	|G(j\omega)| = \frac{1}{\sqrt{1 + \left(\frac{\omega}{\omega_c}\right)^{2n}}}
@@ -511,27 +518,47 @@
 %	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
 	\subsection*{Dynamo Calibration}
-	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The clean dynamo data was then compared to the speed readings taken from the tachometer, the \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}.
+	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The cleaned dynamo data was then compared to the speed readings taken from the tachometer, see Figure \ref{figspeedvrvolt}. The \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}.
 	
 	\begin{equation}
-		v_m = 317.666 \times {V_D} - 146.947
+		v_m = 312.806 \times {V_D} - 159.196
 		\label{eqnspdvvr}
 	\end{equation}
 	
 	\nomenclature{$v_m$}{Motor rotational speed\hfill $RPM$}
 	\nomenclature[aV ]{$V_D$}{Dynamo output voltage\hfill $V$}
 	
+	\begin{figure}[!htb]
+		\centering
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.35]{figures/fig_speed_v_rvolt.png}
+			\caption{Dynamo Calibration Results}
+			\label{figspeedvrvolt}
+			\footnotesize
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
+			\caption{Stall Torque Calibration Results}
+			\label{figstalltcal}
+			\footnotesize
+		\end{subfigure}
+		\label{figcals}
+		\caption{Calibration Results}
+	\end{figure}
+	
 	\noindent
-	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts. In addition a relationship between the rotational speed and the potentiometer value was found, from the same logged data: Equation \ref{eqnsvemp}.
+	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts. In addition a relationship between the rotational speed and the potentiometer value was found, from the same logged data: Equation \ref{eqnsvemp} (see Figure \ref{figdynocheck}).
 	
 	\begin{equation}
-		v_{NL} = 4.292 \times pv + 144.927
+		v_{NL} = 5.13 \times pv + 15.275
 		\label{eqnsvemp}
 	\end{equation}
 	
 	
 	\subsection*{HES Calibration}
-	The goal for this was to find a function of the HES output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output. A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqncurvcr}.
+	The goal for this was to find a function of the HES output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). Similar to above, the current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output (see Figure \ref{figcurevalres}). A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqncurvcr}.
 	\begin{equation}
 		I_{ms} = 3.580 \times {V_{HES}} - 7.784
 		\label{eqncurvcr}
@@ -570,16 +597,25 @@
 			\includegraphics[scale=0.3]{figures/fig_supplyvolt_v_val.png}
 			\caption{Voltage Control Check}
 			\label{figvoltvval}
+			\footnotesize
+			Comparison of actual supply voltage (average of three readings) and theoretically expected supply voltage. A linear equation was fit to the read supply voltage data (red dashed line).
 		\end{subfigure}
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
 			\includegraphics[scale=0.3]{figures/fig_speed_v_val.png}
 			\caption{Speed Reading Check}
 			\label{figdynocheck}
+			\footnotesize
+			Comparison of tachometer motor speed readings (blue line), and dynamo speed reading (small red circles). A linear equation was fit to the tachometer readings (dashed green line) and used to calibrate the dynamo sensor.
 		\end{subfigure}
 		\label{figspeecal}
 		\caption{Speed and Voltage Evaluations}
-	\end{figure} \newline  \noindent
+		\begin{subfigure}{0.9\textwidth}
+%		\centering
+		{\footnotesize \textbf{(a):} \newline
+		\textbf{(b):} }
+		\end{subfigure}
+	\end{figure}
 
 	\subsection*{Speed Measurement} % last edited 14/3/2017
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
@@ -588,14 +624,17 @@
 	\subsection*{Current Sensor}
 	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the voltage will increase (forward direction) or decrease (forward direction). \br
 	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
-	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents).\br
-	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with the actual values obtained with a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
+	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
+	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.4]{figures/fig_hes_cal.png}
+		\includegraphics[scale=0.35]{figures/fig_hes_cal.png}
 		\caption{Current Sensor Evaluation Results}
 		\label{figcurevalres}
-	\end{figure} % redo experiment? :(
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Supply current plotted against the raw HES input (light red lines) and the filter HES input (blue line). A Butterworth low pass filter (4$^{th}$ order, cut off frequency = 0.0127Hz) was used. A 3$^{rd}$ order polynomial was fit to the data (green line).
+		\end{subfigure}
+	\end{figure}
 	
 	\subsection*{Data Filtering}
 	[Blank section]

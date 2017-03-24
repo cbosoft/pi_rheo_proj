@@ -25,7 +25,7 @@ for i in range(1, len(datl)):
     st.append(fo[i-1] * 0.12)  # ish
 
 # Set up figure
-f = plt.figure(figsize=(7, 7))
+f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 z = np.polyfit(cu, st, 1)
@@ -42,5 +42,6 @@ ax.set_ylabel("$Stall\ Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
 plt.legend(loc=3)
 
 # Show plot
+plt.grid(which='both', axis='both')
 plt.savefig("./fig_stall_torque_v_supply_current.png")
 plt.close(f)

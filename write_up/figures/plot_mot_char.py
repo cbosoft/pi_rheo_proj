@@ -13,7 +13,7 @@ import matplotlib.ticker as mtick
 
 
 
-if __name__ == "__main__":
+if False:
 
     print "loading geometry"
     logf = open("./../../logs/cell_geom.csv", "r")
@@ -96,5 +96,6 @@ if __name__ == "__main__":
     # Show plot
     print "saving plot"
     #plt.show()
+    plt.grid(which='both', axis='both')
     plt.savefig("./fig_mot_charac.png")
     plt.close(f)

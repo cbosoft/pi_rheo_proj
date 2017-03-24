@@ -9,7 +9,7 @@ import numpy as np
 
 # Read csv
 
-log = "./../../logs/std_sweep.csv"
+log = "./../../logs/long_cal.csv"
 datf = open(log, "r")
 datl = datf.readlines()
 datf.close()
@@ -47,8 +47,8 @@ for i in range(1, len(datl)):
     st.append(float(splt[0]) - tz)
     
     dr.append(float(splt[1]))
-    cr.append(float(splt[3]))
-    pv.append(int(splt[4]))
+    cr.append(float(splt[2]))
+    pv.append(int(splt[3]))
 
 if True:
     dr = filter(st, dr)
@@ -69,8 +69,8 @@ for i in range(1, len(datl)):
     
     mu.append(tau[i - 1] / gam_dot[i - 1])
 
-if False:
-    mu = filter(st, mu)
+if True:
+    mu = filter(st, mu, method="butter",A=10, B=0.08)
 
 
 # Set up figure
@@ -78,10 +78,10 @@ f = plt.figure(figsize=(7, 7))
 ax = f.add_subplot(111)
 plt.title("Placeholder graph!")
 # Plot data and trendline
-ax.plot(st, mu, 'b')
+ax.plot(st[150000:], mu[150000:], 'b')
 
-ax2 = ax.twinx()
-ax2.plot(st, T, 'g')
+#ax2 = ax.twinx()
+#ax2.plot(st, T, 'g')
 
 #ax3 = ax2.twinx()
 #ax3.plot(st, Ts, 'r')
@@ -94,5 +94,6 @@ ax.set_ylabel("$Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
 
 
 # Show plot
+plt.grid(which='both', axis='both')
 plt.savefig("./visco.png")
 

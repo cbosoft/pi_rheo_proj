@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 
 def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
     # load up some noisy data
-    print "loading data"
     logf = open(path_file, "r")
     dat = logf.readlines()
     logf.close()
@@ -20,8 +19,7 @@ def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
     s = [0] * 0  # y, speed
     start = 0.0  # start time (since epoch)
     st = [0] * 0 # specific time (time since run begun, seconds)
-    
-    print "sorting..."
+  
 
     splt = dat[1].split(",", 5)
     t.append(float(splt[0]))
@@ -35,8 +33,6 @@ def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
         s.append(float(splt[2]))
         st.append(t[i - 1] - start)
     
-    print "sorted"
-    print "applying filter"
     # Apply filter
     c = filter(t, s, method=filter_method)
     return st, s, c
@@ -59,7 +55,6 @@ if __name__ == "__main__":
     
     # simple 
     
-    print "plotting"
     # Set up figure
     f = plt.figure(figsize=(15,15))
     ax = f.add_subplot(111)
@@ -69,7 +64,7 @@ if __name__ == "__main__":
     ax.plot(x, y, 'b', color=(0,0,1,0.2))
     for i in range(2, 3):
         for j in range(8, 9):
-            print "A={0}, B={1}, plotting...".format((i), (0.01 * j))
+            #print "A={0}, B={1}, plotting...".format((i), (0.01 * j))
             ax.plot(x, filter(x, y, method="butter", A=(i), B=(0.01 * j)))
 
     ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
@@ -77,8 +72,7 @@ if __name__ == "__main__":
 
     #plt.title("$Filter\ Type:\ {0}$".format(method), fontsize=20)
 
-    # Show plot
-    print "saving plot"
-    #plt.show()
+    # Save plot
+    plt.grid(which='both', axis='both')
     plt.savefig("./fig_filt_compar.png")
     plt.close(f)
