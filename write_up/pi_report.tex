@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6535} % last proper build on Fri 24 March 2017 at 16:54:29
+\def\thewords{6320} % last proper build on Sat 25 March 2017 at 15:25:11
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -179,11 +179,11 @@
                                                                
 	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
-	Jamming is a special form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared.\br
+	"Jamming" is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
 	This project aimed to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
 	Raspberry Pis have been widely adopted by the electronic hobbyist groups, used in a wide variety of projects; ranging from simple robotics to home security and automation systems. The latter shows how powerful the Raspberry Pi can be, and how it can be of use in the laboratory. The Raspberry Pi is, via the GPIO ports, high modular in terms of the available hardware. Any amount of sensors can be attached allowing the Raspberry Pi to have access to any amount of information, depending on the needs of the application. \br
-	In this application, the hardware connected to the Raspberry Pi was relatively simply. A programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
+	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
 	The rheometer itself is a Couette cell rotating rheomter composed of two cylinders; the outer one is hollow and contains the fluid to be tested, and a solid inner one. The inner cylinder is rotated which shears the fluid. Sensor's were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
 	%Jamming can be observed as a sudden increase in the apparent viscosity, accompanied by a decrease in rotational speed and increase in current drawn by the motor.\br
 	The rheometer was evaluated according to how well it performed as compared to a standard laboratory cone-and-plate rheometer. \br
@@ -200,7 +200,7 @@
 	\mu = \frac{\tau}{\dot{\gamma}}
 	\label{eqnvisco}
 	\end{equation}
-	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate or the shear stress. Newtonian fluids (like water) have a viscosity which is independent of the shear stress - proportional only to the shear rate. Some fluids have time-dependant viscosities: thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied, and rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress: shear-thinning fluids have a viscosity that appears to decrease with increased stress, and shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
+	There are different classes of fluids depending on how their viscosity behaves with respect to shear rate or to shear stress. Newtonian fluids have a constant viscosity, the shear stress required to shear at a specific rate is directly proportional to the shear rate and the fluid's viscosity is the constant of proportionality. Non-Newtonian fluids have viscosities that are not constant. Some fluids viscosities which vary with the length of time shear is applied. Thixotropic fluids have a viscosity which apparently reduces the longer a stress is applied. Rheopectic fluids have a viscosity which apparently increases the longer a stress is applied. Other non-Newtonian fluids are dependant on the magnitude of the stress. Shear-thinning fluids have a viscosity that appears to decrease with increased stress. Shear thickening fluids appear to experience a viscosity increase with an increase in stress \cite{backtypesofnonnewt}. Figures \ref{figshearthin} \& \ref{figshearthick} give examples of how shear rate varies with shear stress for non-Newtonian fluids. \br
 	\begin{figure}[!htb]
 		\centering
 		\begin{subfigure}[t]{0.45\textwidth}
@@ -210,6 +210,7 @@
 			\label{figshearthin}
 			\footnotesize 
 			Viscosity vs. shear stress for a shear-thinning fluid. Glass spheres 15 $\mu$m in diameter suspended in thermoplastic.
+			%Better Graph? Talk more about the parts of the graph. Newtonian area at low shear, non-Newtonian at high
 		\end{subfigure}
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
@@ -224,28 +225,28 @@
 	\end{figure}
 	
 	\noindent
-	Viscosity is measured in the lab using a rheometer. There are several distinct types of rheometers: capillary rheometers flow the fluid through a pipe of known dimensions and use the time taken to calculate the viscosity, cone-and-plate rheometers use a plate upon which is the fluid to be tested, and into the fluid is placed a cone which is spun (using the geometry and the torque/rotational rate of the spinning cone to calulate the viscosity), and the rotational rheometer which consists of a cylinder within another with the fluid to be tested between the cylinders such that it shears when a cylinder is rotated. \br
-	The capillary rheometer consists of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}.\br
-	The cone-and-plate rheometer consists of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate.\br %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
-	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is the fluid. Constructed from two cylinders: the outer (hollow) cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of shear rate between the cylinders. This rheometer functions in much the same way to the cone-and-plate, but with different geometry.
+	Viscosity is measured in the lab using a rheometer. There are three general types of rheometers: capillary, cone-and-plate, and rotational. Capillary rheometers consist of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}. Cone-and-plate rheometers consist of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate. %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
+	\br
+	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is the shearing fluid. In Couette flow, the strain rate calculation is simplified: strain rate is the first derivative of the velocity of the shear. In Couette flow, the velocity varies linearly with accross the gap therefore the strain rate is constant. A Couette cell is a practical approximation of the infinitely long plate shear scenario. The cell is constructed from two cylinders: the outer cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of velocity, and a constant strain rate.
 	
 	\section*{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour, which has been explained in a number of ways. One theory explaining the onset of DST is the hydroclustering theory: as the suspension undergoes shear, the particles are forced together, forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite[p.~7]{backbrownjaegrev}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles. % other theories?
+	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour. The concept of hydroclustering has been used to explain this shear thickening behaviour: as the suspension undergoes shear, the particles are forced together forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite{figshearthick}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles \cite[p.~7]{backbrownjaegrev}. % other theories?
 	\br
-	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST, also termed dilatancy). CST is where the viscosity increases proportionally past a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards after a yield stress. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also lends credence to the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. \br
-	DST is thought to be closely linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
-	Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases. \br
-	%The equivalence of particles to hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh \br
-	%flow, shear, jam frequency %TODO
-	An interesting phenomenon that occurs in shearing suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "Dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
-	\newline \newline \noindent
+	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST). In CST the viscosity increases proportionally to shear after a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also supports the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. 
+	\br
+	DST is linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
+	%Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases. 
+	%\br
+	%The equivalence of particles to hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh 
+	%\br
+	An interesting phenomenon that occurs in jamming suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{images/cfors_cracks.png}
 		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
 		\label{cforscracks}
-	\end{figure} \newline  \noindent
-	
+	\end{figure}
+	%LINK
 	\section*{Raspberry Pi}
 	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
 	\begin{figure}[!htb]
@@ -254,18 +255,27 @@
 		\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
 		\label{pidia}
 	\end{figure} \newline% \noindent
-	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. \br
-	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. As a tool in research, the Raspberry Pi has been used as a miniature server for researching the traffic patterns in data centres (the Pis were emulating the behaviours of full scale servers) \cite{piglasgowdc}.\br
-	What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). \br
-	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins, some are grounded, most are GPIO pins. Each GPIO pin supports digital signals. Resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and are activated/deactivated programmatically. \newline
+	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. 
+	\br
+	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. As a research tool, the Raspberry Pi has been used as a miniature server for researching the traffic patterns in data centres (the Pis were emulating the behaviours of full scale servers) \cite{piglasgowdc}.
+	\br
+	What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). 
+	\br
+	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins, some are grounded, most are GPIO pins. Each GPIO pin supports digital signals. Resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and are activated/deactivated programmatically.
+	
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.2]{images/gpiopinout.png}
 		\caption{Raspberry Pi 3 Model B GPIO Pinout Diagram (taken from  \cite{pigpiopinout})}
 		\label{gpiopinout}
-	\end{figure} \newline  \noindent
-	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins taken up by the single device is extremely inconvenient. This can easily be sent via serial connection with just two wires. 
-	%Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. \br
+	\end{figure}
+	
+	\noindent
+	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins used for this single action is inconvenient. This can easily be sent via serial connection with just two wires. There are several serial communication options built into the Raspberry Pi: $I^2C$ (Inter-Integrated Circuit) and SPI (Serial Peripheral Interface) are two. SPI uses up to four wires for communication: a clock line for synchronising data transfer, a master-out-slave-in data line (MOSI), a master-in-slave-out (MISO), %not the soup
+	and a chip select line for selecting which slave device the master is communicating with.
+	%\br
+	%Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. 
+	%\br
 	%The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -289,7 +299,7 @@
 	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of 44.151mm, and inner diameter of 39.111mm, a height of 39.753mm. The cylinder has been glued to a metal plate which holds it in place. \br
 	The inner cylinder is a perspex cylinder built onto the motor's shaft. The cylinder is 30.215mm in diameter and 46.795mm in height. There is a thinner section of the cylinder at the top of the main cylinder, which is used as a pulley for the belt to hold on to (see Figure \ref{expdia}). \br
 	The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand also holds the dynamo in position.\br
-	The electronic circuits were built onto breadboards. This allowed for simple and quick alterations to be made to the circuitry during development. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the raspberry pi to the breadboard circuitry.
+	The electronic circuits were built onto breadboards. This allowed for simple and quick alterations to be made to the circuitry during development. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the Raspberry Pi to the breadboard circuitry.
 	
 	\section{Electronic Circuits} % last edited 21/3/2017
 	%in depth description of relevant electronic circuits
@@ -305,7 +315,11 @@
 	\subsection*{\textit{Sensor Input}} % last edited 21/3/2017
 	%Dynamo
 	The speed of the motor was gauged using a second motor acting as a dynamo. The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This voltage was amplified using an operational amplifier circuit by a factor of ten and read in using an ADC (MCP3008). This was calibrated by setting the potentiometer to different values and recording the voltage produced by the dynamo. Then the speed at these known potentiometer values was found using a tachometer (SERNO). Thus the speed as a function of the dynamo voltage can be calculated. \br
-	The current supplied to the motor is measured using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read (between 0v and 3.3v).
+	To sense the current drawn by the motor, a Hall Effect sensor (ACS712) is used. A Hall Effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the voltage will increase (forward direction) or decrease (forward direction). 
+	\br
+	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). 
+	%\br
+	%The current supplied to the motor is measured using a Hall Effect sensor and inductor package (ACS712). This uses a Hall Effect sensor to detect the size of the magnetic field generated by the current passing through an inductor, producing a voltage proportional to the magnitude of the current. This signal is passed through an op-amp (LM358) to bring it up to a suitable level for the ADC to read (between 0v and 3.3v).
 	
 
 	\subsection*{\textit{Motor Speed Control}} % last edited 21/3/2017
@@ -353,14 +367,17 @@
 	%\subsection{\textit{PEND Input Processing}}
 
 	\section{Software} % last edited 13/3/2017 %uml for diagram?
-	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion.
-		\begin{figure}[!htb]
-			\centering
-			\includegraphics[scale=0.35]{images/codemap.png}
-			\caption{Class Diagram}
-			\label{figcladia}
-		\end{figure} \newline  \noindent
-	The hardware designed for this project makes heavy use of the SPI protocol - a kind of serial communication. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. This package makes functions available to create a connection to an SPI device, to send data, and to receive data. This package is used to set the resistance on the digital potentiometer, and to read signal information from the analogue to digital converter. \br
+	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion. SPI is used to facilitate communication between the Raspbery Pi and the hardware: to set the resistance on the digital potentiometer; to read signal information from the analogue to digital converter. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. \newline
+	
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.35]{images/codemap.png}
+		%filter.py arrow is backwards?
+		\caption{Class Diagram}
+		\label{figcladia}
+	\end{figure}
+	
+	\noindent
 	The software is organised into different classes (see Figure \ref{figcladia}):
 	\begin{itemize}
 		\item Digital Potentiometer \newline 
@@ -382,7 +399,7 @@
 	To set the potentiometer resistance, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. The spidev package is used to send this value to the correct register on the potentiometer, causing it to alter its resistance.
 	
 	\subsection*{ADC} % last edited 13/3/2017
-	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. Again, just as before, multiple instances can be used in conjunction to manage reading data from different ADCs connected to the \rpi at the same time. \br
+	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. \br
 	The initialisation function for the ADC class has two parameters, both optional. The first is a chip select parameter (used to tell spidev which device we are trying to communicate with on the SPI network) which has a value of 1 by default. The second parameter is the value of the reference voltage (\texttt{vref}), 3.3 by default, used to calculate the voltage read in by the ADC from the 10-bit value read from the ADC. \br
 	Usage of the class is very simple: the "\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the "\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.
 	
@@ -418,8 +435,9 @@
 	Function "\texttt{get\_control\_action}" is used to obtain the control action in response to the input. This function takes a single argument, the value of the controlled variable (controller input). Then, python's "\texttt{time}" package is used to calculate, accurately, the time between now and the previous call of the function to give the accurate sample time (\(\Delta t_s\)) used in the velocity algorithm. The function then simply applies Equation \ref{eqdiscpid} to obtain the control action best suited to maintain the desired set point.
 	
 	\subsection*{Noise Filter} % last edited 13/3/2017
-	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms were be applied. \br
-	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter, using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.\br	\begin{figure}[!htb]
+	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms were be applied. \br %Expand!!
+	\cbh \cbh \cbh \cbh \br
+	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.\br	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{figures/fig_butter.png}
 		\caption{Frequency Domain Signal Response To Butterworth Function}
@@ -446,7 +464,7 @@
 	The class is initialised with several optional variables; most are used by the motor class itself while some are for setting up the ADC class, and some are for setting up the digital potentiometer.\br
 	Motor-relevant arguments:
 	\begin{itemize}
-		\item \texttt{startnow} - a boolean value indicating whether the speed poll thread should begun now. \texttt{False} by default.
+		\item \texttt{startnow} - a boolean value indicating whether the speed poll thread should begin when the class is first instantiated. \texttt{False} by default.
 		\item \texttt{poll\_logging} - a boolean value indicating whether data should be logged by the motor to file. \texttt{True} by default.
 		\item \texttt{log\_note} - a string added to the log file to give more information about the logged data (the test conditions etc). \texttt{"DATETIME"} by default, replaced by the current date and time when the log is written.
 		\item \texttt{log\_titles} - a list of strings giving the headings to be included above the data in the log.
@@ -479,7 +497,7 @@
 	\nomenclature[g]{$\omega_N$}{Motor no-load speed\hfill $rad s^{-1}$}
 	
 	\noindent
-	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\), \(\omega_N\)) is in rad/s, and Power (\(P_m\)) is in W. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed (Equation \ref{eqnsvemp}) and stall torque (Equation \ref{eqntsemp}) in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
+	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\) and \(\omega_N\)) is in rad/s. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed (Equation \ref{eqnsvemp}) and stall torque (Equation \ref{eqntsemp}) in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
 	
 	\nomenclature{$v_{NL}$}{Motor rotational speed, no loading\hfill $RPM$}
 	\nomenclature{$pv$}{Potentiometer value\hfill }
@@ -491,7 +509,7 @@
 		\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
-	The average strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. The strain rate is the derivative of the velocity of the fluid in the gap. If the velocity varies linearly through the gap (as in ideal Couette flow), then the average derivative will simply be the velocity ($ms^{-1}$) divided by the gap size ($m$).
+	The strain rate imposed upon the fluid in the gap between the cylinders can be calculated using Equation \ref{eqnavsr}. The strain rate is the derivative of the velocity of the fluid in the gap. If the velocity varies linearly through the gap (as in ideal Couette flow), then the derivative will simply be the velocity ($ms^{-1}$) divided by the gap size ($m$).
 	\begin{equation}
 		\dot{\gamma} = \frac{\omega r_i}{r_o - r_i}
 		\label{eqnavsr}
@@ -622,8 +640,6 @@
 	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.\br
 	
 	\subsection*{Current Sensor}
-	To sense the current drawn by the motor, a hall effect sensor is used. A hall effect is able to produce a voltage proportional to the strength of a magnetic field, a magnetic field which can be produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The sensor used is the ACS712 package using a 5v supply from the Raspberry Pi. The normal output (at zero amps sensed) is half of the supply voltage. The direction of the current will determine whether the voltage will increase (forward direction) or decrease (forward direction). \br
-	The current draw by the motor will only ever be in a single direction, so the direction information is not necessary. To increase the resolution, 2.5v is subtracted from the signal before it is amplified by 10 and fed into the ADC (channel \#1). \br
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
 	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
 	\begin{figure}[!htb]
