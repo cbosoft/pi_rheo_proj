@@ -11,8 +11,6 @@ import math
 # Read csv
 
 log = "./../../logs/long_cal.csv"
-
-print "opening log {0}".format(log)
 datf = open(log, "r")
 datl = datf.readlines()
 datf.close()
