@@ -103,7 +103,7 @@ min_l = 10000
 max_l = len(pv)
 
 # Set up figure
-f = plt.figure(figsize=(12, 12))
+f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Plot data and trendline 1: CRF vs CU
