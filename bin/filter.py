@@ -22,11 +22,11 @@ def butterworthf(x, y, A=4, B=0.08):
 	fl = filtfilt(b, a, y)
 	return fl
  
-def wienerf(y, sample_size=29, noise_magnitude=0.5):
+def wienerf(y, sample_size=29, noise_magnitude=1):
 	wi = wiener(y, sample_size, noise_magnitude) #, mysize=sample_size, noise=noise_magnitude)
 	return wi
  
-def splinef(x, y, samples=240):
+def splinef(x, y, samples=100):
 	sp = UnivariateSpline(x, y, s=samples)
 	return sp(x)
     
