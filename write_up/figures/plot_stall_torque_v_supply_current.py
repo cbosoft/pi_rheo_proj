@@ -22,7 +22,7 @@ for i in range(1, len(datl)):
     bl.append(float(splt[1]))
 
     fo.append(bl[i-1] * 9.80665 * 0.001)
-    st.append(fo[i-1] * 0.12)  # ish
+    st.append(fo[i-1] * 0.099375)  # ish
 
 # Set up figure
 f = plt.figure(figsize=(8, 8))
@@ -35,7 +35,7 @@ tl = np.poly1d(z)
 ax.plot(cu, st, 'o', label="$Read\ Data$")
 ax.plot(cu, tl(cu), 'r--', label="$T_S = {0:.3f}I_{1} + {2:.3f}$".format(z[0], "{ms}", z[1]))
 
-ax.set_xlabel("\n $Current Supply,\ A$", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $Current\ Supply,\ A$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Stall\ Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
 
 # Show Legend
