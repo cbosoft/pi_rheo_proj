@@ -83,7 +83,7 @@ t3l = np.poly1d(z3z)
 ax.plot(rv, av_speed_long, 'o', label="$Recorded\ Speed$")
 ax.plot(tl(pv), t3l(tl(pv)), 'r--', label="$v_{2} = {0:.3f} V_D {1:.3f}$".format(z3z[0], z3z[1], "{NL}"))
 
-ax.set_xlabel("\n $Read Voltage,\ V$", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $Read\ Voltage,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
 # Show Legend
