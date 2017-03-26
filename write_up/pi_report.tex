@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6320} % last proper build on Sat 25 March 2017 at 15:25:11
+\def\thewords{6767} % last proper build on Sun 26 March 2017 at 00:24:14
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -41,19 +41,21 @@
 
 \setlength{\fboxsep}{2pt}  % separator length around figure boxes
 \setlength{\fboxrule}{1pt}  % rule width around figures
+\setlength{\parindent}{0pt}
+%\parskip = \baselineskip
 
 \def\achapter{\shorttitle}  % set the command "achapter" to  the name of the current section
 
 \def\nc#1{
 	\addtocounter{chapter}{1} 
 	\def\achapter{\arabic{chapter} #1}
-	\addcontentsline{toc}{chapter}{\achapter} 
 	\chapter*{\arabic{chapter} #1} 
+	\addcontentsline{toc}{chapter}{\achapter} 
 }
 \def\jc#1{
 	\def\achapter{#1}
-	\addcontentsline{toc}{chapter}{\achapter} 
 	\chapter*{\achapter} 
+	\addcontentsline{toc}{chapter}{\achapter} 
 }
 \def\rpilong{Raspberry Pi }
 \def\rpi{Raspberry Pi }
@@ -179,10 +181,10 @@
                                                                
 	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
-	"Jamming" is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
+	Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
 	This project aimed to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
-	Raspberry Pis have been widely adopted by the electronic hobbyist groups, used in a wide variety of projects; ranging from simple robotics to home security and automation systems. The latter shows how powerful the Raspberry Pi can be, and how it can be of use in the laboratory. The Raspberry Pi is, via the GPIO ports, high modular in terms of the available hardware. Any amount of sensors can be attached allowing the Raspberry Pi to have access to any amount of information, depending on the needs of the application. \br
+	Raspberry Pis have been welcomed by the electronic hobbyist groups and has been used in a wide variety of projects; ranging from simple robotics to home security and automation systems. The latter shows how powerful the Raspberry Pi can be, and how it can be of use in the laboratory. The Raspberry Pi is, via the GPIO ports, high modular in terms of the available hardware. Any amount of sensors can be attached allowing the Raspberry Pi to have access to any amount of information, depending on the needs of the application. \br
 	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
 	The rheometer itself is a Couette cell rotating rheomter composed of two cylinders; the outer one is hollow and contains the fluid to be tested, and a solid inner one. The inner cylinder is rotated which shears the fluid. Sensor's were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
 	%Jamming can be observed as a sudden increase in the apparent viscosity, accompanied by a decrease in rotational speed and increase in current drawn by the motor.\br
@@ -364,8 +366,6 @@
 	
 	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $V$}
 
-	%\subsection{\textit{PEND Input Processing}}
-
 	\section{Software} % last edited 13/3/2017 %uml for diagram?
 	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion. SPI is used to facilitate communication between the Raspbery Pi and the hardware: to set the resistance on the digital potentiometer; to read signal information from the analogue to digital converter. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. \newline
 	
@@ -435,9 +435,15 @@
 	Function "\texttt{get\_control\_action}" is used to obtain the control action in response to the input. This function takes a single argument, the value of the controlled variable (controller input). Then, python's "\texttt{time}" package is used to calculate, accurately, the time between now and the previous call of the function to give the accurate sample time (\(\Delta t_s\)) used in the velocity algorithm. The function then simply applies Equation \ref{eqdiscpid} to obtain the control action best suited to maintain the desired set point.
 	
 	\subsection*{Noise Filter} % last edited 13/3/2017
-	The data read in by the ADC is noisy. Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms were be applied. \br %Expand!!
-	\cbh \cbh \cbh \cbh \br
-	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.\br	\begin{figure}[!htb]
+	The data read in by the ADC is noisy - it contains unwanted fluctuations along with the desired signal. Noise can originate from many different sources \cite{wileyadvsignproc}: mains power supply fluctuations, faults in the conductive materials, fluctuations in temperature and pressure, and even the random nature of electron flow (current). Some noise can be easily predicted and identified (e.g. a 50Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
+	\br
+	Filtering techniques can be used to eliminate noise from a signal. Frequency filters remove certain frequencies from the signale. Other filtering techniques include: fitting polynomial equations to sections of the data ("splines") - a more graphical method of removing the noise; using a probabilistic analysis of the data to determine the main response; or using a moving average of the data (which can be weighted to favour the data surrounding the current point being filtered).
+	\br
+%	Fluctuations in the power supply, temperature, manufacturing errors in the motor and cylinders are all possible sources of the noise. To reduce the noise, filtering algorithms were be applied. \br %Expand!!
+%	\cbh \cbh \cbh \cbh \br
+	The filtering algorithm used in the \texttt{filter} function, is a low pass frequency filter using a Butterworth function. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated.
+	
+	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{figures/fig_butter.png}
 		\caption{Frequency Domain Signal Response To Butterworth Function}
@@ -446,10 +452,11 @@
 			\centering
 			{\footnotesize 4$^{th}$ order Butterworth filter response (blue line) with 0.0127 Hz cut-off frequency (green line).}
 		\end{subfigure}
-	\end{figure}\noindent
+	\end{figure}
+	
 	\begin{equation}
-	|G(j\omega)| = \frac{1}{\sqrt{1 + \left(\frac{\omega}{\omega_c}\right)^{2n}}}
-	\label{eqnbuttgain}
+		|G(j\omega)| = \frac{1}{\sqrt{1 + \left(\frac{\omega}{\omega_c}\right)^{2n}}}
+		\label{eqnbuttgain}
 	\end{equation}
 	
 	\nomenclature{$|G(j\omega)|$}{Frequence response, or gain\hfill dB}
@@ -470,8 +477,8 @@
 		\item \texttt{log\_titles} - a list of strings giving the headings to be included above the data in the log.
 		\item \texttt{log\_dir} - string, path to directory where the logged data will be saved.
 		\item \texttt{i\_poll\_rate} - "inverse poll rate", the interval between speed polls. A higher value results in sporadic data and lower processing requirements, a low value results in better data but a higher toll on the Raspberry Pi's resources. \texttt{0.1} by default.
-		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(317.666, -146.947)} by default.
-		\item \texttt{cvf} = "current-voltage-function", tuple representing the two coefficients in a linear (1D) fit equation for the relationship between the motor's current draw and the voltage read from the HES current sensor via the ADC. \texttt{(3.58, -7.784)} by default.
+		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(312.806, -159.196)} by default.
+%		\item \texttt{cvf} = "current-voltage-function", tuple representing the two coefficients in a linear (1D) fit equation for the relationship between the motor's current draw and the voltage read from the HES current sensor via the ADC. \texttt{(3.58, -7.784)} by default.
 	\end{itemize}
 	The motor class, once set up, can be used to set the supply to a motor (using a digital potentiometer), can read in the motor's speed and calculate its current draw (using the ADC).
 	
@@ -591,7 +598,7 @@
 	\subsection*{Stall Torque}
 	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm will hit the top of a balance. The motor will be stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque can be easily calculated by multiplying this force by the length of the arm.
 	\begin{equation}
-		T_s = 0.169 \times I_{ms} + 0.038
+		T_s = 0.14 \times I_{ms} + 0.032
 		\label{eqntsemp}
 	\end{equation}
 	
@@ -628,23 +635,19 @@
 		\end{subfigure}
 		\label{figspeecal}
 		\caption{Speed and Voltage Evaluations}
-		\begin{subfigure}{0.9\textwidth}
-%		\centering
-		{\footnotesize \textbf{(a):} \newline
-		\textbf{(b):} }
-		\end{subfigure}
 	\end{figure}
 
 	\subsection*{Speed Measurement} % last edited 14/3/2017
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
-	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.\br
+	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.
 	
 	\subsection*{Current Sensor}
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
 	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
+	
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.35]{figures/fig_hes_cal.png}
+		\includegraphics[scale=0.45]{figures/fig_hes_cal.png}
 		\caption{Current Sensor Evaluation Results}
 		\label{figcurevalres}
 		\begin{subfigure}{0.9\textwidth}
@@ -653,30 +656,99 @@
 	\end{figure}
 	
 	\subsection*{Data Filtering}
-	[Blank section]
+	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and "drawing" a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise. Figure \ref{figfiltcomp} compares the different filtering methods.
 	
+	\begin{figure}[!htb]
+		\centering
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_filt_compar_spline.png}
+			\caption{Spline Interpolation}
+			\label{figfiltsp}
+			\footnotesize
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_filt_compar_wiener.png}
+			\caption{Wiener Filter}
+			\label{figfiltwi}
+			\footnotesize
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_filt_compar_gaussian.png}
+			\caption{Gaussian Filter}
+			\label{figfiltga}
+			\footnotesize
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_filt_compar_butter.png}
+			\caption{Butterworth Filter}
+			\label{figfiltbu}
+			\footnotesize
+		\end{subfigure}
+		\caption{Comparison of Filter Methods \label{figfiltcomp}}
+	\end{figure}
+	
+    \noindent
+	Due to the Butterworth's nature as a frequency filter, it could cause issue with reading the intermittent jumps up in viscosity due to jamming. This could be circumvented by developing a filter which recognises the different magnitude of jamming to the noise signal. Or the noise could be analysed for constituent signals: the noise could be originating from the 50Hz power supply, or another regular source. Repeated application of different band-stop filters would eliminate the known sources of noise, therefore any remaining disruption in the signal is useful data.
+\iffalse
+	\begin{figure}[!htb]
+		{\centering
+			\includegraphics[scale=0.3]{figures/fig_filt_demonstra.png}
+			\caption{Butterworth Filter Demonstration}
+			\label{figfilterdemon}}
+		%optional:
+		{\footnotesize Actual data readings (faint blue) were passed through a Butterworth filter to obtain a noise-reduced signal (bright blue).\newline {\bfseries a)} Graph of a steady increase in motor supply voltage, excpeted result is a series of 11 steps.\newline {\bfseries b)} Graph showing speed variance with a random intermittent load applied to the motor (an approximation of a shear thickening fluid)\newline {\bfseries c)} Fourier Transform of the response in b); faint blue line shows the fourier transform of the raw (noisy) data, bright blue shows the filtered response, clearly showing the effect of the filter on the resulting data.}
+	\end{figure}
+\fi
 	\subsection*{Rheometry}
 	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low (\(\approx \mu_{water}\)). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
+	\newline
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
 	
+    \noindent
+	As an initial test, the rheometer was run with no fluid in the cylinder: effectively trying to measure the viscosity of the air. With no load on the inner cylinder (zero torque output), the motor is rotating at its no-load speed. Therefore the shear stress exerted on the air is very small, and the shear rate is very large - resulting in a viscosity reading of zero (or very near). The rheometer ran at different shear rates, steadily increasing over the course of the run. The resulting viscosity data was plotted against time and against shear stress (see Figures \ref{figviscair}). 
+	\newline
 
+	\begin{figure}[!htb]
+		\centering
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_visco_v_t.png}
+			\caption{Viscosity vs. Time}
+			\label{figviscovt}
+			\footnotesize
+			Results from an empty run of the rheometer plotted against time (blue circles). Expected result (green dashed line) was zero viscosity for all time.
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_visco_v_tau.png}
+			\caption{Viscosity vs. Shear Stress}
+			\label{figviscovtau}
+			\footnotesize
+			Results from empty run of the rheometer plotted against shear stress (blue circles). Expected result (green dashed line) for all stresses.
+		\end{subfigure}
+		\caption{Viscosity Reading Test \label{figviscair}}
+	\end{figure}
 
+	\noindent
+	In Figure \ref{figviscovt} the viscosity starts very high (approx. 2.5 $Pa.s$) before rapidly falling to around zero. The motor supply voltage is slowly increasing throughout the run; an innacuracy in the speed reading is unlikely to be the source of this error. A more likely source would be in the dynamo calibration (the current supply used to calculate the stall torque could be wrong) or in the stall torque calibration. The latter is a more likely source of the error due to the limited amount of data in that calibration. This is somewhat confirmed in Figure \ref{figviscovtau} - the viscosity appears to be proportional to the shear stress.
+	\br
+	[Unfinished section]
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
-	\chapter*{Conclusions}
-	\addcontentsline{toc}{chapter}{Conclusions}
-	\def\achapter{Conclusions}
+	\nc{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
 	[Blank section]
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
-	\chapter*{Review}
-	\addcontentsline{toc}{chapter}{Review}
-	\def\achapter{Review}
+	\nc{Review}
 	%lit review, history
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	The goal of this project was to design, build, and test a rheometer using a Raspberry Pi and open source software.\br
@@ -688,8 +760,9 @@
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	\newpage
-	\addcontentsline{toc}{chapter}{Nomenclature}
-	\def\achapter{Nomenclature}
+	\stepcounter{chapter}
+	\addcontentsline{toc}{chapter}{\arabic{chapter} Nomenclature}
+	\def\achapter{\arabic{chapter} Nomenclature}
 	%List all the symbols in alphabetical order, with Greek symbols at the end
 	\printnomenclature[1.5cm]
 	
@@ -974,14 +1047,7 @@ Analogue readings of real world data can be corrupted by noise. Noise can appear
 % <<-- notes from wileyadvsignproc.pdf
 
 % from messing around, butterworth seems to give the best representation of the data as noiselessly and as correct as possible.
-\begin{figure}[!htb]
-	{\centering
-	\includegraphics[scale=0.35]{figures/fig_filt_demonstra.png}
-	\caption{Butterworth Filter Demonstration}
-	\label{figfilterdemon}}
-	%optional:
-	{\footnotesize Actual data readings (faint blue) were passed through a Butterworth filter to obtain a noise-reduced signal (bright blue).\newline {\bfseries a)} Graph of a steady increase in motor supply voltage, excpeted result is a series of 11 steps.\newline {\bfseries b)} Graph showing speed variance with a random intermittent load applied to the motor (an approximation of a shear thickening fluid)\newline {\bfseries c)} Fourier Transform of the response in b); faint blue line shows the fourier transform of the raw (noisy) data, birght blue shows the filtered response, clearly showing the effect of the filter on the resulting data.}
-\end{figure}
+
 %Appendix Bibliography
 
 \end{document}
