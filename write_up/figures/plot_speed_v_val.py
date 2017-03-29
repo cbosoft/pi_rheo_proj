@@ -45,7 +45,7 @@ for i in range(2, len(datl) - 2):
     splt = datl[i].split(",", 13)
     rv = float(splt[1])
     #read_speed.append(float(splt[2]))
-    read_speed.append(312.806 * rv - 159.196)
+    read_speed.append(329.394 * rv - 63.702)
     read_pv.append(float(splt[3]))
 
 filtered_reading = filter(read_pv, read_speed)

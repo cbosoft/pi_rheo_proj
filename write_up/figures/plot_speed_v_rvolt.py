@@ -31,8 +31,8 @@ for i in range(1, len(datl)):
     pv.append(int(splt[3]))
 
 rv = filter(st, rv, method="butter")
-rv = rv[10000:]
-pv = pv[10000:]
+rv = rv[100:]
+pv = pv[100:]
 
 # Read csv
 datf = open("./../../logs/voltvval.csv", "r")

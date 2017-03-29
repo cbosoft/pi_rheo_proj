@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6767} % last proper build on Sun 26 March 2017 at 00:24:14
+\def\thewords{6885} % last proper build on Mon 27 March 2017 at 13:37:04
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -596,9 +596,9 @@
 	Where \(I_{ms}\) is the motor supply current, in amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
 	\subsection*{Stall Torque}
-	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm will hit the top of a balance. The motor will be stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque can be easily calculated by multiplying this force by the length of the arm.
+	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm will hit the top of a balance. The motor will be stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque was then easily calculated by multiplying this force by the length of the arm.
 	\begin{equation}
-		T_s = 0.14 \times I_{ms} + 0.032
+		T_s = 0.173 \times I_{ms} ^2 -0.47 \times I_{ms} + 0.362
 		\label{eqntsemp}
 	\end{equation}
 	
@@ -607,7 +607,7 @@
 	\nomenclature{$m_{ba}$}{Mass reading on balance\hfill $kg$}
 	
 	\noindent
-	Mass readings were taken for multiple different current readings (current supply was altered by altering voltage supply). A one dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}.
+	Mass readings were taken for different current readings (current supply was altered by altering voltage supply). A two dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}. The results and fit equation were plotted on Figure \ref{figstalltcal}.
 
 	\section{Evaluation} % re write recommended
 	%The project can be split into different sections; design, development, and **evaluation**. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
@@ -643,7 +643,7 @@
 	
 	\subsection*{Current Sensor}
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
-	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are somewhat in agreement, although the data is somewhat noisy, despite the applied filtering.
+	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are in agreement, although the data is somewhat noisy despite the applied filtering.
 	
 	\begin{figure}[!htb]
 		\centering

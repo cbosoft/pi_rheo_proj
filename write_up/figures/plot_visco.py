@@ -55,7 +55,7 @@ if True:
     dr = filter(st, dr, method="butter",A=2, B=0.01)
     cr = filter(st, cr, method="butter",A=2, B=0.01)
 
-for i in range(100000, len(datl)):
+for i in range(0, len(datl)):
     s2t.append(st[i-1])
     cu.append((cr[i-1] * 3.58) - 7.784)
     sp_rpms.append((dr[i-1] * 312.809) - 159.196)

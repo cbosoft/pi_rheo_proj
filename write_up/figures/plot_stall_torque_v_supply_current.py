@@ -28,18 +28,39 @@ for i in range(1, len(datl)):
 f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
-z = np.polyfit(cu, st, 1)
-tl = np.poly1d(z)
+# Get trendline
+xl = np.arange(1.05, 2.99, 0.001)
+z = np.polyfit(cu, st, 2)
+#tl = np.poly1d(z)
+
+fit_eqn = "$2D\ fit:\ T_s ="
+cf_str = ""
+fit = 0
+for i in range(0, len(z)):
+    fit += z[i] * (xl ** (len(z) - 1 - i))
+    if z[i] < 0:
+        cf_str = "{:.3f}".format(z[i])
+    else:
+        cf_str = "+{:.3f}".format(z[i])
+    if (len(z) - 1 - i) > 1:
+        fit_eqn += " {} \\times I_{}^{}".format(cf_str, "{ms}", "{" + str((len(z) - 1 - i)) + "}")
+    elif (len(z) - 1 - i) == 1:
+        fit_eqn += " {} \\times I_{}".format(cf_str, "{ms}")
+    else:
+        fit_eqn += " {}".format(cf_str)
+
+fit_eqn += "$"
+
 
 # Plot data and trendline
 ax.plot(cu, st, 'o', label="$Read\ Data$")
-ax.plot(cu, tl(cu), 'r--', label="$T_S = {0:.3f}I_{1} + {2:.3f}$".format(z[0], "{ms}", z[1]))
+ax.plot(xl, fit, 'r--', label=fit_eqn)
 
 ax.set_xlabel("\n $Current\ Supply,\ A$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Stall\ Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
 
 # Show Legend
-plt.legend(loc=3)
+plt.legend(loc=1)
 
 # Show plot
 plt.grid(which='both', axis='both')

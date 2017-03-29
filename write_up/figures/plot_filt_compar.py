@@ -49,7 +49,7 @@ if __name__ == "__main__":
     # load up some noisy data, apply first filter
     # load up some noisy data
     #logf = open("./../../logs/intermittent_load_short.csv", "r")
-    logf = open("./../../logs/long_cal.csv", "r")
+    logf = open("./../../logs/long_cal_old.csv", "r")
     dat = logf.readlines()
     logf.close()
     

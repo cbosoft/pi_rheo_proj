@@ -10,7 +10,7 @@ import math
 
 # Read csv
 
-log = "./../../logs/long_cal.csv"
+log = "./../../logs/long_cal_old.csv"
 datf = open(log, "r")
 datl = datf.readlines()
 datf.close()
@@ -29,8 +29,8 @@ mav = [0] * 0
 splt = datl[1].split(",", 5)
 tz = float(splt[0])
 
-for i in range(2, len(datl) - 2):
-    splt = datl[i].split(",", 5)
+for i in range(1, len(datl)):
+    splt = datl[i].split(",")
     t.append(float(splt[0]))
     st.append(float(splt[0]) - tz)
 
