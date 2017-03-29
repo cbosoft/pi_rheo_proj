@@ -32,7 +32,6 @@ class PIDcontroller(object):
 
     loud = False
     
-    # class initialisation method
     def __init__(self, KP=0, KI=0, KD=0, sample_time="AUTO", set_point=0):
         '''
         object = control.PIDcontroller(**kwargs)
@@ -51,23 +50,23 @@ class PIDcontroller(object):
         set_point - the "goal" for the control system. Default is 0
         '''
         
-        ifl("CONTROLLER INITIALISING")
+        self.ifl("CONTROLLER INITIALISING")
         if str(sample_time) == "AUTO":
-            ifl("    auto_sample ON")
+            self.ifl("    auto_sample ON")
             self.manual_sample = False
         else:
-            ifl("    auto_sample OFF")
+            self.ifl("    auto_sample OFF")
             self.sample_time = sample_time
             self.manual_sample = True
 
-        ifl("    set_point {0:.1f}".format(set_point))
+        self.ifl("    set_point {0:.1f}".format(set_point))
         self.set_point = set_point
         
-        ifl("    KP {0:.1f}".format(KP))
+        self.ifl("    KP {0:.1f}".format(KP))
         self.KP = KP        
-        ifl("    KI {0:.1f}".format(KI))
+        self.ifl("    KI {0:.1f}".format(KI))
         self.KI = KI        
-        ifl("    KD {0:.1f}".format(KD))
+        self.ifl("    KD {0:.1f}".format(KD))
         self.KD = KD
 
     def shift_arrs(self):
@@ -79,9 +78,9 @@ class PIDcontroller(object):
         
         self.ca = self.ca[1:]
         self.e = self.e[1:]
-        self.ca.append(0)
-        self.e.append(0)
-
+        self.ca.append(0.0)
+        self.e.append(0.0)
+        
     def ifl(self, mesg):
         '''
         ilf(mesg)
@@ -116,9 +115,9 @@ class PIDcontroller(object):
 
         self.shift_arrs()  # move stored values down, making space for next set
 
-        self.e[2] = (float(self.set_point) - float(u_val))  # get new error
+        self.e[-1] = (float(self.set_point) - float(u_val))  # get new error
         
-        delta_e = self.e[2] - self.e[1]
+        delta_e = self.e[-1] - self.e[0]
 
         self.ca[2] = 0.0  # self.ca[1]
 
@@ -197,7 +196,7 @@ class PIDcontroller(object):
                     sys.stdout.write(('\r[ {0} ] {1}% [ KP={2:.3f}, KI={3:.3f}]').format(str('#' * (prog / 2)) + str(' ' * (50 - (prog / 2))), prog, self.KP, self.KI))
                     sys.stdout.flush()
 
-        print "\nOptimising..."
+        self.ifl("\nOptimising...")
         for i in range(0, len(points)):
             if (maxima_count[i] > 0 and maxima_count[i] < 5):
                 pass
@@ -220,10 +219,10 @@ class PIDcontroller(object):
                 ise_at = i
 
         (a, b, c) = tuning_hist[at_indx]
-        print "GEO TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c)
+        self.ifl("GEO TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c))
 
         (a, b, c) = tuning_hist[ise_at]
-        print "ISE TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c)
+        self.ifl("ISE TUNE RESULTS: KP={0}, KI={1}, KD={2}".format(a, b, c))
         
         if (ise_tuning):
             self.KP, self.KI, self.KD = tuning_hist[ise_at]
@@ -236,7 +235,7 @@ class PIDcontroller(object):
             return (tuning_hist[ise_at], ise[ise_at])
         #return (points[at_indx], tuning_hist, at_indx)
 
-    def do_sim(self, time_constant, steady_state_gain, length=100, manual_sample_time=0.1):
+    def do_sim(self, time_constant, steady_state_gain, length=100, manual_sample_time=0.1, horiz_return=True):
         '''
         do_sim(time_constant, steady_state_gain, **kwargs)
         
@@ -254,6 +253,7 @@ class PIDcontroller(object):
         length - the number of samples to calculate response for. Default is 100.
         manual_sample_time - if the controller is using manual sample times, the value set here will be used for the sample time. Default is 0.1.
         '''
+        
         # save controller settings and change it for the simulation
         ts = self.set_point
         m_on = self.manual_sample
@@ -262,6 +262,8 @@ class PIDcontroller(object):
         self.sample_time = manual_sample_time
         self.set_point = 1
         resp = [[0.0, 0.0], [0.0, 0.0]]
+        x_s = [0] * 0
+        y_s = [0] * 0
         y = [0.0, 0.0]
 
         # reset memory
@@ -272,15 +274,15 @@ class PIDcontroller(object):
         for i in range(0, length):
             y[0] = y[1]
 
-            y[1] = (((float(time_constant) - float(self.sample_time)) /
-            float(time_constant)) * float(y[0])
-            + ((float(steady_state_gain) * float(self.sample_time)) /
-            float(time_constant)) * float(self.ca[2]))
-
-            self.get_control_action(y[1])
-            resp.append([i, y[1]])
+            y[1] = (((float(time_constant) - float(self.sample_time)) / float(time_constant)) * float(y[0])
+            + ((float(steady_state_gain) * float(self.sample_time)) / float(time_constant)) * float(self.ca[-1]))
+            
+            self.get_control_action(y[-1])
+            resp.append([i, y[-1]])
+            x_s.append(i)
+            y_s.append(y[-1])
             try:
-                ise += (self.e[2] ** 2)
+                ise += (self.e[-2] ** 2)
             except OverflowError:
                 ise += 10000
             # print y[1]
@@ -289,7 +291,10 @@ class PIDcontroller(object):
         self.set_point = ts
         self.sample_time=st
         self.manual_sample = m_on
-        return (resp, ise)
+        if not horiz_return:
+            return (x_s, y_s)
+        else:
+            return (resp, ise)
 
     def reset_memory(self):
         '''

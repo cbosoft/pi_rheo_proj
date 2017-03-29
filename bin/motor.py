@@ -151,7 +151,7 @@ class motor(object):
                     fvolts[0] = filter.filter(self.tims, self.srvs, method=self.filtering)[-self.filter_delay]
                     fvolts[1] = filter.filter(self.tims, self.crvs, method=self.filtering)[-self.filter_delay]
                 else:
-                    volts= [0, 0]
+                    fvolts= [0, 0]
             
             # Get current
             # self.current = self.cvf[0] * volts[1] + self.cvf[1]
@@ -256,7 +256,7 @@ class motor(object):
             self.logf.close()
             
             if not self.filtering == "NONE":
-                self.fix_logs()
+                pass  # self.fix_logs()  # fixes log ordering (sort of)
 
 if __name__ == "__main__":
     #  Will get motor's speed for select potvals
