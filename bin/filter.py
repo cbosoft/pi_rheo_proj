@@ -11,19 +11,19 @@ from scipy.signal import wiener, filtfilt, butter, gaussian  # for
 from scipy.ndimage import filters
 import scipy.optimize as op
 import matplotlib.pyplot as plt
-
-def gaussianf(x, y, A=39, B=10):
-	b = gaussian(A, B) # a here is samples and B is a number or something
+        
+def gaussianf(self, x, y, samples=51, sigma=7):
+	b = gaussian(samples, sigma)
 	ga = filters.convolve1d(y, b/b.sum())
 	return ga
 
-def butterworthf(x, y, A=4, B=0.08):
-	b, a = butter(A, B)
+def butterworthf(x, y, order=4, nyq=0.08):
+	b, a = butter(order, nyq)  # cutoff frequency normalised to the nyquist frequency
 	fl = filtfilt(b, a, y)
 	return fl
  
-def wienerf(y, sample_size=29, noise_magnitude=1):
-	wi = wiener(y, sample_size, noise_magnitude) #, mysize=sample_size, noise=noise_magnitude)
+def wienerf(y, sample_size=29):
+	wi = wiener(y, sample_size)
 	return wi
  
 def splinef(x, y, samples=100):
@@ -38,7 +38,8 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
     x - The x data for the singal (usually time)
     y - The noisy signal data
     method - Which filter to use. "butter" by default.
-    A, B - Parameters of the filter to be used. Pre-set by default to most optimal. Not recommended to be changed.
+    A, B - Parameters of the filter to be used. Pre-set by default to most optimal.
+           See individual filter functions for specific definitions.
     
     Returns:
     A list of filtered y-values, the same length as the input data.
@@ -62,12 +63,12 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
     elif method == "gaussian":
 
         if not use_A:
-            A = 39
+            A = 51
 
         if not use_B:
-            B = 10
+            B = 7
         
-        output = gaussianf(x, y, A, B)
+        output = gaussianf(x, y, samples=A, sigma=B)
 
     elif method == "butter":
 
@@ -75,9 +76,9 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
             A = 2
 
         if not use_B:
-            B = 0.05
+            B = 0.001
 
-        output = butterworthf(x, y, A, B)
+        output = butterworthf(x, y, order=A, nyq=B)
 
     elif method == "spline":
 

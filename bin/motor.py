@@ -31,6 +31,8 @@ class motor(object):
     
     # Speed calc
     speed = 0.0  # Output value
+    dr = 0.0
+    fdr = 0.0
     svf = [1.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
     
     # Filtering ## Separate filter for current reading?
@@ -58,7 +60,7 @@ class motor(object):
     poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7bit", "Filtered Dynamo Reading/V", "Filtered HES Reading/V"],
     log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1,
-    filtering="NONE", filter_samples=100):
+    filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
         # Set calibration variables
         self.max_speed = max_speed
@@ -137,8 +139,9 @@ class motor(object):
             
             # Get speed
             volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1])]
+            self.dr = volts[0]
             fvolts = volts
-            self.speed = self.svf[0] * volts[0] + self.svf[1]
+
             # if desired, apply filtering to input
             if not (self.filtering == "NONE"):
                 self.update_filt_hist(volts[0], volts[1], t)
@@ -148,17 +151,11 @@ class motor(object):
                 if self.filtering_delay >= 100: start_delay = filtering_delay + 1
                     
                 if (len(self.tims) >= start_delay):
-                    fvolts[0] = filter.filter(self.tims, self.srvs, method=self.filtering)[-self.filter_delay]
-                    fvolts[1] = filter.filter(self.tims, self.crvs, method=self.filtering)[-self.filter_delay]
-                else:
-                    fvolts= [0, 0]
+                    fvolts[0] = filter.filter(self.tims, self.srvs, method=self.filtering, A=self.filtA, B=self.filtB)[-self.filter_delay]
+                    fvolts[1] = filter.filter(self.tims, self.crvs, method=self.filtering, A=self.filtA, B=self.filtB)[-self.filter_delay]
+
+            fdr = fvolts[0]
             
-            # Get current
-            # self.current = self.cvf[0] * volts[1] + self.cvf[1]
-            
-            # Power = Current x Supply Voltage
-            # Supply voltage is calculable from the potentiometer value (POTVAL/127) * (10.5 - 2.8) + 2.8 = SUPPLY VOLTAGE
-            # self.power = (((self.pot.lav / 127) * (10.5 - 2.8)) + 2.8) * self.current
             if self.log_paused:
                 self.log_add_note = True
 
@@ -183,33 +180,7 @@ class motor(object):
         self.crvs.append(crv)
         self.tims.append(tim)
 
-    def get_speed(self):
-        if (self.poll_running):
-            return self.speed
-        else:
-            print "Warning! Speed poll is not running, speed value is wrong."
-            return 0.0
-
-    def set_speed(self, speed):
-        # check if speed value is in range
-        value = speed
-        if (value > self.max_speed):
-            # value too big! warn + set to max speed
-            print("Warning! Desired speed too high, setting to max speed.")
-            value = self.max_speed
-        elif (value < self.min_speed):
-            # value too small! warn + set to min speed
-            print("Warning! Desired speed too low, setting to min speed.")
-            value = self.min_speed
-        
-        # convert speed value to a 7 bit number (0-127)
-        value = int(((value - self.min_speed) /
-        (self.max_speed - self.min_speed)) * 127)
-        
-        # Note: This assumes a perfectly linear variance of speed with resistance.
-        # Will need to adjust this according to how the speed ACTUALLY varies with resistance.
-        # If the variation is fairly unpredictable, then another system (incr/decr) will need to be used.
-        # set this value on the digital potentiometer
+    def set_pot(self, value):
         self.dp.set_resistance(value)
     
     def fix_logs(self):

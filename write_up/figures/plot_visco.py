@@ -6,10 +6,12 @@ from filter import filter
 
 import matplotlib.pyplot as plt
 import numpy as np
+import glob
 
 # Read csv
 
-log = "./../../logs/long_cal.csv"
+#log = "./../../logs/long_cal.csv"
+log = sorted(glob.glob("./../../bin/test scripts/long_sweep/*"))[-2]
 datf = open(log, "r")
 datl = datf.readlines()
 datf.close()
@@ -52,8 +54,8 @@ for i in range(1, len(datl)):
     pv.append(int(splt[3]))
 
 if True:
-    dr = filter(st, dr, method="butter",A=2, B=0.01)
-    cr = filter(st, cr, method="butter",A=2, B=0.01)
+    dr = filter(st, dr, method="butter",A=2, B=0.001)
+    cr = filter(st, cr, method="butter",A=2, B=0.001)
 
 for i in range(0, len(datl)):
     s2t.append(st[i-1])
@@ -74,7 +76,7 @@ for i in range(0, len(datl)):
     mu.append(tau[-1] / gam_dot[-1])
 
 if True:
-    mu = filter(st, mu, method="butter", A=2, B=0.01)
+    mu = filter(st, mu, method="butter", A=2, B=0.001)
 
 exp_visc = [0] * 2
 exp_t = [190] * 1
@@ -88,8 +90,12 @@ f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Plot data and trendline
-ax.plot(s2t[0::100], mu[0::100], 'b.')
-ax.plot(exp_t, exp_visc, 'g--')
+ax.plot(s2t[10000::1], mu[10000::1], 'b-')
+#plt.axhline(y=0, color='green')
+
+cr = np.array(cr)
+dr = np.array(dr)
+#ax.plot(st, (cr / (dr**2))*18, 'g')  # rough fit
 #ax.set_ylim([-10, 10])
 #ax.set_yscale("log")
 ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
@@ -106,7 +112,7 @@ f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Plot data and trendline
-ax.loglog(tau[0::100], mu[0::100], 'b.')
+ax.loglog(tau[1000::1000], mu[1000::1000], 'b.')
 #ax.plot(exp_tau, exp_visc, 'g--')
 #ax.plot(sp_rpms, sn_rpms, 'o')
 #ax.set_ylim([-10, 10])
