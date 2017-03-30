@@ -11,23 +11,11 @@ import motor
 import control as cl
 import time
 
-# Get log directory name
-print "Enter the log directory name:"
-print "(Or leave blank for default)"
-
-r = raw_input()
-
-if r == "":
-    r = "./eval_speed_control_test"
-else:
-    r = "./" + r
-
 # Create instance of motor class
-mot = motor.motor(startnow=True, poll_logging=True, log_dir=r)
-#mot = motor.motor(startnow=True, poll_logging=True, log_dir=r, filtering="butter")
+mot = motor.motor(startnow=True, poll_logging=True, log_dir="./eval_speed_control_test", filtering="butter")
 
 # Create instance of controller class
-controller = cl.PIDcontroller(KP=1, KI=1, sample_time=0.1)
+controller = cl.PIDcontroller(KP=0.4, KI=9, sample_time=0.1)
 
 # Get setpoint
 print "Enter set point motor speed (in RPM):"
