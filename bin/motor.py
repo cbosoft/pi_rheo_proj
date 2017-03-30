@@ -59,7 +59,7 @@ class motor(object):
     startnow=False, adc_channels=[0, 1], adc_vref=3.3,
     poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7bit", "Filtered Dynamo Reading/V", "Filtered HES Reading/V"],
-    log_note="DATETIME", svf=[317.666, -146.947], cvf=[1.0, 0.0], i_poll_rate=0.1,
+    log_note="DATETIME", svf=[1.0, 0.0], cvf=[1.0, 0.0], i_poll_rate=0.1,
     filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
         # Set calibration variables
@@ -69,11 +69,7 @@ class motor(object):
         self.cvf = cvf
         
         # Filtering
-        if filtering == "NONE":
-            self.filtering = "NONE" 
-        else:
-            self.filtering = filtering
-        
+        self.filtering = filtering
         if not filtering == "NONE": self.filtlen = filter_samples
 
         # Set sensor variables
