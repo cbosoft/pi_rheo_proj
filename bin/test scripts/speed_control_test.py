@@ -48,9 +48,8 @@ try:
     for i in range(0, 600):
         # for 1 minute:
         # get motor speed
-        cur_speed = mot.speed
         # compare with set point & get control action (thank you controller library)
-        delta_pv = controller.get_control_action(cur_speed)
+        delta_pv = controller.get_control_action(mot.fdr * mot.svf[0] + mot.svf[1])
         # apply control action
         nu_ca = mot.pot.lav + delta_pv
         if nu_ca < 0: nu_ca = 0
