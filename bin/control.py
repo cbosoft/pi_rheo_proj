@@ -103,7 +103,7 @@ class PIDcontroller(object):
         
         returns: (float) the recommended change to the current control action (delta control action)
         '''
-        
+
         # Get actual time between samples
         if (self.manual_sample == False):
             if (self.time_of_last == 0):
@@ -119,16 +119,16 @@ class PIDcontroller(object):
         
         delta_e = self.e[-1] - self.e[0]
 
-        self.ca[2] = 0.0  # self.ca[1]
+        self.ca[-1] = 0.0
 
-        self.ca[2] += float(self.KP) * delta_e
+        self.ca[-1] += float(self.KP) * delta_e
 
-        self.ca[2] += (float(self.KI) * float(self.sample_time)
-        * float(self.e[2]))
+        self.ca[-1] += (float(self.KI) * float(self.sample_time)
+        * float(self.e[-1]))
 
-        self.ca[2] += ((float(self.KD) / float(self.sample_time)) * delta_e)
+        self.ca[-1] += ((float(self.KD) / float(self.sample_time)) * delta_e)
         # (float(self.e[2]) - (2 * float(self.e[1])) + float(self.e[0])))
-        return self.ca[2]
+        return self.ca[-1]
 
     def tune(self, time_constant, steady_state_gain, steps=20, pmx=(0.0, 1.0),imx=(0.0, 1.0), dmx=(0.0, 1.0), ise_tuning=True):
         '''
@@ -260,11 +260,12 @@ class PIDcontroller(object):
         self.manual_sample = True
         st = self.sample_time
         self.sample_time = manual_sample_time
-        self.set_point = 1
-        resp = [[0.0, 0.0], [0.0, 0.0]]
+        self.set_point = 100
+        resp = [0.0, 0.0] * 0
         x_s = [0] * 0
         y_s = [0] * 0
         y = [0.0, 0.0]
+        pv = 64
 
         # reset memory
         self.reset_memory()
@@ -274,8 +275,14 @@ class PIDcontroller(object):
         for i in range(0, length):
             y[0] = y[1]
 
-            y[1] = (((float(time_constant) - float(self.sample_time)) / float(time_constant)) * float(y[0])
-            + ((float(steady_state_gain) * float(self.sample_time)) / float(time_constant)) * float(self.ca[-1]))
+            #y[1] = (((float(time_constant) - float(self.sample_time)) / float(time_constant)) * float(y[0])
+            #+ ((float(steady_state_gain) * float(self.sample_time)) / float(time_constant)) * float(self.ca[-1]))
+            
+            #y[1] = float(self.ca[-1]) * float(steady_state_gain) / ((float(time_constant) / float(self.sample_time)) + 1)
+
+            pv += self.ca[-1]
+
+            y[1] = 5.130 * pv + 15.275
             
             self.get_control_action(y[-1])
             resp.append([i, y[-1]])

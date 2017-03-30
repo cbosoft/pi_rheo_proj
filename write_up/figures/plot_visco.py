@@ -63,9 +63,9 @@ for i in range(0, len(datl)):
     sn_rpms.append(((5.13 * pv[i - 1]) + 15.275))
     #    sn_rpms.append((4.292 * pv[i - 1]) + 144.927)
 
-    Ts.append((0.14 * cu[-1]) + 0.032)
-    #Ts.append(0.15)
-    T.append(Ts[-1] * (1 - (sp_rpms[-1]/ sn_rpms[-1])))
+    #Ts.append((0.14 * cu[-1]) + 0.032)
+    Ts.append(0.119)
+    T.append(Ts[-1] * (1 - (sp_rpms[-1] * 0.1667 / sn_rpms[-1])))
 
     tau.append(T[-1] / (2 * np.pi * ri * ri * L))
     
@@ -106,8 +106,9 @@ f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Plot data and trendline
-ax.plot(tau[0::100], mu[0::100], 'b.')
-ax.plot(exp_tau, exp_visc, 'g--')
+ax.loglog(tau[0::100], mu[0::100], 'b.')
+#ax.plot(exp_tau, exp_visc, 'g--')
+#ax.plot(sp_rpms, sn_rpms, 'o')
 #ax.set_ylim([-10, 10])
 #ax.set_yscale("log")
 ax.set_xlabel("\n $Shear\ Stress,\ Pa$", ha='center', va='center', fontsize=24)
