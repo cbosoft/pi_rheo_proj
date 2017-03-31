@@ -33,15 +33,17 @@ class motor(object):
     speed = 0.0  # Output value
     dr = 0.0
     fdr = 0.0
-    svf = [1.0, 0.0]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
+    svf = [300, -150]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
     
     # Filtering ## Separate filter for current reading?
-    filtlen = 500  # number of samples to "remember" for filtering purposes
+    filtlen = 10000  # number of samples to "remember" for filtering purposes
     srvs = [0.0] * 0  # used to hold the last (filtlen) samples of dynamo volt readings
     crvs = [0.0] * 0  # used to hold the last (filtlen) samples of current volt readings
     tims = [0.0] * 0  # time data for ^
     filtering = "NONE"
     filter_delay = 100
+    filtA = 2
+    filtB = 0.008
 
     # Current calc
     current = 0.0 # Read current in A
@@ -59,7 +61,7 @@ class motor(object):
     startnow=False, adc_channels=[0, 1], adc_vref=3.3,
     poll_logging=True, log_dir="./dat+plot",
     log_titles=["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7bit", "Filtered Dynamo Reading/V", "Filtered HES Reading/V"],
-    log_note="DATETIME", svf=[1.0, 0.0], cvf=[1.0, 0.0], i_poll_rate=0.1,
+    log_note="DATETIME", svf=[312.806, -159.196], cvf=[1.0, 0.0], i_poll_rate=0.1,
     filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
         # Set calibration variables
@@ -71,6 +73,8 @@ class motor(object):
         # Filtering
         self.filtering = filtering
         if not filtering == "NONE": self.filtlen = filter_samples
+        if not filt_param_A == 0.314: self.filtA = filt_param_A
+        if not filt_param_B == 0.314: self.filtB = filt_param_B
 
         # Set sensor variables
         self.pot = dp()
@@ -141,16 +145,16 @@ class motor(object):
             # if desired, apply filtering to input
             if not (self.filtering == "NONE"):
                 self.update_filt_hist(volts[0], volts[1], t)
+                start_delay = 20
+
+                #if self.filter_delay >= 100: start_delay = self.filter_delay + 1
                 
-                start_delay = 100
-
-                if self.filtering_delay >= 100: start_delay = filtering_delay + 1
-                    
                 if (len(self.tims) >= start_delay):
-                    fvolts[0] = filter.filter(self.tims, self.srvs, method=self.filtering, A=self.filtA, B=self.filtB)[-self.filter_delay]
-                    fvolts[1] = filter.filter(self.tims, self.crvs, method=self.filtering, A=self.filtA, B=self.filtB)[-self.filter_delay]
-
-            fdr = fvolts[0]
+                    fvolts[0] = filter.filter(self.tims, self.srvs, method=self.filtering, A=self.filtA, B=self.filtB)[-10]
+                    fvolts[1] = filter.filter(self.tims, self.crvs, method=self.filtering, A=self.filtA, B=self.filtB)[-10]
+            
+            #print fvolts
+            self.fdr = fvolts[0]
             
             if self.log_paused:
                 self.log_add_note = True
@@ -168,7 +172,7 @@ class motor(object):
         print("Motor polling has halted.")
 
     def update_filt_hist(self, srv, crv, tim):
-        if (len(self.spds) + 1) > self.filtlen:
+        if (len(self.srvs) + 1) > self.filtlen:
             self.srvs = self.srvs[1:]
             self.crvs = self.crvs[1:]
             self.tims = self.tims[1:]

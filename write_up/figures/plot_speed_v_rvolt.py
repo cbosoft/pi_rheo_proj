@@ -30,7 +30,7 @@ for i in range(1, len(datl)):
     rv.append(float(splt[1]))
     pv.append(int(splt[3]))
 
-rv = filter(st, rv, method="butter")
+rv = filter(st, rv, method="butter", A=2, B=0.001)
 rv = rv[100:]
 pv = pv[100:]
 
@@ -52,14 +52,16 @@ for i in range(2, len(datl)):
 
 av_speed_long = [0] * 0
 
+#print pv
+
 cur_pv = pv[0]
-j = 0
+pv_indx = 0
 for i in range(0, len(pv)):
-    if (pv[i] > (cur_pv + 7)):
-        cur_pv = pv[i]
-        j += 1
-    
-    av_speed_long.append(av_spd[j])
+    for j in range(0, len(p2v)):
+        if (pv[i] - p2v[j]) < 8 and (pv[i] - p2v[j]) >= 0:
+            #print pv[i] - p2v[j]
+            pv_indx = j
+    av_speed_long.append(av_spd[pv_indx])
     
 
 # 1st Trend: speed as a function of potval

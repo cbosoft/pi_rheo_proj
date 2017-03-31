@@ -12,12 +12,12 @@ from scipy.ndimage import filters
 import scipy.optimize as op
 import matplotlib.pyplot as plt
         
-def gaussianf(self, x, y, samples=51, sigma=7):
+def gaussianf(x, y, samples=51, sigma=7):
 	b = gaussian(samples, sigma)
 	ga = filters.convolve1d(y, b/b.sum())
 	return ga
 
-def butterworthf(x, y, order=4, nyq=0.08):
+def butterworthf(x, y, order=4, nyq=0.008):
 	b, a = butter(order, nyq)  # cutoff frequency normalised to the nyquist frequency
 	fl = filtfilt(b, a, y)
 	return fl
@@ -76,7 +76,7 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
             A = 2
 
         if not use_B:
-            B = 0.001
+            B = 0.008
 
         output = butterworthf(x, y, order=A, nyq=B)
 
