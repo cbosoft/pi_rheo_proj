@@ -213,7 +213,21 @@ At the heart of the modern controller is the control algorithm. This is the calc
 \end{itemize}
 Each control element has an associated gain parameter which affects how strongly that element is represented in the control action. These parameters must be set properly before controller can be used. This is done in a process called tuning. There are a variety of methods for tuning the controller, most commonly used is the Ziegler-Nichols method, involving tuning the controller such that the measured value oscillates in a sustained way. Then using the period of oscillation along with other measured parameters to decide on the optimum controller tuning. After tuning using a method such as Ziegler-Nichols it is often required to tweak the tuning manually to obtain the most effective controller for the situation. This is done mostly by trial and error. Trial and error tuning can also be used to fully tune the device, although this would take a long time to do by hand. \br
 The controller device itself is a small computer, reading input from the instruments and then applying the algorithm to determine how it should alter the process. These small computers are called "microcontrollers". A microcontroller chip is a small re-programmable computer which reads input from, and outputs data to an electronic circuit \cite{backwhatismc}. Microcontrollers are programmed by connecting them to a "master" computer which can set the data on the microcontroller's storage. Data is stored as binary data (data is stored solely in the form of 0s and 1s). The program is written in a programming language, a special set of instructions which the environment can understand and convert into actions. \br
+\begin{equation}
+ca = \pm K_C \left(\Delta \epsilon (k) + \frac{\Delta t_s}{\tau _I}\epsilon (k) + \tau _D \frac{\Delta \epsilon(k) - \Delta \epsilon(k - 1)}{\Delta t_s}\right)
+\label{eqdiscpid}
+\end{equation}
 
+\nomenclature{$K_C$}{Controller gain}
+\nomenclature[g]{$\epsilon (k)$}{Error between the set point and controller input}
+\nomenclature[g]{$\Delta\epsilon (k)$}{Change in error}
+\nomenclature{$k$}{Discrete time sample number}
+\nomenclature[g]{$\tau_I$}{Integral time constant}
+\nomenclature[g]{$\tau_D$}{Derivative time constant}
+\nomenclature[g]{$\Delta t_s$}{Sample time}
+\nomenclature{$K_P$}{Proportional action gain}
+\nomenclature{$K_I$}{Integral action gain}
+\nomenclature{$K_D$}{Derivative action gain}
 \section{Raspberry Pi} % section last edited 3/3/2017
 \noindent
 Microcontrollers are commonly used in education to teach computer programming \cite{backmcedu1, backmcedu2}. However, it was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline

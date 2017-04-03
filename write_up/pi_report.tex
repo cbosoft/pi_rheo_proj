@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6885} % last proper build on Mon 27 March 2017 at 13:37:04
+\def\thewords{6864} % last proper build on Mon 03 April 2017 at 17:31:12
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -404,36 +404,51 @@
 	Usage of the class is very simple: the "\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the "\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.
 	
 	\subsection*{Control} % last edited 13/3/2017
-	This class is primarily a discrete-time implementation of the PID algorithm, also known as the velocity algorithm (Equation \ref{eqdiscpid}).\br
-	The initialisation function for this class accepts five optional arguments:
-	\begin{itemize}
-		\item KP, the proportional control coefficient. 0 by default.
-		\item KI, the integral control coefficient. 0 by default.
-		\item KD, the derivative control coefficient. 0 by default.
-		\item sample\_time, the interval time between control action updates. By default, this is automatically calculated, but can be set manually here for simulating the response.
-		\item set\_point, what is the desired value for the controlled process variable. 0 by default.
-	\end{itemize}
-	For the PID controller to be useful, it needs to be tuned. This can be done using a model transfer of the process and the "\texttt{tune}" function. This function will iterate through a range of possible tunings and decide upon the best solution based upon the model's response to a step change in set point. This decision is based upon rise time, and stability (amount of response oscillation). Alternatively, the tune function will based the optimal tuning upon the integral-squared-error (ISE) value of the result. The model must be first order, its parameters (time constant "\texttt{time\_constant}" and steady state gain "\texttt{steady\_state\_gain}") are passed to the tune function as required arguments. Optional arguments are the ranges for the tuning to iterate through for each tuning parameter: \texttt{pmx}, \texttt{imx}, and \texttt{dmx}. These arguments are tuples representing the bottom end of the range and the top end. By default all three are equal to \texttt{(0.0, 1.0)}. Other optional arguments are the number of iterations to go through ("\texttt{steps}", 20 by default), and "\texttt{ise\_tuning}", a boolean value indicating whether to use the ISE tuning method (\texttt{True} by default). \br
-	The main use of this class is to obtain a suitable control action to apply, based upon an input reading. This is calculated using Equation \ref{eqdiscpid}.
+	This class is a discrete-time implementation of a PI controller based upon the PID algorithm (Equation \ref{eqnpidalg}). Due to the random fluctuations in speed caused by the jamming effect, derivative control is not included ($K_D = 0$). Derivative action works on the rate of change of the error. Therefore a sudden change in the error is going to ellicit an extreme response from  the controller, which will upset the process. In addition, there will be noise inherent in the signal (discussed in the next section) which will severely impair the controller if derivative action is turned on. 
+	
 	\begin{equation}
-	ca = \pm K_C \left(\Delta \epsilon (k) + \frac{\Delta t_s}{\tau _I}\epsilon (k) + \tau _D \frac{\Delta \epsilon(k) - \Delta \epsilon(k - 1)}{\Delta t_s}\right)
-	\label{eqdiscpid}
+		ca = \pm K_C \left(e + \frac{1}{\tau _I} \int e \space dt + \tau _D \frac{de}{dt}\right)
+		\label{eqnpidalg}
 	\end{equation}
 	
 	\nomenclature{$K_C$}{Controller gain}
-	\nomenclature[g]{$\epsilon (k)$}{Error between the set point and controller input}
-	\nomenclature[g]{$\Delta\epsilon (k)$}{Change in error}
-	\nomenclature{$k$}{Discrete time sample number}
+	\nomenclature[g]{$e$}{Error between the set point and controller input}
 	\nomenclature[g]{$\tau_I$}{Integral time constant}
 	\nomenclature[g]{$\tau_D$}{Derivative time constant}
-	\nomenclature[g]{$\Delta t_s$}{Sample time}
 	\nomenclature{$K_P$}{Proportional action gain}
 	\nomenclature{$K_I$}{Integral action gain}
 	\nomenclature{$K_D$}{Derivative action gain}
-	\noindent
-	Mentioned in Chapter 1 are the PID parameters; KP, KI, and KD. These are not absent from Equation \ref{eqdiscpid}, just hidden: \(K_P = K_C\), \(K_I = \frac{K_C}{\tau _I}\), and \(K_D = K_C \times \tau_D\).\br
-	Function "\texttt{get\_control\_action}" is used to obtain the control action in response to the input. This function takes a single argument, the value of the controlled variable (controller input). Then, python's "\texttt{time}" package is used to calculate, accurately, the time between now and the previous call of the function to give the accurate sample time (\(\Delta t_s\)) used in the velocity algorithm. The function then simply applies Equation \ref{eqdiscpid} to obtain the control action best suited to maintain the desired set point.
 	
+	\noindent
+	Mentioned in Chapter 1 are the PID parameters; KP, KI, and KD. These are not absent from Equation \ref{eqnpidalg}, just hidden: \(K_P = K_C\), \(K_I = \frac{K_C}{\tau _I}\), and \(K_D = K_C \times \tau_D\).\br
+	The control class uses a discrete time transfer function of the controller algorithm, formed by first removing the derivative action and taking a Laplace transform. In Laplace domain notation; $U(s)$ is the controller output, and $e(s)$ is the error between the process output (controlled variable) and the set point. The resulting transfer function is shown as Equation \ref{eqnpitf}.
+	
+	\begin{equation}
+		\frac{ca}{e}(s) = \frac{K_P  s + K_I}{s}
+%		\frac{ca}{e}(s) = K_P + \frac{K_I}{s}
+		\label{eqnpitf}
+	\end{equation}
+	
+	\nomenclature{$K_C$}{Controller gain}
+	\nomenclature[g]{$e$}{Error between the set point and controller input}
+	\nomenclature[g]{$\tau_I$}{Integral time constant}
+	\nomenclature[g]{$\tau_D$}{Derivative time constant}
+	\nomenclature{$K_P$}{Proportional action gain}
+	\nomenclature{$K_I$}{Integral action gain}
+	\nomenclature{$K_D$}{Derivative action gain}
+	
+	\noindent
+	This class makes use of the \texttt{scipy.signal} package to deal with transfer functions.\br
+	The initialisation function for this class has three arguments:
+	\begin{itemize}
+		\item \texttt{tuning} - tuple (float, float). Represents the proportional and integral gains respectively.
+		\item \texttt{set\_point} - float. Optional. The desired value for the controlled process variable. 0 by default.
+		\item \texttt{sample\_time} - float. Optional. The interval time between control action updates. By default, this is automatically calculated, but can be set manually here for simulating the response.
+	\end{itemize}
+	Function "\texttt{get\_control\_action(Y)}" is used to obtain the control action in response to the input. This function takes a single argument: the process output. Then the \texttt{scipy.signal} package's transfer function class is used to obtain the result from the controller's transfer function, giving a suitable control action.
+	For the controller to be useful, it needs to be tuned. This can be done using a modelled transfer function of the process, such as a First Order Plus Dead-Time (FOPDT) model. Using a model, the controller can be simulated to view how it reacts to different tunings. The class includes a simulation function ("\texttt{do\_sim}") to allow for manual tuning. The function uses a transfer function for the process (a first order model) and simulates process output for a length of time after a step change in set point. The results give an indication of how well the controller can manage the process. \br
+	There are a number of techniques used to tune controllers.
+
 	\subsection*{Noise Filter} % last edited 13/3/2017
 	The data read in by the ADC is noisy - it contains unwanted fluctuations along with the desired signal. Noise can originate from many different sources \cite{wileyadvsignproc}: mains power supply fluctuations, faults in the conductive materials, fluctuations in temperature and pressure, and even the random nature of electron flow (current). Some noise can be easily predicted and identified (e.g. a 50Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
 	\br

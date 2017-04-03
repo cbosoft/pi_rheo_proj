@@ -351,23 +351,15 @@
 	\section{Week Beginning 27 March 2017 (Week 12)}
 	\begin{itemize}
 		\mon
-		\item TODO
+		\item Implemented improvements to control system (now using discrete transfer functions instead of straight up velocity algorithm
+		\item Tidied and re-wrote docstrings/comments.
+		\item Updated report
+	\end{itemize}
+	\newpage
+	\chapter{To-do list}
+	\begin{itemize}
 		\item Tuning, model the process, ziegler nichols tuning method
 		\item Why is viscosity reading off?
 		\item Is there an issue with the method?
 	\end{itemize}
-	\newpage
-	\chapter{Considerations/To-do list}
-	\begin{itemize}
-		\item peclet number?
-		\item wall slip?
-		\subitem wall slip is often avoided by "roughening" the walls of the viscometer
-		\subitem even if the fluid slips, this gives useful information about the fluid (although this data cannot be used to give viscosity, that would not be sensible)
-		\subitem slip is less likely to occur in molecular fluids (water, glycerol) and more likely to occur in suspensions of colloids/granules (as particles get bigger, the surface (e.g. glass) is less "grippy" - its relative roughness decreases)
-		\item density matching
-		\item refractive index matching
-		\item test control system working
-		\item check rpi results against rheometer results for different mixtures of glycerol and water (check it works at high and low viscosities)
-	\end{itemize}
-	
 \end{document}
