@@ -450,7 +450,7 @@
 	There are a number of techniques used to tune controllers.
 
 	\subsection*{Noise Filter} % last edited 13/3/2017
-	The data read in by the ADC is noisy - it contains unwanted fluctuations along with the desired signal. Noise can originate from many different sources \cite{wileyadvsignproc}: mains power supply fluctuations, faults in the conductive materials, fluctuations in temperature and pressure, and even the random nature of electron flow (current). Some noise can be easily predicted and identified (e.g. a 50Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
+	The data read in by the ADC is noisy - it contains unwanted fluctuations along with the desired signal. Noise can originate from many different sources: mains power supply fluctuations, faults in the conductive materials, fluctuations in temperature and pressure, and even the random nature of electron flow (current)\cite{wileyadvsignproc}. Some noise can be easily predicted and identified (e.g. a 50Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
 	\br
 	Filtering techniques can be used to eliminate noise from a signal. Frequency filters remove certain frequencies from the signale. Other filtering techniques include: fitting polynomial equations to sections of the data ("splines") - a more graphical method of removing the noise; using a probabilistic analysis of the data to determine the main response; or using a moving average of the data (which can be weighted to favour the data surrounding the current point being filtered).
 	\br
@@ -719,41 +719,14 @@
 	\end{figure}
 \fi
 	\subsection*{Rheometry}
-	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low (\(\approx \mu_{water}\)). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
+	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
 	\newline
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
 	
     \noindent
-	As an initial test, the rheometer was run with no fluid in the cylinder: effectively trying to measure the viscosity of the air. With no load on the inner cylinder (zero torque output), the motor is rotating at its no-load speed. Therefore the shear stress exerted on the air is very small, and the shear rate is very large - resulting in a viscosity reading of zero (or very near). The rheometer ran at different shear rates, steadily increasing over the course of the run. The resulting viscosity data was plotted against time and against shear stress (see Figures \ref{figviscair}). 
-	\newline
-
-	\begin{figure}[!htb]
-		\centering
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.3]{figures/fig_visco_v_t.png}
-			\caption{Viscosity vs. Time}
-			\label{figviscovt}
-			\footnotesize
-			Results from an empty run of the rheometer plotted against time (blue circles). Expected result (green dashed line) was zero viscosity for all time.
-		\end{subfigure}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.3]{figures/fig_visco_v_tau.png}
-			\caption{Viscosity vs. Shear Stress}
-			\label{figviscovtau}
-			\footnotesize
-			Results from empty run of the rheometer plotted against shear stress (blue circles). Expected result (green dashed line) for all stresses.
-		\end{subfigure}
-		\caption{Viscosity Reading Test \label{figviscair}}
-	\end{figure}
-
-	\noindent
-	In Figure \ref{figviscovt} the viscosity starts very high (approx. 2.5 $Pa.s$) before rapidly falling to around zero. The motor supply voltage is slowly increasing throughout the run; an innacuracy in the speed reading is unlikely to be the source of this error. A more likely source would be in the dynamo calibration (the current supply used to calculate the stall torque could be wrong) or in the stall torque calibration. The latter is a more likely source of the error due to the limited amount of data in that calibration. This is somewhat confirmed in Figure \ref{figviscovtau} - the viscosity appears to be proportional to the shear stress.
-	\br
-	[Unfinished section]
+	The newtonian reference fluids will be aqueous glycerol solutions. Fluids of different compositions were used to give fluids of varying viscosity ranging from $\mu = 0.001Pa.s$ for pure water to $\mu = 1.41 Pa.s$ for pure glycerol.
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 	\nc{Conclusions}
