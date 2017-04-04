@@ -13,6 +13,7 @@ import filter
 from glob import glob
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
+from control import tf_pi_controller as pitf
 
 
 class motor(object):
@@ -24,8 +25,8 @@ class motor(object):
     poll_logging = True  # Will log every (i_poll_rate)s if this is True
     log_paused = False
     log_add_note = False
-    log_dir = "./dat+plot"  # where the logged data should be saved
-    log_titles = ["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7-bit" "Filtered Dynamo Reading/V"]
+    log_dir = "./logs"  # where the logged data should be saved
+    log_titles = ["t", "dr", "cr", "pv", "fdr", "fcr"]
     i_poll_rate = 0.1  # How often data is polled, should not be less than span
     this_log_name = ""
     
@@ -35,8 +36,8 @@ class motor(object):
     fdr = 0.0
     svf = [300, -150]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
     
-    # Filtering ## Separate filter for current reading?
-    filtlen = 10000  # number of samples to "remember" for filtering purposes
+    # Filtering
+    filtlen = 1000    # number of samples to "remember" for filtering purposes
     srvs = [0.0] * 0  # used to hold the last (filtlen) samples of dynamo volt readings
     crvs = [0.0] * 0  # used to hold the last (filtlen) samples of current volt readings
     tims = [0.0] * 0  # time data for ^
@@ -44,31 +45,29 @@ class motor(object):
     filter_delay = 100
     filtA = 2
     filtB = 0.008
-
-    # Current calc
-    current = 0.0 # Read current in A
-    cvf = [1.0, 0.0]  # 1st order linear fit equation; CURRENT = cvf[0] * VOLTAGE + cvf[1]; VOLTAGE in volts, CURRENT in Amps
-
-    max_speed = 0  # RPM, at voltage = ~10.5v
-    min_speed = 0  # RPM, at voltage = ~2.5v
     
-    # Instances of Class
+    # Control thread
+    control_stopped = True
+    
+    # Classes
     pot = dp()  # potentiometer to control voltage
+    pic = pitf((0.2, 0.15))
     aconv = ac()  # adc to read current/voltage
     adc_chan = [0, 1]  # voltage channel, current channel
 
     def __init__(self, max_speed=0, min_speed=0,
-    startnow=False, adc_channels=[0, 1], adc_vref=3.3,
-    poll_logging=True, log_dir="./dat+plot",
-    log_titles=["Time/s", "Dynamo Reading/V", "HES Reading/V", "Potentiometer Value/7bit", "Filtered Dynamo Reading/V", "Filtered HES Reading/V"],
-    log_note="DATETIME", svf=[312.806, -159.196], cvf=[1.0, 0.0], i_poll_rate=0.1,
-    filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
+                 startnow=False, adc_channels=[0, 1], adc_vref=3.3,
+                 poll_logging=True, log_dir="./logs",
+                 log_note="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15)
+                 filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
         # Set calibration variables
         self.max_speed = max_speed
         self.min_speed = min_speed
         self.svf = svf
-        self.cvf = cvf
+        
+        # controller
+        self.pic = pitf(pic_tuning)
         
         # Filtering
         self.filtering = filtering
@@ -83,7 +82,6 @@ class motor(object):
         
         # Set up logs
         self.log_dir = log_dir
-        self.log_titles = log_titles
         self.poll_logging = poll_logging
         self.new_logs(log_note)
         
@@ -116,10 +114,6 @@ class motor(object):
             else:
                 self.logf.write("NOTE: " + log_note + "\n")
 
-    def start_poll(self):
-        if (not self.poll_running):  # if not already running
-            td.start_new_thread(self.poll, tuple())
-
     def log_pause(self):
         self.log_paused = True
 
@@ -127,6 +121,28 @@ class motor(object):
         self.log_note = new_note
         self.log_paused = False
 
+    def start_poll(self):
+        if (not self.poll_running):  # if not already running
+            td.start_new_thread(self.poll, tuple())
+    
+    def start_control(self):
+        if self.control_stopped:
+            td.start_new_thread(self.control, tuple())
+            
+    def update_setpoint(self, value):
+        self.pic.set_point = value
+    
+    def control(self):
+        while not self.control_stopped:
+            control_action = self.pic.get_control_action(self.speed)
+            if control_action > 128: control_action = 128
+            if control_action < 0: control_action = 0
+            self.set_pot(control_action)
+            time.sleep(0.1)
+            
+    def stop_control(self):
+        self.control_stopped = True
+        
     def poll(self):
 
         self.poll_running = True
@@ -182,40 +198,6 @@ class motor(object):
 
     def set_pot(self, value):
         self.dp.set_resistance(value)
-    
-    def fix_logs(self):
-        logf = open(self.this_log_name, "r")
-        datl = logf.readlines()
-        logf.close()
-
-        cols = [[0] * 0] * 0
-        for i in range(0, len(self.log_titles)):
-            cols.append([self.log_titles[i]] * 1)
-        cols.append(["notes\n"] * 1)
-
-        for i in range(1, len(datl)):
-            splt = datl[i].split(",", len(self.log_titles))
-            for j in range(0, len(cols)):
-                cols[j].append(splt[j])
-
-        for i in range(0, len(cols)):
-            if cols[i][0][:4] == "Filt":
-                title = cols[i][0]
-                mv = cols[i][1:self.filter_delay + 1]
-                main_data = cols[i][self.filter_delay + 1:]
-                cols[i] = [title]*1
-                for j in range(0, len(main_data)):
-                    cols[i].append(main_data[j])
-                for j in range(0, len(mv)):
-                    cols[i].append(mv[j])
-
-        logf = open(self.this_log_name, "w")
-        for i in range(0, len(cols[0])):
-            line = ""
-            for j in range(0, len(cols)):
-                line += (str(cols[j][i]) + ",")
-            logf.write(line[:-1])
-        logf.close()
                    
     def clean_exit(self):
         print "Closing poll thread..."
@@ -225,9 +207,6 @@ class motor(object):
         if (self.poll_logging):
             print "Saving log file..."
             self.logf.close()
-            
-            if not self.filtering == "NONE":
-                pass  # self.fix_logs()  # fixes log ordering (sort of)
 
 if __name__ == "__main__":
     #  Will get motor's speed for select potvals
