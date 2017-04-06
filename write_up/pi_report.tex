@@ -90,6 +90,15 @@
 	\item
 	\end{itemize}
 
+%%%%TABLE 
+	\begin{table}
+		\begin{tabular}{| p{5cm} | p{5cm} | p{5cm} |}
+			-- cut --
+		\end{tabular}
+		\caption{CAPTION}
+		\label{TABLEREF}
+	\end{table}
+
 \fi
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -719,14 +728,35 @@
 	\end{figure}
 \fi
 	\subsection*{Rheometry}
-	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this will be done in several stages, first the rheometer will be used to measure the viscosity of a range of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). After the test with Newtonian fluids, non-Newtonian fluids can be used to evaluate the Rheometer's ability to detect jamming.
-	\newline
+	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this was done in several stages, first the rheometer was used to measure the viscosity of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). This will evaluate the ability of the rheometer to accurately measure viscosity, while also verifying the empirical calibrations used. Then, a non-newtonian fluid (cornstarch and water suspension) will be used in the rheometer to guage how well it can detect variance in viscosity.\br
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
 	
     \noindent
-	The newtonian reference fluids will be aqueous glycerol solutions. Fluids of different compositions were used to give fluids of varying viscosity ranging from $\mu = 0.001Pa.s$ for pure water to $\mu = 1.41 Pa.s$ for pure glycerol. Equally spaced along the 
+	The newtonian reference fluids will be aqueous glycerol solutions. Fluids of different compositions were used to give fluids of varying viscosity ranging from $\mu = 0.001Pa.s$ for pure water to $\mu = 1.41 Pa.s$ for pure glycerol. Table \ref{tabglyvisc} shows the different compositions of solutions used.
+	\begin{table}
+		\centering
+		\begin{tabular}{| c | c |}
+			\hline
+			 Viscosity ($Pa.s$) & Composition (wt\% glycerol)\\
+			 \hline
+			 0.001 & 17.7 \\
+			 0.121 & 95.3 \\
+			 0.241 & 97.6 \\
+			 0.361 & 98.8 \\
+			 0.481 & 99.5 \\
+			 0.601 & 100 \\
+			\hline
+		\end{tabular}
+		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions}
+		\label{tabglyvisc}
+	\end{table}
+	For each fluid, the method was as follows: The cell was partially filled with solution, up to 1 centimetre fill height. The rheometer was then run over a range of set strain rates (from $17 s^{-1}$ to $209 s^{-1}$). This was then repeated for progressively deeper fill heights (1cm, 2cm, 3cm, and 4cm). Rotational speed was recorded, along with the current supplied to the motor. The viscosity was then calculated and compared to the known value. \br
+	[UNFINISHED] \br
+	The non-newtonian fluid used was 'oobleck' - a water and cornflower suspension. \br
+	[UNFINISHED]
+	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 	\nc{Conclusions}

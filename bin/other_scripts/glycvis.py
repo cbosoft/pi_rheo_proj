@@ -8,7 +8,7 @@ def get_mixture_viscosity(T, Cm):
     mug = 12100 * np.exp(((-1233 + T) * T)/(9900 + 70 * T))
     #print "| a: {:.3f} \t\t\t| b: {:.3f} \t\t\t| alp: {:.3f}\t|".format(a, b, alp)
     #print "| muw: {:.3f} \t\t\t| mug: {:.3f} \t\t\t| alp: {:.3f}\t|".format(muw, mug, alp)
-    mum = (muw ** alp) * (mug ** (1- alp))
+    mum = (muw ** alp) * (mug ** (1- alp)) * 0.001
     return mum
 
 def get_mixture_composition(T, mum):
@@ -32,10 +32,22 @@ def get_mixture_composition(T, mum):
             if Cm[i] < 0:# or Cm[i] > 1:
                 Cm[i] = np.nan
     return mum, Cm
+
+def get_strain(spd):
+    return spd * 2 * np.pi * 0.015 / ((0.0195 - 0.015) * 60)
     
 
 if __name__ == "__main__":
-    mus = np.linspace(1, 101, 6)
+    mus = np.linspace(1, 601, 6)
     __, cs = get_mixture_composition(20, mus)
     for i in range(0, len(mus)):
         print "Mu: {:.3f}\t Cm: {:.3f}".format(mus[i], cs[i])
+    cmps = np.linspace(0.1, 1, 10)
+    oms = get_mixture_viscosity(20, cmps)
+    print ""
+    for i in range(0, len(oms)):
+        print "Mu: {:.3f}\t Cm: {:.3f}".format(oms[i], cmps[i])
+    spds = np.linspace(50, 600, 5)
+    strs = get_strain(spds)
+    for i in range(0, len(spds)):
+        print "Gamma: {}".format(strs[i])
