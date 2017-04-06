@@ -158,11 +158,12 @@
 	% Summary Page
 	\jc{Summary} % last edited 14/3/2017
 	%Brief, factual, generally following the same order of presentation as the report. Do not include figures, tables, or references.
-	% WHAT WE DID
+	% The information in the summary is a bit disorganized.  It should start with the aim of the project, which was to design, build, and test a rheometer.  It should then mention how these tasks were carried out.  Finally, it should mention that the rheometer was applied to a colloidal suspension that exhibited jamming, quickly describing jamming in a couple of sentences.
+	% AIM: TO DESIGN, BUILD, TEST A RHEOMETER
+	% HOW WAS IT TESTED?
+	% WHAT WAS WITH THE COLLOIDS?
 	A couette cell rotating rheometer was constructed, with the inner cylinder rotated by an electric motor. The rheometer was controlled by a Raspberry Pi computer using its GPIO ports to interact with electronic sensors and other hardware. \br
-	% WHY WE DID IT
 	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
-	% HOW IT TURNED OUT
 	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol (Newtonian fluids) as well as the rheology of non-Newtonian mixtures of cornstarch and water. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment, and observing how well the rheometer can pick up the instances of jamming. \br
 	Work in progress. Conclusion and results to follow.
 	%not finished, cannot conclude
@@ -190,6 +191,10 @@
                                                                
 	\nc{Introduction} % section last edited 20/3/2017
 	%The introduction sets the scene. It should include a brief description of the organisation, the type of work carried out, projects undertaken, background information to the work carried out and a brief outline of the report and of the learning objectives for the project.
+	% Should be about one page:
+	% - background information + motivation
+	% - objectives
+	% - paragraph summarising remainder of report (?)
 	Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
 	This project aimed to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
@@ -206,6 +211,8 @@
 
 	\nc{Background} % section last edited 22/3/2017	
 	\section*{Rheometry} % last edited 8/3/2017
+	% SCHEMATICS OF THE DIFFERENT RHEOMETER TYPES
+	% DISCUSSION OF RELATIONSHIP BETWEEN VISCOSITY/TORQUE/ROTATION RATE/GEOMETRY
 	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it shears(\(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
 	\begin{equation}
 	\mu = \frac{\tau}{\dot{\gamma}}
@@ -241,9 +248,9 @@
 	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is the shearing fluid. In Couette flow, the strain rate calculation is simplified: strain rate is the first derivative of the velocity of the shear. In Couette flow, the velocity varies linearly with accross the gap therefore the strain rate is constant. A Couette cell is a practical approximation of the infinitely long plate shear scenario. The cell is constructed from two cylinders: the outer cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of velocity, and a constant strain rate.
 	
 	\section*{Colloidal Suspensions and Jamming} % last edited 8/3/2017
-	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour. The concept of hydroclustering has been used to explain this shear thickening behaviour: as the suspension undergoes shear, the particles are forced together forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite{figshearthick}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles \cite[p.~7]{backbrownjaegrev}. % other theories?
+	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour. The concept of hydroclustering has been used to explain this shear thickening behaviour: as the suspension undergoes shear, the particles are forced together forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite{figshearthick}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles \cite{backbrownjaegrev}. % other theories?
 	\br
-	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST). In CST the viscosity increases proportionally to shear after a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also supports the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite[p.~7]{backbrownjaegrev}. 
+	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST). In CST the viscosity increases proportionally to shear after a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also supports the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite{backbrownjaegrev}. 
 	\br
 	DST is linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
 	%Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases. 
@@ -254,7 +261,7 @@
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{images/cfors_cracks.png}
-		\caption{Suspension Surface Cracks (taken from \cite[p.~118]{thescforsyth})}
+		\caption{Suspension Surface Cracks (taken from \cite{thescforsyth})}
 		\label{cforscracks}
 	\end{figure}
 	%LINK
@@ -293,6 +300,12 @@
 
 	\nc{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially.
+	
+	% TODO :: 
+	% UNCERTAINTIES IN MEASUREMENTS
+	% UNITS IN EMPIRICAL EQUATIONS
+	% DIMENSIONS SHOWN ON CELL DIAGRAM
+	% PHOTOGRAPH OF SET UP
 
 
 
@@ -306,7 +319,6 @@
 		\caption{Diagram of the Experimental Apparatus}
 		\label{expdia}
 	\end{figure} \newline \noindent
-	% TODO :: UNCERTAINTIES IN MEASUREMENTS, MEASUREMENTS
 	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of 44.151mm, and inner diameter of 39.111mm, a height of 39.753mm. The cylinder has been glued to a metal plate which holds it in place. \br
 	The inner cylinder is a perspex cylinder built onto the motor's shaft. The cylinder is 30.215mm in diameter and 46.795mm in height. There is a thinner section of the cylinder at the top of the main cylinder, which is used as a pulley for the belt to hold on to (see Figure \ref{expdia}). \br
 	The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand also holds the dynamo in position.\br
@@ -376,6 +388,7 @@
 	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $V$}
 
 	\section{Software} % last edited 13/3/2017 %uml for diagram?
+	% PACKAGES USED REFERENCES
 	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion. SPI is used to facilitate communication between the Raspbery Pi and the hardware: to set the resistance on the digital potentiometer; to read signal information from the analogue to digital converter. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. \newline
 	
 	\begin{figure}[!htb]
@@ -507,7 +520,7 @@
 	The motor class, once set up, can be used to set the supply to a motor (using a digital potentiometer), can read in the motor's speed and calculate its current draw (using the ADC).
 	
 	\subsection*{Post Processing and Results} % edited 15/3/2017
-	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor python class records the time, speed, supply voltage (potentiometer value), and supply current which is used to calculate the torque output from the motor. Knowing the torque and the rotational rate, the shear stress, strain rate, and the viscosity can be calculated. The torque output (\(T\)) from a DC motor can be found using Equation \ref{eqntcomplex} \cite[p.~111-112]{backdcmotor}. At a load high enough that the motor can no longer spin, the torque output is the stall torque (\(T_s\)). At no load, the speed is at its highest and is called the no-load speed (\(\omega_N\)). By applying this information Equation \ref{eqntcomplex} becomes Equation \ref{eqntlesscomplex}.
+	Bringing everything together, the rheometry of a fluid can be calculated from the logged data. The motor python class records the time, speed, supply voltage (potentiometer value), and supply current which is used to calculate the torque output from the motor. Knowing the torque and the rotational rate, the shear stress, strain rate, and the viscosity can be calculated. The torque output (\(T\)) from a DC motor can be found using Equation \ref{eqntcomplex} \cite{backdcmotor}. At a load high enough that the motor can no longer spin, the torque output is the stall torque (\(T_s\)). At no load, the speed is at its highest and is called the no-load speed (\(\omega_N\)). By applying this information Equation \ref{eqntcomplex} becomes Equation \ref{eqntlesscomplex}.
 	\begin{equation}
 		T = \frac{k_v V_a}{r_a} - \frac{{{k_v}^2} \omega}{r_a}
 		\label{eqntcomplex}
@@ -766,7 +779,7 @@
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
 
-	\nc{Review}
+	\nc{Reflection and Review}
 	%lit review, history
 	%Relate this section to the learning objectives in the introduction. Report what you have learnt about the organisation and about yourself. Mention your achievements, what you have learnt, skills you have acquired or improved. This might be technical or "soft" skills. Try to relate this to what you have learned in your coursework at University and what skills you will take forward to your first full time professional post.
 	The goal of this project was to design, build, and test a rheometer using a Raspberry Pi and open source software.\br
