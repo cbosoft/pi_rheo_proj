@@ -162,10 +162,12 @@
 	% AIM: TO DESIGN, BUILD, TEST A RHEOMETER
 	% HOW WAS IT TESTED?
 	% WHAT WAS WITH THE COLLOIDS?
-	A couette cell rotating rheometer was constructed, with the inner cylinder rotated by an electric motor. The rheometer was controlled by a Raspberry Pi computer using its GPIO ports to interact with electronic sensors and other hardware. \br
-	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
-	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol (Newtonian fluids) as well as the rheology of non-Newtonian mixtures of cornstarch and water. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment, and observing how well the rheometer can pick up the instances of jamming. \br
-	Work in progress. Conclusion and results to follow.
+	The aim of this project was to design build and test a rheometer. The rheometer was designed around a couette cell - two cylinders with a liquid in the gap between the two, one cylinder is rotated to shear the fluid. The cylinder was rotated by an electric motor controlled by a Raspberry Pi. Speed measurement and motor supply current sensors on the rheometer were accessed by the Raspberry Pi which records and uses this data as the experiment goes on to calculate the viscosity. \br
+	The rheometer was tested by using it to measure the viscosity of reference Newtonian fluids. This confirmed the rheometer's ability to accurately gauge a fluid's viscosity. Then, non-Newtonian fluids were used in the rheometer to determine its ability to detect variance in the viscosity (with respect to time, or to shear rate). %REREAD
+%	A couette cell rotating rheometer was constructed, with the inner cylinder rotated by an electric motor. The rheometer was controlled by a Raspberry Pi computer using its GPIO ports to interact with electronic sensors and other hardware. \br
+%	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
+%	The rheometer was evaluated by using it to measure the rheology of various known solutions of water and glycerol (Newtonian fluids) as well as the rheology of non-Newtonian mixtures of cornstarch and water. The rheometer's accuracy was gauged by comparing the result with that from standard lab equipment, and observing how well the rheometer can pick up the instances of jamming. \br
+%	Work in progress. Conclusion and results to follow.
 	%not finished, cannot conclude
 	\newpage \begin{center} \large \space \normalsize \end{center}
 	
@@ -264,7 +266,6 @@
 		\caption{Suspension Surface Cracks (taken from \cite{thescforsyth})}
 		\label{cforscracks}
 	\end{figure}
-	%LINK
 	\section*{Raspberry Pi}
 	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
 	\begin{figure}[!htb]
@@ -381,7 +382,7 @@
 	\nomenclature[aV ]{$V_{AB}$}{Voltage accross the potentiometer terminals\hfill $V$}
 	
 	\begin{equation}
-	V_{ms} = 0.0636 \times pv + 2.423
+	V_{ms} = 0.0636V \times pv + 2.423V
 	\label{eqnmotsupvol}
 	\end{equation}
 	
@@ -389,12 +390,13 @@
 
 	\section{Software} % last edited 13/3/2017 %uml for diagram?
 	% PACKAGES USED REFERENCES
-	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion. SPI is used to facilitate communication between the Raspbery Pi and the hardware: to set the resistance on the digital potentiometer; to read signal information from the analogue to digital converter. The SPI protocol can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. \newline
+	Software was written to enable the Raspberry Pi to communicate with the hardware. The Python language was chosen as it is a very popular, easy to use, and easy to read language. Its popularity means that there is an abundance of software packages available for inclusion. \texttt{RPi.GPIO}\cite{citerpigpio} comes pre-installed on Raspian and is used for accessing the GPIO pins from a Python environment. The SPI protocol is used frequently in the software for this project and can be accessed in a python environment by using the \texttt{spidev} package \cite{srcspidev}. For calculations and data processing, the \texttt{numpy} package \cite{numpyref} is very useful. Data filtering is accomplished with the use of the \texttt{scipy} package \cite{scipyref}.\newline
 	
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.35]{images/codemap.png}
 		%filter.py arrow is backwards?
+		%RE DO, SOFTWARE WAS SHUFFLED A BIT
 		\caption{Class Diagram}
 		\label{figcladia}
 	\end{figure}
@@ -549,7 +551,7 @@
 	\noindent
 	Combining Equations \ref{eqnsvemp} and \ref{eqntsemp} with Equation \ref{eqntlesscomplex} yields an equation for motor torque as a function of rotational speed and potentiometer value, Equation \ref{eqnmottsvsp}.
 	\begin{equation}
-		T = \left(0.169 \times I_{ms} + 0.038\right) \left(1 - \frac{\omega}{0.01138 pv + 0.3844} \right)
+		T = \left(0.169\frac{Nm}{A} \times I_{ms} + 0.038Nm\right) \left(1 - \frac{\omega}{0.01138rads^{-1} pv + 0.3844rads^{-1}} \right)
 		\label{eqnmottsvsp}
 	\end{equation}
 	With the torque and the rotational speed known, the next step is to calculate the shear stress and the strain rate.\br
@@ -646,7 +648,7 @@
 	\noindent
 	Mass readings were taken for different current readings (current supply was altered by altering voltage supply). A two dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}. The results and fit equation were plotted on Figure \ref{figstalltcal}.
 
-	\section{Evaluation} % re write recommended
+	\section{Evaluation}
 	%The project can be split into different sections; design, development, and **evaluation**. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
 	% The varies aspects of the design were tested to evaluate whether they met the design specifications for speed, and accuracy.
 	
@@ -741,7 +743,7 @@
 	\end{figure}
 \fi
 	\subsection*{Rheometry}
-	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this was done in several stages, first the rheometer was used to measure the viscosity of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). This will evaluate the ability of the rheometer to accurately measure viscosity, while also verifying the empirical calibrations used. Then, a non-newtonian fluid (cornstarch and water suspension) will be used in the rheometer to guage how well it can detect variance in viscosity.\br
+	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this was done in several stages, first the rheometer was used to measure the viscosity of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). This will evaluate the ability of the rheometer to accurately measure viscosity, while also verifying the empirical calibrations used. Then, a non-newtonian fluid (cornstarch and water suspension) will be used in the rheometer to gauge how well it can detect variance in viscosity.\br
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
@@ -838,6 +840,7 @@
 \apsect{Source Code}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-= \label{apxsrc}
 As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to maintain. The source code for each class section, as well as the filtering library, is included here.
 \apsubsect{ADC Class}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
+
 \begin{Verbatim}[frame=single]
 #
 # adc.py
