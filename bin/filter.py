@@ -7,10 +7,10 @@
 # imports
 import numpy as np  # for maths
 from scipy.interpolate import UnivariateSpline  # for splining
-from scipy.signal import wiener, filtfilt, butter, gaussian  # for 
-from scipy.ndimage import filters
-import scipy.optimize as op
-import matplotlib.pyplot as plt
+from scipy.signal import wiener, filtfilt, butter, gaussian  # for fliter-making
+from scipy.ndimage import filters # for applying filters
+#import scipy.optimize as op
+#import matplotlib.pyplot as plt
         
 def gaussianf(x, y, samples=51, sigma=7):
 	b = gaussian(samples, sigma)
