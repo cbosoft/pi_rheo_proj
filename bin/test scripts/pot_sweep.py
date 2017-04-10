@@ -12,7 +12,7 @@ sys.path.append('./..')
 import motor
 import time
 
-mot = motor.motor(startnow=True, poll_logging=True, log_dir="./long_sweep", i_poll_rate=0.001)
+mot = motor.motor(startnow=True, poll_logging=True, log_dir="./glyc_sweep_15ml", i_poll_rate=0.001)
 
 print "Starting..."
 mot.pot.set_resistance(48)

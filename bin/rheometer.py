@@ -34,7 +34,7 @@ class rheometer(object):
     
     def __init__(self, motor_params={'log_dir':'./rheometer'}, fill_vol=5):
         self.mot = motor(**motor_params)
-        self.fill_height = fill_vol / dxsa
+        self.fill_height = fill_vol / self.dxsa
             
     def get_rheometry(self, strain_rate, run_length):
         pass
@@ -48,17 +48,24 @@ class rheometer(object):
             iterator = iter(strain_rate)
         except TypeError:
             variable_strain = False
-        
-        if variable_strain:
-            for i in range(0, len(variable_strain)):
-                self.set_strain_rate(strain_rate[i])
-                time.sleep(run_length / len(variable_strain))
-        else:
-            self.set_strain_rate(strain_rate)
-            time.sleep(run_length)
-        self.mot.clean_exit()
-        return calc_visc(self.mot.this_log_name)
-        
+        print "Reading data ({} s)...".format(run_length)
+        try:
+            if variable_strain:
+                for i in range(0, len(strain_rate)):
+                    self.set_strain_rate(strain_rate[i])
+                    time.sleep(run_length / len(strain_rate))
+            else:
+                self.set_strain_rate(strain_rate)
+                time.sleep(run_length)
+
+            self.mot.clean_exit()
+            print "Calculating viscosity..."
+            return self.calc_visc(self.mot.this_log_name)
+
+        except KeyboardInterrupt:
+            self.mot.clean_exit()
+            return 0  # Operation was cancelled
+
     def calc_visc(self, filename):
             datf = pd.read_csv(filename)
 
@@ -103,7 +110,7 @@ class rheometer(object):
         desired_speed = value * (self.ro - self.ri) / self.ri  # in rads
         desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
         if self.mot.control_stopped:
-            set_pv = int((desired_speed - spf[1]) / spf[0])
+            set_pv = int((desired_speed - self.spf[1]) / self.spf[0])
             self.mot.set_pot(set_pv)
         else:
             self.mot.update_setpoint(desired_speed)

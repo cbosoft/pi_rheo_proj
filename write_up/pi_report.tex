@@ -647,6 +647,39 @@
 	
 	\noindent
 	Mass readings were taken for different current readings (current supply was altered by altering voltage supply). A two dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}. The results and fit equation were plotted on Figure \ref{figstalltcal}.
+	
+	\subsection*{Torque}
+	The goal of this calibration was to obtain an empirical function for the torque output from the motor. Fluids of known viscosity were put into the rheometer at different fill heights. The rheometer was then run at different strain rates holding at each for 5 seconds while rotational speed, and motor supply current data was recorded.\br
+	Table \ref{tabreffluvisc} shows the compositions and viscosities of the fluids used. The rheometer was first loaded with 1ml of the fluid and the rheometer was run. This was repeated for loadings up to 15ml, in 1ml increments. The resulting data was used to calculate the shear stress as it varies with the strain rate. From the stress, motor torque is calculated. A graph was plotted of motor torque against motor power input and a 1st order equation was fit (see Figure \ref{figmottorqcal}).
+	\begin{table}
+		\centering
+		\begin{tabular}{| c | c | c |}
+			\hline
+			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
+			\hline
+			0.00 & 0.001 & -- \\
+			94.6 & 0.286 & -- \\
+			97.3 & 0.571 & -- \\
+			98.6 & 0.856 & -- \\
+			99.4 & 1.141 & -- \\
+			\hline
+		\end{tabular}
+		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions}
+		\label{tabreffluvisc}
+	\end{table}
+
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.45]{figures/fig_torque_cal.png}
+		\caption{Torque Calibration Results}
+		\label{figmottorqcal}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Motor torque plotted against supply power (red dots). A first order fit equation is included (green dashed line).
+		\end{subfigure}
+	\end{figure}
+	
+	\noindent
+	To confirm the 
 
 	\section{Evaluation}
 	%The project can be split into different sections; design, development, and **evaluation**. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.

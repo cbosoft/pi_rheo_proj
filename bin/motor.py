@@ -101,14 +101,14 @@ class motor(object):
 
         # Creat log
         if (self.poll_logging):
-            if log_name == "DATETIME"
+            if log_name == "DATETIME":
                 self.this_log_name = self.log_dir + "/log_" + un + ".csv"
             else:
                 self.this_log_name = self.log_dir + "/" + log_name
             
             self.logf = open(self.this_log_name, "w")
             
-            self.logf.write("t,dr,cr,pv,fdr,fcr")
+            self.logf.write("t,dr,cr,pv,fdr,fcr\n")
 
     def log_pause(self):
         self.log_paused = True
@@ -193,7 +193,7 @@ class motor(object):
         self.tims.append(tim)
 
     def set_pot(self, value):
-        self.dp.set_resistance(value)
+        self.pot.set_resistance(value)
                    
     def clean_exit(self):
         self.poll_running = False

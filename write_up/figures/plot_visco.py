@@ -128,7 +128,7 @@ def calc_T(filename, fill_volume=5, visc=0.001):
     return st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe
 
 if __name__=="__main__":
-    file = sorted(glob.glob("./../../logs/water_cal_10ml/*.csv"))[-1]
+    file = sorted(glob.glob("./../../bin/test scripts/glyc_sweep_15ml/*.csv"))[-1]
     
     ## CALIBRATE TORQUE READINGS
     st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe = calc_T(file, 10)

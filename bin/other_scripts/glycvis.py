@@ -40,10 +40,11 @@ def get_mixture_composition(T, mum):
 
     rhow    = 1000.0 * (1.0 - abs((T - 4.0) / 622.0)**1.7)
     rhog    = 1277.0 - 0.654 * T
+    print "{} {}".format(rhow, rhog)
     Vf      = (1.0 / ((1.0 / Cm) - 1.0)) * (rhow / rhog)
     V2f     = 1.0 / ((1.0 / Vf) + 1.0)
     
-    return Vf, V2f
+    return Cm, Vf, V2f
 
 def get_strain(spd):
     return spd * 2 * np.pi * 0.015 / ((0.0195 - 0.015) * 60)
@@ -51,8 +52,9 @@ def get_strain(spd):
 
 if __name__ == "__main__":
     mus = np.linspace(1.005, 1141, 5)
-    vf, vof = get_mixture_composition(20, mus)
-    mixvol = 30
+    mf, vf, vof = get_mixture_composition(20, mus)
+    print mf[-1]
+    mixvol = 20
     print "\n\t\t{}ml mixture\n".format(mixvol)
     print " Viscosity \t ml glycerol \t ml glycerol \t ml water"
     print " in cP  \t per ml water \t \n"           #per ml mix \t per ml mix\n"
