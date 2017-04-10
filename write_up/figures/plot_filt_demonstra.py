@@ -73,7 +73,7 @@ if __name__ == "__main__":
     ax_tr = f.add_subplot(222)
     plt.title("$c)\ Frequency\ Spectra\ (Fourier\ Transform)$\n", fontsize=24)
     ax_b = f.add_subplot(212)
-    plt.title("$b)\ Intermittent\ Load$", fontsize=24)
+    plt.title("$b)\ Intermittent\ Loading$", fontsize=24)
     
     # get spectra
     w, ps_n, ps_f = get_ft(x1, y1, f1)
