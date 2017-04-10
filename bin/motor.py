@@ -26,7 +26,6 @@ class motor(object):
     log_paused = False
     log_add_note = False
     log_dir = "./logs"  # where the logged data should be saved
-    log_titles = ["t", "dr", "cr", "pv", "fdr", "fcr"]
     i_poll_rate = 0.1  # How often data is polled, should not be less than span
     this_log_name = ""
     
@@ -55,15 +54,12 @@ class motor(object):
     aconv = ac()  # adc to read current/voltage
     adc_chan = [0, 1]  # voltage channel, current channel
 
-    def __init__(self, max_speed=0, min_speed=0,
-                 startnow=False, adc_channels=[0, 1], adc_vref=3.3,
+    def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
                  poll_logging=True, log_dir="./logs",
-                 log_note="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15)
+                 log_name="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15),
                  filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
         # Set calibration variables
-        self.max_speed = max_speed
-        self.min_speed = min_speed
         self.svf = svf
         
         # controller
@@ -76,20 +72,20 @@ class motor(object):
         if not filt_param_B == 0.314: self.filtB = filt_param_B
 
         # Set sensor variables
-        self.pot = dp()
-        self.aconv = ac(cs_pin=1, vref=adc_vref)
+        #self.pot = dp()
+        #self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.i_poll_rate=i_poll_rate
         
         # Set up logs
         self.log_dir = log_dir
         self.poll_logging = poll_logging
-        self.new_logs(log_note)
+        self.new_logs(log_name)
         
         # Start speed polling (if necessary)
         if (startnow):
             self.start_poll()
 
-    def new_logs(self, log_note="--"):
+    def new_logs(self, log_name="DATETIME"):
         # Try closing old log file
         try:
             logf.close()
@@ -105,14 +101,14 @@ class motor(object):
 
         # Creat log
         if (self.poll_logging):
-            self.this_log_name = self.log_dir + "/log_" + un + ".csv"
-            self.logf = open(self.this_log_name, "w")
-            for s in self.log_titles:
-                self.logf.write(s + ", ")
-            if (log_note == "DATETIME"):
-                self.logf.write(time.strftime("%H:%M %d-%m-%Y", time.gmtime()) + "\n")
+            if log_name == "DATETIME"
+                self.this_log_name = self.log_dir + "/log_" + un + ".csv"
             else:
-                self.logf.write("NOTE: " + log_note + "\n")
+                self.this_log_name = self.log_dir + "/" + log_name
+            
+            self.logf = open(self.this_log_name, "w")
+            
+            self.logf.write("t,dr,cr,pv,fdr,fcr")
 
     def log_pause(self):
         self.log_paused = True
@@ -200,12 +196,11 @@ class motor(object):
         self.dp.set_resistance(value)
                    
     def clean_exit(self):
-        print "Closing poll thread..."
         self.poll_running = False
+        self.control_stopped = True
         time.sleep(0.5)
         
         if (self.poll_logging):
-            print "Saving log file..."
             self.logf.close()
 
 if __name__ == "__main__":
