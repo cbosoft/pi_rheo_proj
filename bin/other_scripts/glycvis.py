@@ -59,9 +59,9 @@ if __name__ == "__main__":
     print " Viscosity \t ml glycerol \t ml glycerol \t ml water"
     print " in cP  \t per ml water \t \n"           #per ml mix \t per ml mix\n"
     for i in range(0, len(mus)):
-        print " {:.3f}   \t {:.3f}  \t {:.3f}   \t {:.3f}".format(mus[i], vf[i], vof[i] * mixvol, (1 - vof[i]) * mixvol)
-    #cmps = np.linspace(0.1, 1, 10)
-    #oms = get_mixture_viscosity(20, cmps)
-    #print ""
-    #for i in range(0, len(oms)):
-    #    print "Mu: {:.3f}\t Cm: {:.3f}".format(oms[i], cmps[i])
+        print " {:.3f}   \t {:.3f}  \t {:.3f}   \t {:.3f}".format(mus[i], mf[i], vof[i] * mixvol, (1 - vof[i]) * mixvol)
+
+    oms = get_mixture_viscosity(20, mf)
+    print ""
+    for i in range(0, len(oms)):
+        print "Mu: {:.3f}\t Cm: {:.3f}".format(oms[i], mf[i])
