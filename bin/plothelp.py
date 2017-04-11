@@ -11,10 +11,12 @@ def fit_line(x, y, dg, x_name="x", y_name="y"):
     cf_str = ""
     for i in range(0, len(coeffs)):
         fit += coeffs[i] * (x ** (len(coeffs) - 1 - i))
-        if coeffs[i] < 0:
-            cf_str = "{:.3E}".format(coeffs[i])
+        if i == 0:
+            cf_str = "({:.3E})".format(coeffs[i])
+        elif coeffs[i] < 0:
+            cf_str = "-({:.3E})".format(-1*coeffs[i])
         else:
-            cf_str = "+{:.9E}".format(coeffs[i])
+            cf_str = "+({:.3E})".format(coeffs[i])
         if (len(coeffs) - 1 - i) > 1:
             fit_eqn += " {} \\times {}^{}".format(cf_str, x_name, "{" + str((len(coeffs) - 1 - i)) + "}")
         elif (len(coeffs) - 1 - i) == 1:
