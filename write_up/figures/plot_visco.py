@@ -52,7 +52,7 @@ def calc_v(filename, fill_volume=5):
     sn_rpms = 5.13 * pv + 15.275
     vo      = 0.0636 * pv + 2.423
     pe      = cu * vo
-    T       = 0.000001054 * pe - 0.000001488
+    T       = 5
     #Ts      = (0.173 * (cu**2)) + (-0.47 * cu) + 0.362
     #T       = Ts * (1 - (sp_rpms / sn_rpms))
     tau     = T / (2 * np.pi * ri * ri * fill_height) 
@@ -134,17 +134,20 @@ if __name__=="__main__":
     st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe = calc_T(file, 10)
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
-    l = 20000
+    l = 100000
+    h = -200000
+    l = 100000
     h = -1
-    
+    x = sp_rpms[l:h] * vo[l:h]
+    y = T[l:h]
     # Plot data
-    ax.plot(pe[l:h], T[l:h], 'r.', label="$Torque\ Reading\ vs.\ Supply\ Power$")
+    ax.plot(x, y, 'r.', label="$Torque\ Reading\ vs.\ Supply\ Power$")
     
     # get empirical fit equation
-    fit, fit_eqn, __ = fit_line(pe[l:h], T[l:h], 1, "P", "T")
+    fit, fit_eqn, __ = fit_line(x, y, 2, "P", "T")
     
     # plot fit eqn
-    ax.plot(pe[l:h], fit, 'g--', label=fit_eqn)
+    ax.plot(x, fit, 'g--', label=fit_eqn)
 
     ax.set_xlabel("\n $Supply\ Power,\ W$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
