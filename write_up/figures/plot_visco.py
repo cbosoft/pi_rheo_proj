@@ -47,14 +47,16 @@ def calc_v(filename, fill_volume=5):
 
     # Calculate viscosity etc
     cu      = (-956.06 * (cr ** 3)) + (6543.97 * (cr ** 2)) + (-14924.369 * cr) + 11341.612
+    dr = dr *0.9
     sp_rpms = dr * 316.451 - 163.091
     sp_rads = (sp_rpms * 2 * np.pi) / 60
     sn_rpms = 5.13 * pv + 15.275
     vo      = 0.0636 * pv + 2.423
     pe      = cu * vo
-    T       = (0.001640) * pe - 0.001835
+    #T       = (0.001640) * pe - 0.001835
     #Ts      = (0.173 * (cu**2)) + (-0.47 * cu) + 0.362
-    #T       = Ts * (1 - (sp_rpms / sn_rpms))
+    Ts      = 41.75 * cu - 28.88
+    T       = Ts * (1 - (sp_rpms / sn_rpms))
     tau     = T / (2 * np.pi * ri * ri * fill_height) 
     gam_dot = (sp_rads * ri) / (ro - ri)
     
@@ -117,25 +119,29 @@ def calc_T(filename, fill_volume=5, visc=0.001):
     
     # Calculate torque
     mus     = [visc] * len(cr)
+    dr = dr *0.9
     sp_rpms = dr * 316.451 - 163.091
     sp_rads = (sp_rpms * 2 * np.pi) / 60
+    sn_rpms = 5.13 * pv + 15.275
     gam_dot = (sp_rads * ri) / (ro - ri)
     tau     = mus * gam_dot
     T       = tau * (2 * np.pi * ri * ri * fill_height) 
+    Ts      = T / (1.0 - (sp_rpms / sn_rpms))
     cu      = (-956.06 * (cr ** 3)) + (6543.97 * (cr ** 2)) + (-14924.369 * cr) + 11341.612
     vo      = 0.0636 * pv + 2.423
     pe     = cu * vo
-    return st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe
+    return st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts
 
 def cal_T(file, visco, fillvol, l, h):
     ## CALIBRATE TORQUE READINGS
-    st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe = calc_T(file, fillvol, visco)
+    st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts = calc_T(file, fillvol, visco)
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
 
-    x = pe[l:h]
-    y = T[l:h]
-    f, feqn, __ = fit_line(x, y, 1, "{P_e}", "T")
+    x = cu[l:h]
+    y = Ts[l:h]
+    f, feqn, __ = fit_line(x, y, 1, "I_{ms}", "Ts")
+    print feqn
     return x, y, f, feqn
 
 if __name__=="__main__":
@@ -150,9 +156,12 @@ if __name__=="__main__":
     # Plot data + fit (GLYCEROL)
     ax.plot(xg15, yg15, 'r.', label="$Glycerol\ 100\%,\ 15ml$")
     ax.plot(xg15, fg15, 'r--', label=feqng15)
-
-    ax.set_xlabel("\n $Supply\ Power,\ W$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
+    ax.plot(xg15, (0.173 * (xg15**2)) + (-0.47 * xg15) + 0.362, 'y--', label="old empirical cal")
+    
+    ylim = 20
+    #ax.set_ylim([-ylim, ylim])
+    ax.set_xlabel("\n $Supply\ Current,\ A$", ha='center', va='center', fontsize=24)
+    ax.set_ylabel("$Stall\ Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
 
     plt.legend(loc=2)
     plt.grid(which='both', axis='both')
@@ -160,9 +169,10 @@ if __name__=="__main__":
     ax2 = f.add_subplot(122)
 
     # Plot data + fit (WATER)
-    ax2.plot(xw10, yw10, 'b.', label="$Water\ 100\%,\ 15ml$")
+    ax2.plot(xw10, yw10, 'b.', label="$Water\ 100\%,\ 10ml$")
     ax2.plot(xw10, fw10, 'b--', label=feqnw10)
 
+    #ax2.set_ylim([-(ylim / 20), ylim / 20])
     ax2.set_xlabel("\n $Supply\ Power,\ W$", ha='center', va='center', fontsize=24)
     ax2.set_ylabel("$Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
 
@@ -172,8 +182,8 @@ if __name__=="__main__":
     plt.close(f)
     
     ## CHECK CALIBRATION
-    #st, sp, tau, gam_dot, mu, av, cr, sn, pe, T = calc_v(sorted(glob.glob("./../../bin/test scripts/glyc_sweep_15ml/*.csv"))[-1], 15)
-    st, sp, tau, gam_dot, mu, av, cr, sn, pe, T = calc_v(sorted(glob.glob("./../../logs/water_cal_10ml/*.csv"))[-1], 15)
+    st, sp, tau, gam_dot, mu, av, cr, sn, pe, T = calc_v(sorted(glob.glob("./../../bin/test scripts/glyc_sweep_15ml/*.csv"))[-1], 15)
+    #st, sp, tau, gam_dot, mu, av, cr, sn, pe, T = calc_v(sorted(glob.glob("./../../logs/water_cal_10ml/*.csv"))[-1], 15)
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
     

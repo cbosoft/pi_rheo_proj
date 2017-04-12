@@ -162,7 +162,7 @@
 	% AIM: TO DESIGN, BUILD, TEST A RHEOMETER
 	% HOW WAS IT TESTED?
 	% WHAT WAS WITH THE COLLOIDS?
-	The aim of this project was to design build and test a rheometer. The rheometer was designed around a couette cell - two cylinders with a liquid in the gap between the two, one cylinder is rotated to shear the fluid. The cylinder was rotated by an electric motor controlled by a Raspberry Pi. Speed measurement and motor supply current sensors on the rheometer were accessed by the Raspberry Pi which records and uses this data as the experiment goes on to calculate the viscosity. \br
+	The aim of this project was to design, build, and test a rheometer. The rheometer was designed around a couette cell - two cylinders with a liquid in the gap between the two. One cylinder is rotated to shear the fluid, the rate of rotation and the torque required are used to calculate the viscosity. The rheometer was managed and controlled by a Raspberry Pi, which uses the information available to calculate the viscosity of the sheared fluid. \br
 	The rheometer was tested by using it to measure the viscosity of reference Newtonian fluids. This confirmed the rheometer's ability to accurately gauge a fluid's viscosity. Then, non-Newtonian fluids were used in the rheometer to determine its ability to detect variance in the viscosity (with respect to time, or to shear rate). %REREAD
 %	A couette cell rotating rheometer was constructed, with the inner cylinder rotated by an electric motor. The rheometer was controlled by a Raspberry Pi computer using its GPIO ports to interact with electronic sensors and other hardware. \br
 %	The overall aim of the project was to design, build, and test a bespoke rheometer using a Raspberry Pi and open source software into order to create a device to help further our knowledge of the jamming phenomenon in colloidal suspensions.\br
@@ -304,9 +304,9 @@
 	
 	% TODO :: 
 	% UNCERTAINTIES IN MEASUREMENTS
-	% UNITS IN EMPIRICAL EQUATIONS
-	% DIMENSIONS SHOWN ON CELL DIAGRAM
-	% PHOTOGRAPH OF SET UP
+	% UNITS IN EMPIRICAL EQUATIONS (DONE)
+	% DIMENSIONS SHOWN ON CELL DIAGRAM (IN PROGRESS)
+	% PHOTOGRAPH OF SET UP (IN PROGRESS)
 
 
 
@@ -650,18 +650,13 @@
 	
 	\subsection*{Torque}
 	The goal of this calibration was to obtain an empirical function for the torque output from the motor. Fluids of known viscosity were put into the rheometer at different fill heights. The rheometer was then run at different strain rates holding at each for 5 seconds while rotational speed, and motor supply current data was recorded.\br
-	Table \ref{tabreffluvisc} shows the compositions and viscosities of the fluids used. The rheometer was first loaded with 1ml of the fluid and the rheometer was run. This was repeated for loadings up to 15ml, in 1ml increments. The resulting data was used to calculate the shear stress as it varies with the strain rate. From the stress, motor torque is calculated. A graph was plotted of motor torque against motor power input and a 1st order equation was fit (see Figure \ref{figmottorqcal}).
+	Table \ref{tabreffluvisc} shows the compositions and viscosities of the fluids used. The rheometer was first loaded with 1ml of the fluid and the rheometer was run. This was repeated for loadings up to 15ml, in 5ml increments. The resulting data was used to calculate the shear stress as it varies with the strain rate. From the stress, motor torque is calculated. A graph was plotted of motor torque against motor power input and a 1st order equation was fit (see Figure \ref{figmottorqcal}).
 	\begin{table}
 		\centering
 		\begin{tabular}{| c | c | c |}
 			\hline
 			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
 			\hline
-			0.00 & 0.001 & -- \\
-			94.6 & 0.286 & -- \\
-			97.3 & 0.571 & -- \\
-			98.6 & 0.856 & -- \\
-			99.4 & 1.141 & -- \\
 			\hline
 		\end{tabular}
 		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions}
