@@ -1,4 +1,4 @@
-I'm using a Raspberry Pi to control an experiment, using the scripts posted here. WIP.
+I'm using a Raspberry Pi to control a custom built rheometer.
 
 Useful links:
 
