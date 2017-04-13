@@ -543,7 +543,9 @@
 	\nomenclature[g]{$\omega_N$}{Motor no-load speed\hfill $rad s^{-1}$}
 	
 	\noindent
-	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\) and \(\omega_N\)) is in rad/s. These equations give the power as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed (Equation \ref{eqnsvemp}) and stall torque (Equation \ref{eqntsemp}) in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.
+	Where Torque (\(T\), \(T_s\)) is in Nm, speed (\(\omega\) and \(\omega_N\)) is in rad/s. These equations give the torque as a function of the current rotational rate, if the stall torque and no-load speed are known. These values will change as a result of the supply voltage. Empirical relationships were found by experiment for the no-load speed (Equation \ref{eqnsvemp}) and stall torque (Equation \ref{eqntsemp}) in terms of the value sent to the potentiometer (\(pv\)), which dictates the supply voltage.\br
+	
+	In addition to the stall torque scaling method, an empirical calibration for the torque output as a function of supply current was formed using reference fluids (discussed later on).
 	
 	\nomenclature{$v_{NL}$}{Motor rotational speed, no loading\hfill $RPM$}
 	\nomenclature{$pv$}{Potentiometer value\hfill }
@@ -603,7 +605,7 @@
 		\end{subfigure}
 		\begin{subfigure}[t]{0.45\textwidth}
 			\centering
-%			\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
+			\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
 			\caption{Stall Torque Calibration Results}
 			\label{figstalltcal}
 			\footnotesize
@@ -708,7 +710,7 @@
 	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
 	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.
 	
-	\subsection*{Current Sensor}
+	\subsection*{Current Sensor} %REDO
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
 	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are in agreement, although the data is somewhat noisy despite the applied filtering.
 	
@@ -771,7 +773,7 @@
 	\end{figure}
 \fi
 	\subsection*{Rheometry}
-	The rheometer must be able to calculate the viscosity of a fluid as it varies with time. The evaluation of this was done in several stages, first the rheometer was used to measure the viscosity of Newtonian fluids with a range of viscosities going from high (\(\approx \mu_{glycerol}\)) to low ($\approx \mu_{water}$). This will evaluate the ability of the rheometer to accurately measure viscosity, while also verifying the empirical calibrations used. Then, a non-newtonian fluid (cornstarch and water suspension) will be used in the rheometer to gauge how well it can detect variance in viscosity.\br
+	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer (Discovery Hybrid Rheometer 2).\br
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}

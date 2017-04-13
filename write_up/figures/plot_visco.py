@@ -115,11 +115,10 @@ def calc_T(filename, fill_volume=5, visc=0.001):
     for i in range(1, len(cr)):
         if cr[i] < 2.28: cr[i] = 2.28
         if cr[i] > 2.4: cr[i] = 2.4
-    cr = filter(st, cr, method="butter", A=2, B=0.001)
+    cr = filter(st, cr, method="butter", A=2, B=0.0001)
     
     # Calculate torque
     mus     = [visc] * len(cr)
-    dr = dr *0.9
     sp_rpms = dr * 316.451 - 163.091
     sp_rads = (sp_rpms * 2 * np.pi) / 60
     sn_rpms = 5.13 * pv + 15.275
@@ -130,25 +129,23 @@ def calc_T(filename, fill_volume=5, visc=0.001):
     cu      = (-956.06 * (cr ** 3)) + (6543.97 * (cr ** 2)) + (-14924.369 * cr) + 11341.612
     vo      = 0.0636 * pv + 2.423
     pe     = cu * vo
-    return st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts
+    return st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts, sn_rpms, pv
 
 def cal_T(file, visco, fillvol, l, h):
     ## CALIBRATE TORQUE READINGS
-    st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts = calc_T(file, fillvol, visco)
-    f = plt.figure(figsize=(8, 8))
-    ax = f.add_subplot(111)
+    st, mus, sp_rpms, sp_rads, gam_dot, tau, T, cu, vo, pe, Ts, sn_rpms, pv = calc_T(file, fillvol, visco)
 
     x = cu[l:h]
     y = Ts[l:h]
     f, feqn, __ = fit_line(x, y, 1, "I_{ms}", "Ts")
     print feqn
-    return x, y, f, feqn
+    return x, y, f, feqn, sp_rpms[l:h], sn_rpms[l:h], pv[l:h]
 
 if __name__=="__main__":
     l = 100000
     h = -1
-    xg15, yg15, fg15, feqng15 = cal_T(sorted(glob.glob("./../../bin/test scripts/glyc_sweep_15ml/*.csv"))[-1], 1.141, 15, l, h)
-    xw10, yw10, fw10, feqnw10 = cal_T(sorted(glob.glob("./../../logs/water_cal_10ml/*.csv"))[-1], 0.001005, 10, l, h)
+    xg15, yg15, fg15, feqng15, sp_rpms15, sn_rpms15, pv15 = cal_T(sorted(glob.glob("./../../bin/test scripts/glyc_sweep_15ml/*.csv"))[-1], 1.141, 15, l, h)
+    xw10, yw10, fw10, feqnw10, sp_rpms10, sn_rpms10, pv10 = cal_T(sorted(glob.glob("./../../logs/water_cal_10ml/*.csv"))[-1], 0.001005, 10, l, h)
     
     f = plt.figure(figsize=(16, 8))
     ax = f.add_subplot(121)
@@ -156,7 +153,10 @@ if __name__=="__main__":
     # Plot data + fit (GLYCEROL)
     ax.plot(xg15, yg15, 'r.', label="$Glycerol\ 100\%,\ 15ml$")
     ax.plot(xg15, fg15, 'r--', label=feqng15)
-    ax.plot(xg15, (0.173 * (xg15**2)) + (-0.47 * xg15) + 0.362, 'y--', label="old empirical cal")
+    weight_cal_Ts15 = (0.173 * (xg15**2)) + (-0.47 * xg15) + 0.362
+    weight_cal_T15 = (1 - (sp_rpms15 / sn_rpms15))
+    ax.plot(xg15, weight_cal_T15, 'y--', label="$weight calibrated$")
+
     
     ylim = 20
     #ax.set_ylim([-ylim, ylim])
