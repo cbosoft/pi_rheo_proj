@@ -24,8 +24,8 @@ overall_loop.py                 uses the other libs to achieve the main task
 
 /lib/img_recog                  contains scripts and files used and output by the crack detection script
 ```
-*Distributed under Gnu General Public License (GPL). *
+*Distributed under Gnu General Public License (GPL).*
 
-*You can use this as much as you like, share it as you like, whatever. *
+*You can use this as much as you like, share it as you like, whatever.*
 
 *However, there is no warranty or guarantee that it will actually work.*
