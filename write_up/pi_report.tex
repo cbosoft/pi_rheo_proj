@@ -584,7 +584,8 @@
 %	The design requires that some calibrations are made prior to use. How the motor's speed varies with the voltage output of the dynamo is required before the system can give a speed reading, and the correlation between the current supply and the HES voltage output is required. The motor characteristic curves are also required for the viscosity calculation. This data is found by experimentation as follows.
 	
 	\subsection*{Dynamo Calibration}
-	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The cleaned dynamo data was then compared to the speed readings taken from the tachometer, see Figure \ref{figspeedvrvolt}. The \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}.
+	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The cleaned dynamo data was then compared to the speed readings taken from the tachometer, see Figure \ref{figspeedvrvolt}. The \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}. \br
+	The digital potentiometer was to give a supply voltages between 2.275 and 10.723, in steps of 0.528. At each supply voltage, A tachometer was used to read the speed (in m/s). The reading was taken five times per supply voltage and the dynamo voltage level was recorded at intervals of 100ms by the Raspberry Pi. 
 	
 	\begin{equation}
 		v_m = 312.806 \times {V_D} - 159.196
@@ -596,26 +597,13 @@
 	
 	\begin{figure}[!htb]
 		\centering
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/fig_speed_v_rvolt.png}
-			\caption{Dynamo Calibration Results}
-			\label{figspeedvrvolt}
-			\footnotesize
-		\end{subfigure}
-		\begin{subfigure}[t]{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
-			\caption{Stall Torque Calibration Results}
-			\label{figstalltcal}
-			\footnotesize
-		\end{subfigure}
-		\label{figcals}
-		\caption{Calibration Results}
+		\includegraphics[scale=0.35]{figures/fig_speed_v_rvolt.png}
+		\caption{Dynamo Calibration Results}
+		\label{figspeedvrvolt}
 	\end{figure}
 	
 	\noindent
-	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts. In addition a relationship between the rotational speed and the potentiometer value was found, from the same logged data: Equation \ref{eqnsvemp} (see Figure \ref{figdynocheck}).
+	Where \(v_m\) is the rotational speed of the motor in RPM, and \(V_D\) is the voltage output from the dynamo as it enters the ADC (after being boosted x10 by the operational amplifier) in volts. In addition a relationship between the load-less rotational speed (no-load speed) and the potentiometer value was found, from the same logged data: Equation \ref{eqnsvemp} (see Figure \ref{figdynocheck}).
 	
 	\begin{equation}
 		v_{NL} = 5.13 \times pv + 15.275
@@ -637,33 +625,36 @@
 	Where \(I_{ms}\) is the motor supply current, in amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
 	\subsection*{Stall Torque}
-	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm will hit the top of a balance. The motor will be stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque was then easily calculated by multiplying this force by the length of the arm.
+	The goal of this calibration experiment was to obtain a function of a current drawn by the motor to give the stall torque of the motor. This was obtained by attaching an arm to the motor's shaft and positioning the motor such that the arm hit the top of a balance. The motor was stalled by the presence of the immovable balance, the reading on which will be representative of the force applied by the motor. The stall torque was then easily calculated by multiplying this force by the length of the arm.
 	\begin{equation}
-		T_s = 0.173 \times I_{ms} ^2 -0.47 \times I_{ms} + 0.362
+		T_s = M_B \times g \times L_A
+		\label{eqntscalc}
+	\end{equation}
+	\begin{equation}
+		T_s = [ FILL\ ME\ IN\ AT\ THE\ END]
 		\label{eqntsemp}
 	\end{equation}
 	
+	\nomenclature{$M_B$}{Mass reading on balance\hfill $g$}
+	\nomenclature{$L_A$}{Length of arm attached to shaft\hfill $m$}
 	\nomenclature{$g$}{Acceleration due to gravity\hfill $ms^{-2}$}
 	\nomenclature{$L_a$}{Length of motor shaft arm\hfill $m$}
 	\nomenclature{$m_{ba}$}{Mass reading on balance\hfill $kg$}
 	
 	\noindent
-	Mass readings were taken for different current readings (current supply was altered by altering voltage supply). A two dimensional equation was fit to the data resulting in Equation \ref{eqntsemp}. The results and fit equation were plotted on Figure \ref{figstalltcal}.
+	Mass readings were taken for different supply voltages, the current drawn by the motor was recorded from an ammeter, and the mass reading on the balance was also recorded. Each reading was taken five times per supply voltage and averaged. The results were plotted on Figure \ref{figstalltcal}. An equation was fit to the data; Equation \ref{eqntsemp}.
+	
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
+		\caption{Stall Torque Calibration Results}
+		\label{figstalltcal}
+	\end{figure}
 	
 	\subsection*{Torque}
 	The goal of this calibration was to obtain an empirical function for the torque output from the motor. Fluids of known viscosity were put into the rheometer at different fill heights. The rheometer was then run at different strain rates holding at each for 5 seconds while rotational speed, and motor supply current data was recorded.\br
 	Table \ref{tabreffluvisc} shows the compositions and viscosities of the fluids used. The rheometer was first loaded with 1ml of the fluid and the rheometer was run. This was repeated for loadings up to 15ml, in 5ml increments. The resulting data was used to calculate the shear stress as it varies with the strain rate. From the stress, motor torque is calculated. A graph was plotted of motor torque against motor power input and a 1st order equation was fit (see Figure \ref{figmottorqcal}).
-	\begin{table}
-		\centering
-		\begin{tabular}{| c | c | c |}
-			\hline
-			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
-			\hline
-			\hline
-		\end{tabular}
-		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions}
-		\label{tabreffluvisc}
-	\end{table}
+
 
 	\begin{figure}[!htb]
 		\centering
@@ -725,7 +716,7 @@
 	\end{figure}
 	
 	\subsection*{Data Filtering}
-	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and "drawing" a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise. Figure \ref{figfiltcomp} compares the different filtering methods.
+	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and "drawing" a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise. Figure \ref{figfiltcomp} compares the different filtering methods.\\
 	
 	\begin{figure}[!htb]
 		\centering
@@ -773,33 +764,39 @@
 	\end{figure}
 \fi
 	\subsection*{Rheometry}
-	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer (Discovery Hybrid Rheometer 2).\br
+	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer (Discovery Hybrid Rheometer 2).\\
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
 	
     \noindent
-	The newtonian reference fluids will be aqueous glycerol solutions. Fluids of different compositions were used to give fluids of varying viscosity ranging from $\mu = 0.001Pa.s$ for pure water to $\mu = 1.41 Pa.s$ for pure glycerol. Table \ref{tabglyvisc} shows the different compositions of solutions used.
+	The newtonian reference fluids will be aqueous glycerol solutions. Table \ref{tabreffluvisc} shows the different compositions of solutions used. The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between 0.001$Pa.s$ ($\mu_{water}$) and 1.141$Pa.s$ ($\mu_{glycerol}$). This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The room temperature is roughly 15$^oC$, and so the viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$.\\
 	\begin{table}
 		\centering
-		\begin{tabular}{| c | c |}
+		\begin{tabular}{| c | c | c |}
 			\hline
-			 Viscosity ($Pa.s$) & Composition (wt\% glycerol)\\
-			 \hline
-			 0.001 & 17.7 \\
-			 0.121 & 95.3 \\
-			 0.241 & 97.6 \\
-			 0.361 & 98.8 \\
-			 0.481 & 99.5 \\
-			 0.601 & 100 \\
+			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
+			\hline
+			100.0\% & 2.656 & 1.328 \\
+			98.87\% & 2.120 & 1.129 \\
+			96.37\% & 1.104 & 0.9061 \\
+			93.75\% & 0.613 & 0.6102 \\
+			88.87\% & 0.358 & 0.4005 \\
 			\hline
 		\end{tabular}
-		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions}
-		\label{tabglyvisc}
+		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
+		\label{tabreffluvisc}
 	\end{table}
-	For each fluid, the method was as follows: The cell was partially filled with solution, up to 1 centimetre fill height. The rheometer was then run over a range of set strain rates (from $17 s^{-1}$ to $209 s^{-1}$). This was then repeated for progressively deeper fill heights (1cm, 2cm, 3cm, and 4cm). Rotational speed was recorded, along with the current supplied to the motor. The viscosity was then calculated and compared to the known value. \br
-	[UNFINISHED] \br
-	The non-newtonian fluid used was 'oobleck' - a water and cornflower suspension. \br
+	
+	\noindent
+	The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3Pa.s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
+	\br
+	The viscosity of the solutions was checked using a DHR-2 cone-and-plate rheometer. A 40mm parallel plate was used. The rheometer was used to sweep up strain rate from 5$s^-1$ to 250$s^-1$, roughly the same range of strain rates from the Raspberry Pi rheometer. A 400$\mu m$ gap was used. It was calculated that 502$\mu l$ of each solution would be required to fill the gap accurately. To account for any small loss of fluid to the pipette, 505$\mu l$ of each solution was pipetted (using a Starlab ErgoOne 20$\mu l$ to 200$\mu l$ single channel pipette) onto the plate. The 40mm plate head was lowered into the test position and the rheometer was run for its set sweep. This was repeated three times per solution tested.
+	\br
+	
+	
+	
+	\noindent
 	[UNFINISHED]
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
