@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6864} % last proper build on Mon 03 April 2017 at 17:31:12
+\def\thewords{7073} % last proper build on Mon 17 April 2017 at 15:50:46
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -197,15 +197,16 @@
 	% - background information + motivation
 	% - objectives
 	% - paragraph summarising remainder of report (?)
-	Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
-	This project aimed to design, build, and test a control system for a bespoke rheometer (focused on recording the time variance of rheological properties). \br
+	
+	% BACKGROUND AND MOTIVATION
+	This project aimed to design, build, and test a control system for a bespoke rheometer which will focus on recording time varying properties of colloidal suspensions in order to better understand jamming. Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
+	% OBJECTIVES
+	The rheometer \br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
-	Raspberry Pis have been welcomed by the electronic hobbyist groups and has been used in a wide variety of projects; ranging from simple robotics to home security and automation systems. The latter shows how powerful the Raspberry Pi can be, and how it can be of use in the laboratory. The Raspberry Pi is, via the GPIO ports, high modular in terms of the available hardware. Any amount of sensors can be attached allowing the Raspberry Pi to have access to any amount of information, depending on the needs of the application. \br
+	% SUMMARY OF REMAINDER (WORK DONE, RESULTS)
 	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
-	The rheometer itself is a Couette cell rotating rheomter composed of two cylinders; the outer one is hollow and contains the fluid to be tested, and a solid inner one. The inner cylinder is rotated which shears the fluid. Sensor's were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
-	%Jamming can be observed as a sudden increase in the apparent viscosity, accompanied by a decrease in rotational speed and increase in current drawn by the motor.\br
+	The rheometer itself was a Couette shear cell rheometer composed of two cylinders; the outer one hollow and contained the fluid; the inner one solid. The inner cylinder is rotated to shear the fluid. Sensors were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
 	The rheometer was evaluated according to how well it performed as compared to a standard laboratory cone-and-plate rheometer. \br
-	Work in progress. Conclusion and results to follow.
 
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -247,7 +248,7 @@
 	\noindent
 	Viscosity is measured in the lab using a rheometer. There are three general types of rheometers: capillary, cone-and-plate, and rotational. Capillary rheometers consist of a tube of known cross section, through which the test fluid is forced (by pumping, by piston). The viscosity can be found by measuring the flow rate and pressure gradient, and using the Hagen-Poiseulle equation for laminar flow through a pipe \cite{backcaprheom}. Cone-and-plate rheometers consist of a cone rotating in fluid on a stationary plate. The torque required to spin the cone at a speed is measured. The shear stress in the fluid is proportional to the torque output by the motor, and the shear rate is proportional to the rotation rate. %(Information about the CAPR: how does it work, how accurate can it be, what is it usually used for)
 	\br
-	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is the shearing fluid. In Couette flow, the strain rate calculation is simplified: strain rate is the first derivative of the velocity of the shear. In Couette flow, the velocity varies linearly with accross the gap therefore the strain rate is constant. A Couette cell is a practical approximation of the infinitely long plate shear scenario. The cell is constructed from two cylinders: the outer cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of velocity, and a constant strain rate.
+	The rotational rheometer is based upon the idea of Couette flow: two infinitely long plates (separated by a known amount) between which is fluid. As one plate moves, the fluid is sheared. In Couette flow, the strain rate calculation is simplified: strain rate is the first derivative of the velocity of the shear. In Couette flow, the velocity varies linearly with accross the gap therefore the strain rate is constant. A Couette cell is a practical approximation of the infinitely long plate shear scenario. The cell is constructed from two cylinders: the outer cylinder and the inner cylinder. The cylinders are positioned vertically close together to limit the amount of fluid shearing on the bottom of the inner cylinder. This set up mimics the couette flow idea and closely replicates the effect, resulting in linear variation of velocity, and a constant strain rate \cite{couetteshearcell}.
 	
 	\section*{Colloidal Suspensions and Jamming} % last edited 8/3/2017
 	Fluids consisting of solid particles suspended in a liquid are prone to non-Newtonian behaviour, most commonly shear thinning. Some suspensions exhibit shear thickening behaviour. The concept of hydroclustering has been used to explain this shear thickening behaviour: as the suspension undergoes shear, the particles are forced together forming larger particle groups. This increases the effective viscosity compared to low shear flow where the particles movements are not as restricted \cite{figshearthick}. The order-disorder transition  theory explains the increase in viscosity as being due to an increase in stress causing the particles to become disordered. Initially there is a drop in viscosity, due to the particles in the suspension becoming more ordered. Then, as the stress is increased past a yield stress, the viscosity begins to increase due to a disruption in the order of the particles \cite{backbrownjaegrev}. % other theories?
@@ -312,18 +313,32 @@
 
 	\section{Hardware Setup} % last edited 7/3/2017
 	The experiment is based around a Couette cell consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (model 970D161) while the outer cylinder is fixed. The motor is controlled by a Raspberry Pi, which sets the rotational speed and reads the torque load on the motor. This is used to calculate the viscosity of the fluid. Motor speed is read in using a secondary motor acting as a dynamo. The dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the \rpi.
-	%A needle attached to a piezo-electric (termed the Piezo-Electric Needle Device or PEND) is used to detect shear stress at a point within the fluid. When the fluid jams, the needle will move and generate a voltage proportional to the needle's displacement. 
-	Figure \ref{expdia} gives a diagram of the set-up.\newline
+	Figure \ref{expdia} gives a diagram of the set-up, dimensions of the couette cell are summarised in Table \ref{tabcellgeom}.\newline
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.3]{images/exp_set_up.png} % https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fexp_set_up.xml
 		\caption{Diagram of the Experimental Apparatus}
 		\label{expdia}
 	\end{figure} \newline \noindent
-	The outer cylinder is a hollow glass cylinder, closed at one end. It has an outer diameter of 44.151mm, and inner diameter of 39.111mm, a height of 39.753mm. The cylinder has been glued to a metal plate which holds it in place. \br
-	The inner cylinder is a perspex cylinder built onto the motor's shaft. The cylinder is 30.215mm in diameter and 46.795mm in height. There is a thinner section of the cylinder at the top of the main cylinder, which is used as a pulley for the belt to hold on to (see Figure \ref{expdia}). \br
-	The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand also holds the dynamo in position.\br
-	The electronic circuits were built onto breadboards. This allowed for simple and quick alterations to be made to the circuitry during development. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the Raspberry Pi to the breadboard circuitry.
+	\begin{table}
+		\centering
+		\begin{tabular}{|c|c|}
+			\hline
+			Reading 						& Value ($mm$) \\
+			\hline
+			Inner Cylinder, Diameter 		& $30.512 \pm 0.590 \%$\\
+			Inner Cyliner, Height 			& $46.795 \pm 0.577 \%$\\
+			Outer Cylinder, Inner Diameter 	& $39.111 \pm 1.23 \%$\\
+			Outer Cylinder, Outer Diameter 	& $44.151 \pm 0.476 \%$\\
+			Outer Cyliner, Height 			& $39.753 \pm 1.41 \%$\\
+			\hline
+		\end{tabular}
+		\caption{Couette Cell Geometry}
+		\label{tabcellgeom}
+	\end{table}
+	\br
+	The outer cylinder is made of glass and is attached to a metal base with epoxy so that it can be easily clamped in position. The inner cylinder is a perspex cylinder built onto the shaft of the motor. The motor, holding the inner cylinder, is held in place by a clamp stand. This clamp stand also holds the dynamo in position.\br
+	The electronic circuits were built onto a breadboard, which allowed for quick alterations to be made to the circuitry during development, with requiring soldering. Wires connect the electronics to the motor, dynamo, and the power source. A ribbon cable connects the full 40 GPIO pins from the Raspberry Pi to the breadboard circuitry.
 	
 	\section{Electronic Circuits} % last edited 21/3/2017
 	%in depth description of relevant electronic circuits
@@ -371,7 +386,7 @@
 	
 	\noindent
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path taken through the circuit, the higher the number, the higher \(R_{WB}\) will be. When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this.\br
-	A 7-bit number has a maximum value of 127 ($2^7 - 1 = 128$). Therefore the potentiometer terminal B-wiper resistance will increase by $78.7 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
+	A 7-bit number has a maximum value of 127 ($2^7 - 1 = 127$). Therefore the potentiometer terminal B-wiper resistance will increase by $78.7 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
 	
 	\begin{equation}
 	V_{wiper} = V_{AB}\times \frac{3k\Omega + \left(78.7\Omega \times pv\right)}{13k\Omega}
@@ -453,14 +468,6 @@
 		\label{eqnpitf}
 	\end{equation}
 	
-	\nomenclature{$K_C$}{Controller gain}
-	\nomenclature[g]{$e$}{Error between the set point and controller input}
-	\nomenclature[g]{$\tau_I$}{Integral time constant}
-	\nomenclature[g]{$\tau_D$}{Derivative time constant}
-	\nomenclature{$K_P$}{Proportional action gain}
-	\nomenclature{$K_I$}{Integral action gain}
-	\nomenclature{$K_D$}{Derivative action gain}
-	
 	\noindent
 	This class makes use of the \texttt{scipy.signal} package to deal with transfer functions.\br
 	The initialisation function for this class has three arguments:
@@ -472,6 +479,7 @@
 	Function "\texttt{get\_control\_action(Y)}" is used to obtain the control action in response to the input. This function takes a single argument: the process output. Then the \texttt{scipy.signal} package's transfer function class is used to obtain the result from the controller's transfer function, giving a suitable control action.
 	For the controller to be useful, it needs to be tuned. This can be done using a modelled transfer function of the process, such as a First Order Plus Dead-Time (FOPDT) model. Using a model, the controller can be simulated to view how it reacts to different tunings. The class includes a simulation function ("\texttt{do\_sim}") to allow for manual tuning. The function uses a transfer function for the process (a first order model) and simulates process output for a length of time after a step change in set point. The results give an indication of how well the controller can manage the process. \br
 	There are a number of techniques used to tune controllers.
+	\cbh
 
 	\subsection*{Noise Filter} % last edited 13/3/2017
 	The data read in by the ADC is noisy - it contains unwanted fluctuations along with the desired signal. Noise can originate from many different sources: mains power supply fluctuations, faults in the conductive materials, fluctuations in temperature and pressure, and even the random nature of electron flow (current)\cite{wileyadvsignproc}. Some noise can be easily predicted and identified (e.g. a 50Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
