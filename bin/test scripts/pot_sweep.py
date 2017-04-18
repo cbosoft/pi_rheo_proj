@@ -19,10 +19,12 @@ mot.pot.set_resistance(48)
 time.sleep(0.5)
 try:
     for i in range(0, 127):
-        print "Setting potval to " + str(i)
+        print "Setting potval to {}, {}s to go.".format(i, ((127 - i) * 5))
         mot.pot.set_resistance(i)
         time.sleep(5)
+    print "Done!"
     mot.clean_exit()
     
 except KeyboardInterrupt:
+    print "Interrupted!"
     mot.clean_exit()

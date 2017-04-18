@@ -9,7 +9,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 
-def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
+def filterff(path_file, filter_method="butter"):
     # load up some noisy data
     logf = open(path_file, "r")
     dat = logf.readlines()
@@ -35,7 +35,7 @@ def filterff(path_file, filter_method="butter", A=0.314, B=0.314):
         st.append(t[i - 1] - start)
     
     # Apply filter
-    c = filter(t, s, method=filter_method)
+    c = filter(t, s, method=filter_method, A=2, B=0.001)
     return st, s, c
 
 def get_ft(x, y, f):

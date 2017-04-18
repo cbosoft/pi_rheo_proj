@@ -10,7 +10,8 @@ import math
 
 # Read csv
 
-log = "./../../logs/long_cal_old.csv"
+#log = "./../../logs/long_cal_old.csv"
+log = "./../../logs/empty_long_sweep.csv"
 datf = open(log, "r")
 datl = datf.readlines()
 datf.close()
@@ -37,7 +38,8 @@ for i in range(1, len(datl)):
     cr.append(float(splt[2]))
     pv.append(int(splt[3]))
 
-crf = filter.filter(st, cr, method="butter", A=1, B=0.03)
+crf = filter.filter(st, cr, method="butter", A=2, B=0.001)
+crf = filter.filter(st, crf, method="gaussian", A=100, B=100)
 
 for p in pv:
     if p == 0:
@@ -107,10 +109,10 @@ f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
 
 # Plot data and trendline 1: CRF vs CU
-coeffs = np.polyfit(crf[min_l:max_l], cul[min_l:max_l], 3)
-xl = np.arange(2.24, 2.31, 0.001)
+coeffs = np.polyfit(crf[min_l:max_l], cul[min_l:max_l], 1)
+xl = np.arange(1.818, 1.83, 0.001)
 fit = 0
-fit_eqn = "$3D\ fit:\ I_{ms} ="
+fit_eqn = "$fit:\ I_{ms} ="
 cf_str = ""
 for i in range(0, len(coeffs)):
     fit += coeffs[i] * (xl ** (len(coeffs) - 1 - i))
@@ -129,9 +131,9 @@ fit_eqn += "$"
 
 ax.plot(cr[min_l:max_l], cul[min_l:max_l], '-', color=(1,0,0,0.25), label="$Unfiltered\ HES\ Reading$")
 ax.plot(crf[min_l:max_l], cul[min_l:max_l], '-', color=(0,0,1,0.75), label="$Filtered\ HES\ Reading$")
-ax.plot(xl, fit, 'g-', label=fit_eqn)
+ax.plot(xl, fit, 'g^--', label=fit_eqn)
 #ax.plot(xl, fit, 'g-', label="$I_{2} = {0:.3f}V_{3}\ {1:.3f}$".format(coeffs[0], coeffs[1], "{ms}", "{HES}"))
-ax.set_xlim([2.1, 2.45])
+ax.set_xlim([1.75, 1.9])
 ax.set_ylim([0.475, 0.82])
 ax.set_xlabel("\n $Current\ Sensor\ Reading,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Supply\ Current,\ A$\n", ha='center', va='center', fontsize=24)
