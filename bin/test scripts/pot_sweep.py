@@ -12,16 +12,18 @@ sys.path.append('./..')
 import motor
 import time
 
-mot = motor.motor(startnow=True, poll_logging=True, log_dir="./glyc_sweep_15ml", i_poll_rate=0.001)
+mot = motor.motor(startnow=True, poll_logging=False, log_dir=".", i_poll_rate=0.001)
 
 print "Starting..."
 mot.pot.set_resistance(48)
 time.sleep(0.5)
+interval = 2
+step = 1
 try:
-    for i in range(0, 127):
-        print "Setting potval to {}, {}s to go.".format(i, ((127 - i) * 5))
-        mot.pot.set_resistance(i)
-        time.sleep(5)
+    for i in range(0, 127 / step):
+        print "Setting potval to {}, {}s to go.".format((i * step), (((127 / step) - i) * interval))
+        mot.pot.set_resistance((i * step))
+        time.sleep(interval)
     print "Done!"
     mot.clean_exit()
     

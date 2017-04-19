@@ -69,7 +69,7 @@ def cal_and_comp(filename, output, viscosity, fill_volume):
 
     # Calculate the viscosity using the read data and the fit
     #T = fit_coeffs[0] * cu + fit_coeffs[1]
-    T = 0.0156 * cu + eff[-2] * vo + eff[-1] / gam_dot
+    T = 0.0156 * cu + eff[-2] * cu * gam_dot + eff[-1] * gam_dot
     tau     = T / (2 * np.pi * ri * ri * fill_height)
     mu_calc = tau / gam_dot
 
@@ -129,9 +129,9 @@ def calc(filename, output, viscosity, fill_volume, eff):
     pe      = cu * vo
     
     #T calibration
-    T       = 0.0156 * cu + eff[-2] * vo + eff[-1] / gam_dot
-    tau     = T / (2 * np.pi * ri * ri * fill_height) 
     gam_dot = (sp_rads * ri) / (ro - ri)
+    T       = 0.0156 * cu + eff[-2] * cu * gam_dot + eff[-1] * gam_dot
+    tau     = T / (2 * np.pi * ri * ri * fill_height) 
     mu_calc = tau / gam_dot
     taur     = mus * gam_dot
     Tr       = taur * (2 * np.pi * ri * ri * fill_height) 
@@ -145,7 +145,7 @@ def calc(filename, output, viscosity, fill_volume, eff):
     plt.savefig(output)
 
 def fitf(x, b, c):
-    return 0.0156 * x[0] + b * x[1] + c / x[2]
+    return 0.0156 * x[0] + b * x[0] * x[2] + c * x[2]
 
 if __name__ == "__main__":
     f = cal_and_comp("./../../logs/water_long_sweep.csv", "./cal.png", 0.001005, 15)

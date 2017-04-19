@@ -52,7 +52,7 @@ class motor(object):
     pot = dp()  # potentiometer to control voltage
     pic = pitf((0.2, 0.15))
     aconv = ac()  # adc to read current/voltage
-    adc_chan = [0, 1]  # voltage channel, current channel
+    adc_chan = [0, 1, 2, 3]  # voltage channel, current channel, current channel, current channel
 
     def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
                  poll_logging=True, log_dir="./logs",
@@ -108,7 +108,7 @@ class motor(object):
             
             self.logf = open(self.this_log_name, "w")
             
-            self.logf.write("t,dr,cr,pv,fdr,fcr\n")
+            self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr\n")
 
     def log_pause(self):
         self.log_paused = True
@@ -150,7 +150,7 @@ class motor(object):
             t = time.time()
             
             # Get speed
-            volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1])]
+            volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1]), self.aconv.read_volts(self.adc_chan[2]), self.aconv.read_volts(self.adc_chan[3])]
             self.dr = volts[0]
             fvolts = volts
 
@@ -173,10 +173,10 @@ class motor(object):
 
             if (self.poll_logging) and (not self.log_paused):
                 if self.log_add_note:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4:.3f}, {5:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, volts[2], volts[3]))
                     self.log_add_note = False
                 else:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3}, {4:.3f}, {5:.3f} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1]))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], volts[2], volts[3]))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
