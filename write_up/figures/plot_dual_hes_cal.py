@@ -16,12 +16,14 @@ st      = st - st[0]
 cr      = np.array(datf['cr'])
 cra     = np.array(datf['cr2a'])
 crb     = np.array(datf['cr2b'])
-pv      = np.array(datf['pv'])
 cr      = 0.5 * (cra + crb)
+cra = filter.filter(st, cra, method="butter", A=2, B=0.001)
+crb = filter.filter(st, crb, method="gaussian", A=100, B=100)
+pv      = np.array(datf['pv'])
+crf      = 0.5 * (cra + crb)
 
-crf = cr
-crf = filter.filter(st, cr, method="butter", A=2, B=0.001)
-crf = filter.filter(st, crf, method="gaussian", A=100, B=100)
+#crf = filter.filter(st, cr, method="butter", A=2, B=0.001)
+#crf = filter.filter(st, crf, method="gaussian", A=100, B=100)
 
 cu = [0] * 0
 pv_s = [0] * 0

@@ -15,6 +15,9 @@ from plothelp import fit_line
 def fitf(x, a, b, c, d):
     return a + b * x[0] + c * x[1] + d * x[0] * x[1]
 
+def fit2f(x, a, b, c):
+    return a * x[0] + b + c * x[1]
+
 # Import water and Glycerol data
 datw    = pd.read_csv("./../../logs/water_long_sweep.csv")
 stw     = np.array(datw['t'])
@@ -66,6 +69,7 @@ crt     = filter(stt, crt, method = "butter", A=2, B = 0.0001)
 
 # Calculate stuff
 cut     = (25.177 * crt) - 45.264
+cub     = 0.00229473 * pvt + 0.48960784
 sp_rpms_t = drt * 316.451 - 163.091
 sp_rads_t = (sp_rpms_t * 2 * np.pi) / 60
 sn_rpms_t = 5.13 * pvt + 15.275
@@ -74,12 +78,14 @@ pet     = cut * vot
 gam_dot = (sp_rads_t * ri) / (ro - ri)
 tau     = mut * gam_dot
 T       = tau * (2 * np.pi * ri * ri * fill_height) 
-eff, __ =  curve_fit(fitf, [cut, gam_dot], T, p0=[0, 0.0156, 0, 0])
-Tfit    = eff[0] + eff[1] * cut + eff[2] * gam_dot + eff[3] * cut * gam_dot
+eff, __ = curve_fit(fit2f, [(cut - cub), vot], T)
+Tfit    = eff[0] * (cut - cub) + eff[1] + eff[2] * vot
+#eff, __ =  curve_fit(fitf, [cut, gam_dot], T, p0=[0, 0.0156, 0, 0])
+#Tfit    = eff[0] + eff[1] * cut + eff[2] * gam_dot + eff[3] * cut * gam_dot
 tauf    = Tfit / (2 * np.pi * ri * ri * fill_height) 
 mufit   = tauf / gam_dot
-
-print "a = {}\nb = {}\nc = {}\nd = {}".format(eff[0], eff[1], eff[2], eff[3])
+print eff
+#print "a = {}\nb = {}\nc = {}\nd = {}".format(eff[0], eff[1], eff[2], eff[3])
 
 # Plot
 f = plt.figure()
@@ -88,5 +94,6 @@ ax = f.add_subplot(111)
 #ax.plot(stt, cut)
 ax.loglog(stt, mut, 'g-')
 ax.loglog(stt, mufit, 'r--')
+ax.twinx().loglog(stt, cut)
 plt.grid(which='both', axis='both')
 plt.savefig("./test.png")

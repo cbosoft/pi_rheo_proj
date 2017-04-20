@@ -4,42 +4,23 @@ sys.path.append("./../../bin/")
 
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from glob import glob
 import filter
 import math
 
 # Read csv
-
-#log = "./../../logs/long_cal_old.csv"
-log = "./../../logs/empty_long_sweep.csv"
-datf = open(log, "r")
-datl = datf.readlines()
-datf.close()
-
-# Create lists for sorting
-
-speed = [0] * 0
-t = [0] * 0
-st = [0] * 0
-cr = [0] * 0
-cu = [0] * 0
-pv = [0] * 0
-pv_s = [0] * 0
-mav = [0] * 0
-
-splt = datl[1].split(",", 5)
-tz = float(splt[0])
-
-for i in range(1, len(datl)):
-    splt = datl[i].split(",")
-    t.append(float(splt[0]))
-    st.append(float(splt[0]) - tz)
-
-    cr.append(float(splt[2]))
-    pv.append(int(splt[3]))
+datf = pd.read_csv("./../../logs/dual_hes_long1000.csv")
+st      = np.array(datf['t'])
+st      = st - st[0]
+cr      = np.array(datf['cr'])
+pv      = np.array(datf['pv'])
 
 crf = filter.filter(st, cr, method="butter", A=2, B=0.001)
 crf = filter.filter(st, crf, method="gaussian", A=100, B=100)
+
+cu = [0] * 0
+pv_s = [0] * 0
 
 for p in pv:
     if p == 0:
@@ -110,7 +91,7 @@ ax = f.add_subplot(111)
 
 # Plot data and trendline 1: CRF vs CU
 coeffs = np.polyfit(crf[min_l:max_l], cul[min_l:max_l], 1)
-xl = np.arange(1.818, 1.83, 0.001)
+xl = np.arange(min(crf[min_l:max_l]), max(crf[min_l:max_l]), 0.001)
 fit = 0
 fit_eqn = "$fit:\ I_{ms} ="
 cf_str = ""
