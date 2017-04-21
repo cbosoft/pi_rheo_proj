@@ -12,21 +12,19 @@ sys.path.append('./..')
 import motor
 import time
 
-mot = motor.motor(startnow=True, poll_logging=True, log_dir="./g0_vary", i_poll_rate=0.001)
+mot = motor.motor(startnow=True, poll_logging=True, log_dir="./g0_const", i_poll_rate=0.001)
 
 print "Starting..."
 mot.pot.set_resistance(48)
 time.sleep(0.5)
-interval = 16 # in s
-step = 8
+interval = 5
 try:
-    for i in range(0, (128 / step) + 1):
-        print "Setting potval to {}, {}s to go.".format((i * step), (((128 / step) - i + 1) * interval))
-        mot.pot.set_resistance((i * step))
+    for i in range(0, 120 / interval):
+        print "Time Remaining: {}".format(120 - i * interval)
         time.sleep(interval)
     print "Done!"
     mot.clean_exit()
     
 except KeyboardInterrupt:
-    print "Interrupted!"
+    print "\nInterrupted!"
     mot.clean_exit()
