@@ -48,7 +48,7 @@ for i in range(2, len(datl) - 2):
     read_speed.append(316.451 * rv - 162.091)
     read_pv.append(float(splt[3]))
 
-filtered_reading = filter(read_pv, read_speed)
+filtered_reading = filter(read_pv, read_speed, method="butter", A=2, B=0.0001)
 
 # Speed v Value
 # Set up figure
@@ -64,7 +64,8 @@ tl = np.poly1d(z)
 #plt.errorbar(pv, av_spd, yerr=av_spd_err, label="$Actual\ Motor\ Speed$", fmt='bx-', ecolor='g')
 #ax.plot(read_pv, read_speed, 'go', label='$Read\ Motor\ Speed$')
 
-ax.plot(read_pv, filtered_reading, '.', color=(1,0.5,0.5,1), label="$Filtered\ Speed\ Reading$")
+#ax.plot(read_pv, filtered_reading, '.', color=(1,0.5,0.5,1), label="$Filtered\ Speed\ Reading$")
+ax.errorbar(read_pv[::50000], filtered_reading[::50000], yerr=np.std(read_speed), marker='o', linestyle='None')
 ax.plot(pv, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
 ax.plot(pv, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
 
