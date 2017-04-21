@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6245} % last proper build on Thu 20 April 2017 at 14:37:13
+\def\thewords{6418} % last proper build on Fri 21 April 2017 at 17:53:19
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -598,7 +598,7 @@
 	The digital potentiometer was to give a supply voltages between 2.275 and 10.723, in steps of 0.528. At each supply voltage, A tachometer was used to read the speed (in m/s). The reading was taken five times per supply voltage and the dynamo voltage level was recorded at intervals of 100ms by the Raspberry Pi. 
 	
 	\begin{equation}
-		v_m = 312.806 \times {V_D} - 159.196
+		v_m = 308.768 \times {V_D} - 167.080
 		\label{eqnspdvvr}
 	\end{equation}
 	
@@ -607,7 +607,7 @@
 	
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.35]{figures/fig_speed_v_rvolt.png}
+		\includegraphics[scale=0.45]{figures/fig_speed_v_rvolt.png}
 		\caption{Dynamo Calibration Results}
 		\label{figspeedvrvolt}
 	\end{figure}
@@ -656,14 +656,52 @@
 	
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.35]{figures/fig_stall_torque_v_supply_current.png}
+		\includegraphics[scale=0.45]{figures/fig_stall_torque_v_supply_current.png}
 		\caption{Stall Torque Calibration Results}
 		\label{figstalltcal}
 	\end{figure}
 	
 	\subsection*{Torque}
-	The goal of this calibration was to obtain an empirical function for the torque output from the motor. Fluids of known viscosity were put into the rheometer at different fill heights. The rheometer was then run at different strain rates holding at each for 5 seconds while rotational speed, and motor supply current data was recorded.\br
-	Table \ref{tabreffluvisc} shows the compositions and viscosities of the fluids used. The rheometer was first loaded with 1ml of the fluid and the rheometer was run. This was repeated for loadings up to 15ml, in 5ml increments. The resulting data was used to calculate the shear stress as it varies with the strain rate. From the stress, motor torque is calculated. A graph was plotted of motor torque against motor power input and a 1st order equation was fit (see Figure \ref{figmottorqcal}).
+	A relationship between the motor's torque output and the current drawn by the motor was obtained. This was done by putting a fluid of known viscosity into the rheometer and running it at constant shear rate. With the viscosity known and the strain rate known, the shear stress can be calculated. This shear stress was compared with the current draw and a linear equation was fit. \br
+	The reference fluids used were aqueous glycerol solutions of varying viscosity. Table \ref{tabreffluvisc} shows the viscosities of the solutions used. 30ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5ml) and the required water with a micro-pipette (ErgoOne, 20$\mu l$ to 200$\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20ml to be used in the rheometer, and another filled up to 10ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). \br
+	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The resulting experimentally obtained viscosities are included on Table \ref{tabreffluvisc}.\newline
+		\begin{table}
+			\centering
+			\begin{tabular}{| c | c | c |}
+				\hline
+				Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
+				\hline
+				100.0\% & 2.656 & 1.328 \\
+				98.73\% & 2.120 & 1.129 \\
+				96.23\% & 1.104 & 0.9061 \\
+				93.75\% & 0.613 & 0.6102 \\
+				88.87\% & 0.358 & 0.4005 \\
+				\hline
+			\end{tabular}
+			\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
+			\label{tabreffluvisc}
+		\end{table}
+	\noindent
+	\newline
+	The reference fluids were then ran in the rheometer. The torque required to shear the fluid at a shear rate was compared to the increase in motor current draw ($\Delta current$). The results were plotted on Figure \ref{figtcal} and a linear equation was fit, giving an equation for motor torque output with respect to the current draw. This was used to calculate the viscosity of other reference fluids. The results were compared (see Figure \ref{figflucalres}) to gauge how well the correlation works, and whether it is valid or not.
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.45]{figures/fig_t_cal.png}
+		\caption{Torque Calibration Results}
+		\label{figtcal}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Motor torque plotted against supply current (blue lines). A first order fit equation is included (green line).
+		\end{subfigure}
+	\end{figure}
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.45]{figures/fig_t_check.png}
+		\caption{Torque Calibration Check}
+		\label{figflucalres}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Viscosity of reference fluids plotted against time. The solid lines represent the expected results for the viscosity (average of the DHR-2's results for the solution) and the symbols represent the calculated viscosities using the rheometer.
+		\end{subfigure}
+	\end{figure}
 
 
 	\begin{figure}[!htb]
@@ -781,22 +819,7 @@
 	
     \noindent
 	The newtonian reference fluids will be aqueous glycerol solutions. Table \ref{tabreffluvisc} shows the different compositions of solutions used. The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between 0.001$Pa.s$ ($\mu_{water}$) and 1.141$Pa.s$ ($\mu_{glycerol}$). This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The room temperature is roughly 15$^oC$, and so the viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$.\\
-	\begin{table}
-		\centering
-		\begin{tabular}{| c | c | c |}
-			\hline
-			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
-			\hline
-			100.0\% & 2.656 & 1.328 \\
-			98.87\% & 2.120 & 1.129 \\
-			96.37\% & 1.104 & 0.9061 \\
-			93.75\% & 0.613 & 0.6102 \\
-			88.87\% & 0.358 & 0.4005 \\
-			\hline
-		\end{tabular}
-		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
-		\label{tabreffluvisc}
-	\end{table}
+
 	
 	\noindent
 	The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3Pa.s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
