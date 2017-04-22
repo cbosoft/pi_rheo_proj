@@ -8,35 +8,18 @@ from filter import filter
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
+import pandas as pd
 
-def filterff(path_file, filter_method="butter"):
-    # load up some noisy data
-    logf = open(path_file, "r")
-    dat = logf.readlines()
-    logf.close()
+def filterff(path_file):
+    datf = pd.read_csv(path_file)
     
-    # sort the loaded data into lists
-    t = [0] * 0  # x, time
-    s = [0] * 0  # y, speed
-    start = 0.0  # start time (since epoch)
-    st = [0] * 0 # specific time (time since run begun, seconds)
+    st = np.array(datf['t'])
+    st = st - st[0]
     
-
-    splt = dat[1].split(",", 5)
-    t.append(float(splt[0]))
-    s.append(float(splt[2]))
-    start = t[0]
-    st.append(0.0)
-
-    for i in range(2, len(dat)):
-        splt = dat[i].split(",", 5)
-        t.append(float(splt[0]))
-        s.append(float(splt[2]))
-        st.append(t[i - 1] - start)
+    dr = np.array(datf['dr'])
     
-    # Apply filter
-    c = filter(t, s, method=filter_method, A=2, B=0.001)
-    return st, s, c
+    drf = filter(st, dr, method="butter", A=2, B=0.001)
+    return st, dr, drf
 
 def get_ft(x, y, f):
     # get spectra
@@ -58,13 +41,11 @@ if __name__ == "__main__":
     # don't use spline - graphical method has little correlation to actual data
     # (tuned) butterworth seems to work well (A=2, nyf=0.05  
 
-    method = "butter"
-
     # load up some noisy data
     # normal run (1)
-    x1, y1, f1 = filterff("./../../logs/std_sweep.csv", filter_method=method)
+    x1, y1, f1 = filterff("./../../logs/dual_hes_long100.csv")
     # intermittent load
-    x2, y2, f2 = filterff("./../../logs/intermittent_load_short.csv", filter_method=method)
+    x2, y2, f2 = filterff("./../../logs/intermittent_load_short.csv")
     
     # Set up figure
     f = plt.figure(figsize=(16, 16))

@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{6418} % last proper build on Fri 21 April 2017 at 17:53:19
+\def\thewords{7362} % last proper build on Sat 22 April 2017 at 00:45:55
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -201,6 +201,7 @@
 	% BACKGROUND AND MOTIVATION
 	This project aimed to design, build, and test a control system for a bespoke rheometer which will focus on recording time varying properties of colloidal suspensions in order to better understand jamming. Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, better and more efficient techniques can be developed.\br
 	% OBJECTIVES
+	% DESIGN CRITERIA
 	The rheometer \br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
 	% SUMMARY OF REMAINDER (WORK DONE, RESULTS)
@@ -307,8 +308,6 @@
 	
 	% TODO :: 
 	% UNCERTAINTIES IN MEASUREMENTS
-	% UNITS IN EMPIRICAL EQUATIONS (DONE)
-	% DIMENSIONS SHOWN ON CELL DIAGRAM (IN PROGRESS)
 	% PHOTOGRAPH OF SET UP (IN PROGRESS)
 
 
@@ -659,12 +658,15 @@
 		\includegraphics[scale=0.45]{figures/fig_stall_torque_v_supply_current.png}
 		\caption{Stall Torque Calibration Results}
 		\label{figstalltcal}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Measured stall torque plotted against supply current (blue circles). 1$^{st}$ order fit equation (red dashed line). Error bars represent 1 standard deviation of the logged data.
+		\end{subfigure}
 	\end{figure}
 	
 	\subsection*{Torque}
 	A relationship between the motor's torque output and the current drawn by the motor was obtained. This was done by putting a fluid of known viscosity into the rheometer and running it at constant shear rate. With the viscosity known and the strain rate known, the shear stress can be calculated. This shear stress was compared with the current draw and a linear equation was fit. \br
-	The reference fluids used were aqueous glycerol solutions of varying viscosity. Table \ref{tabreffluvisc} shows the viscosities of the solutions used. 30ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5ml) and the required water with a micro-pipette (ErgoOne, 20$\mu l$ to 200$\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20ml to be used in the rheometer, and another filled up to 10ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). \br
-	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The resulting experimentally obtained viscosities are included on Table \ref{tabreffluvisc}.\newline
+	The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between 0.001$Pa.s$ ($\mu_{water}$) and 1.141$Pa.s$ ($\mu_{glycerol}$). This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The temperature in the laboratory is roughly 15$^oC$, and so the solutions' viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$. Table \ref{tabreffluvisc} shows both the theoretical and actual viscosities of the solutions used. 30ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5ml) and the required water with a micro-pipette (ErgoOne, 20$\mu l$ to 200$\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20ml to be used in the rheometer, and another filled up to 10ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). \br
+	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3Pa.s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. \newline
 		\begin{table}
 			\centering
 			\begin{tabular}{| c | c | c |}
@@ -683,46 +685,23 @@
 		\end{table}
 	\noindent
 	\newline
-	The reference fluids were then ran in the rheometer. The torque required to shear the fluid at a shear rate was compared to the increase in motor current draw ($\Delta current$). The results were plotted on Figure \ref{figtcal} and a linear equation was fit, giving an equation for motor torque output with respect to the current draw. This was used to calculate the viscosity of other reference fluids. The results were compared (see Figure \ref{figflucalres}) to gauge how well the correlation works, and whether it is valid or not.
+	The reference fluids were then ran in the rheometer. Each sample was ran twice: once at a constant shear rate (96.9$s^{-1}$) and again with a variable shear rate: from 5$s^{-1}$ to 250$s^{-1}$ in steps of around 14$s^{-1}$. The Raspberry Pi was used to control the settings for each run; the run length and the strain rate were set in a python script. During the run, the supply current and speed of the motor were automatically logged at 1ms intervals, along with the current time and the signal sent to the potentiometer (indicative of the supply voltage to the motor). The torque required to shear the fluid at a shear rate was compared to the increase in motor current draw ($\Delta current$). The results were plotted on Figure \ref{figtcal} and a linear equation was fit, giving an equation for motor torque output with respect to the current draw. This was used to calculate the viscosity of other reference fluids. The results were compared (see Figure \ref{figrheotestres}) to gauge how well the correlation works, and whether it is valid or not (discussed in Evaluation, see later on).
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.45]{figures/fig_t_cal.png}
 		\caption{Torque Calibration Results}
 		\label{figtcal}
 		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Motor torque plotted against supply current (blue lines). A first order fit equation is included (green line).
+			\footnotesize Motor torque plotted against supply current (blue lines). A first order fit equation is included (green line). Error bars represent 1 standard deviation of the logged data.
 		\end{subfigure}
 	\end{figure}
-	\begin{figure}[!htb]
-		\centering
-		\includegraphics[scale=0.45]{figures/fig_t_check.png}
-		\caption{Torque Calibration Check}
-		\label{figflucalres}
-		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Viscosity of reference fluids plotted against time. The solid lines represent the expected results for the viscosity (average of the DHR-2's results for the solution) and the symbols represent the calculated viscosities using the rheometer.
-		\end{subfigure}
-	\end{figure}
-
-
-	\begin{figure}[!htb]
-		\centering
-		\includegraphics[scale=0.45]{figures/fig_torque_cal.png}
-		\caption{Torque Calibration Results}
-		\label{figmottorqcal}
-		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Motor torque plotted against supply power (red dots). A first order fit equation is included (green dashed line).
-		\end{subfigure}
-	\end{figure}
-	
-	\noindent
-	To confirm the 
 
 	\section{Evaluation}
 	%The project can be split into different sections; design, development, and **evaluation**. In the design phase the overarching goal of the system was decided, including the scope and acceptable limitations. During the development phase prototypes of the system were created and tested against the design specification, altering and improving as necessary. Finally, the evaluation phase saw the use of a completed version of the control system in a rheology experiment, benchmarked against the results of standard lab equipment to gauge the utility of the bespoke apparatus.
 	% The varies aspects of the design were tested to evaluate whether they met the design specifications for speed, and accuracy.
 	
 	\subsection*{Voltage Control}
-	To test the efficacy of the voltage control circuit, the voltage was varied using the digital potentiometer and compared with the theoretical result from Equation \ref{eqnmotsupvol}. The resulting data (plotted in Figure \ref{figvoltvval}) shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
+	To test the efficacy of the voltage control circuit, the voltage was varied (from 2.278V to 10.726V) using the digital potentiometer and measured using a voltmeter. This data was compared with the theoretical result from Equation \ref{eqnmotsupvol} and plotted in Figure \ref{figvoltvval}. This shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
 		\centering
 		\begin{subfigure}[t]{0.45\textwidth}
@@ -746,8 +725,21 @@
 	\end{figure}
 
 	\subsection*{Speed Measurement} % last edited 14/3/2017
-	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using both a slow-motion camera to film the rotation and gauge the actual rotational speed, and a tachometer reading the speed, compared with the value obtained using the dynamo (see Figure \ref{figdynocheck} for results). \br
-	Figure \ref{figdynocheck} shows how the actual speed of the motor and the read value compare. It can be seen that the two values correspond well showing that the speed measurement sensor works as intended. There was noise in the readings but with filtering, the signal is relatively accurate.
+	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using a tachometer. The recorded speeds (the tachometer results and the calibrated dynamo results) were plotted on Figure \ref{figdynocheck}. The two signals correspond fairly well, indicating that the speed measurement system works well. However, there was a fairly large amount of noise in the speed measurement signal from the dynamo. This can be seen on Figure \ref{figdynocheck} in the large error bars. The filtering algorithm works well to remove the noise to obtain a useful signal. On Figures \ref{fignoisehistolow} \& \ref{fignoisehistolow}, histograms of the noise at low supply voltage and high supply voltage were plotted respectively. The noise [talk about the shape of the noise (is the histo flat, is it a normal distribution etc etc)]\br
+	\begin{figure}[!htb]
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.45]{figures/fig_hes_cal.png}
+			\caption{Histogram of Dynamo Raw Data, Low Speed}
+			\label{fignoisehistolow}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.45]{figures/placeholderfig.png}
+			\caption{Histogram of Dynamo Raw Data, High Speed}
+			\label{fignoisehistohigh}
+		\end{subfigure}
+	\end{figure}
 	
 	\subsection*{Current Sensor} %REDO
 	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$^{rd}$ order equation was found to best fit the experimental results.\br
@@ -801,7 +793,7 @@
 	
     \noindent
 	Due to the Butterworth's nature as a frequency filter, it could cause issue with reading the intermittent jumps up in viscosity due to jamming. This could be circumvented by developing a filter which recognises the different magnitude of jamming to the noise signal. Or the noise could be analysed for constituent signals: the noise could be originating from the 50Hz power supply, or another regular source. Repeated application of different band-stop filters would eliminate the known sources of noise, therefore any remaining disruption in the signal is useful data.
-\iffalse
+
 	\begin{figure}[!htb]
 		{\centering
 			\includegraphics[scale=0.3]{figures/fig_filt_demonstra.png}
@@ -810,25 +802,25 @@
 		%optional:
 		{\footnotesize Actual data readings (faint blue) were passed through a Butterworth filter to obtain a noise-reduced signal (bright blue).\newline {\bfseries a)} Graph of a steady increase in motor supply voltage, excpeted result is a series of 11 steps.\newline {\bfseries b)} Graph showing speed variance with a random intermittent load applied to the motor (an approximation of a shear thickening fluid)\newline {\bfseries c)} Fourier Transform of the response in b); faint blue line shows the fourier transform of the raw (noisy) data, bright blue shows the filtered response, clearly showing the effect of the filter on the resulting data.}
 	\end{figure}
-\fi
+
 	\subsection*{Rheometry}
-	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer (Discovery Hybrid Rheometer 2).\\
+	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids. The rheometer was calibrated with 98.73vol\% aqueous glycerol solution, before being used to measure the viscosities of 96.23vol\%, 93.75vol\%, and 88.87vol\% glycerol solutions. \br
+	The scissor lift was lowered, allowing the rheometer to easily be loaded. The outer cylinder of the rheometer was loaded with 15ml of the the first fluid using a 5ml syringe (taking care to avoid bubbles). The scissor lift was then raised into the working position, the two cylinders as close together as possible without them touching. The cylinders were then aligned by turning on the motor and observing the flow of the fluid. The fluid would climb up the side of the cylinder if the inner cylinder was too close. This method of aligning the cylinders was found to be the most accurate and efficient way. On the Raspberry Pi a script was written which will load the motor class, with the appropriate settings, and log data sufficient to calculate the viscosity of the fluid in the rheometer. The script also dictates how the speed of the motor should vary, if at all. On one pass the motor's speed (and therefore the rate of strain experienced by the fluid) was increased in steps of around 40RPM over the course of 6 minutes, and on the second pass, the speed was kept constant for several minutes. This process was repeated for each of the four reference solutions, and both pure glycerol and water. The rheometer was calibrated with the 98.73vol\% solution, and used to calculate the viscosities of the 96.23vol\% solution, and the 93.75vol\% solution. The results were plotted on Figure \ref{figrheotestres}.
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $Pa.s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $Pa.s$}
-	
-    \noindent
-	The newtonian reference fluids will be aqueous glycerol solutions. Table \ref{tabreffluvisc} shows the different compositions of solutions used. The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between 0.001$Pa.s$ ($\mu_{water}$) and 1.141$Pa.s$ ($\mu_{glycerol}$). This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The room temperature is roughly 15$^oC$, and so the viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$.\\
 
-	
 	\noindent
-	The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3Pa.s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
-	\br
-	The viscosity of the solutions was checked using a DHR-2 cone-and-plate rheometer. A 40mm parallel plate was used. The rheometer was used to sweep up strain rate from 5$s^-1$ to 250$s^-1$, roughly the same range of strain rates from the Raspberry Pi rheometer. A 400$\mu m$ gap was used. It was calculated that 502$\mu l$ of each solution would be required to fill the gap accurately. To account for any small loss of fluid to the pipette, 505$\mu l$ of each solution was pipetted (using a Starlab ErgoOne 20$\mu l$ to 200$\mu l$ single channel pipette) onto the plate. The 40mm plate head was lowered into the test position and the rheometer was run for its set sweep. This was repeated three times per solution tested.
-	\br
-	
-	
-	
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.45]{figures/fig_t_check.png}
+		\caption{Torque Calibration Check}
+		\label{figrheotestres}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Viscosity of reference fluids plotted against time. The solid lines represent the expected results for the viscosity (average of the DHR-2's results for the solution) and the symbols represent the calculated viscosities using the calibrated rheometer.
+		\end{subfigure}
+	\end{figure}
+
 	\noindent
 	[UNFINISHED]
 	
@@ -836,7 +828,20 @@
 
 	\nc{Conclusions}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
-	[Blank section]
+	The rheometer does not meet its design criteria. The electronics worked well - the motor supply voltage check proved the circuit delivered the expected voltages, the dynamo and Hall effect sensors read the speed and current adequately too. The system's failing lie in the calibrations and calculation assumptions. When calibrating the torque as a function of motor supply current, the resulting linear fit equation is not sufficient to give the torque under different fluid loadings (different viscosities). The small jump in the current 
+	\br \cbh \cbh 
+	\br
+	The motor was not sensitive at all to changes in torque. A large (several orders of magnitude) change in torque represented a tiny change in the current. The motor was a relatively high power model (up to 15v, 20,000RPM) which was geared to reduce speed. The ratio was 16:1, meaning speed was reduced by a factor of 16, but torque output was increased by a factor of 16. Going backwards, this means that a torque requirement increase at the shaft is reduced 16 times at the motor outlet further decreasing its sensitivity to torque. Given that this was an integral part of the design a new (more sensitive) motor should be sought, or a different method of measuring the shear stress experienced by the fluid should be found. 
+	\br
+	There was a huge amount of noise in the readings which had to be filtered out. The filter used was a low-pass frequency filter. Any high frequency noise was removed. If a jamming event is high frequency, then this filter will remove it along with the noise resulting in a loss of useful data. Alternative filters are available - Gaussian weighted average, spline smoothing, or Wiener probabilistic filter - however these were discounted for reasons stated earlier. A solution would be to identify the sources of noise in the signal, and specifically remove the noise with a band-stop frequency filter while hopefully leaving the important information in the signal. 
+	\br
+	One possible source of the noise is variance in the mains power supply. Mains electricity is single phase 50Hz AC - it is a single sinusoidal wave varying from +230V to -230V. When this is converted to DC, the signal is first converted to its absolute value, and is then smoothed out. This may not be done perfectly, resulting in a trace of the original sinusoid in the DC signal. This noise will have a frequency of 50Hz. 
+	\br
+	The voltage reference used by the ADC to convert real world signals into digital signals could vary if not properly regulated. The 3.3V reference used by the ADC comes from the Raspberry Pi's GPIO header and is regulated by the Raspberry Pi and should not, and does not, vary. A voltmeter was attached and the signal was found to stay constant at 3.3V for the duration and is therefore unlikely as a source of noise. 
+	\br
+	The sensors themselves are potential sources for noise. The dynamo gave off very noisy data. This noise could arise from the way the dynamo is constructed: a series of coils which, when rotated in a magnetic field, produce a voltage. Since the magnetic field produced by the permanent magnets in the motor is not continuous and homogeneous, the output is going to vary as the motor rotates. Therefore the signal will dip and rise at a frequency of some multiple of the rotation rate. This noise can be reduced by calculating exactly what multiple of the rotation rate (the number of coils in the armature) and also knowing the shape of the noise waveform. Alternatively, other speed measurement methods could be sought. 
+	\br
+	There is a lot of work that could be done to this system. Future work includes changing out the motor for a motor torque-sensitive model, introducing a piezo-electric stress sensor, and adding a camera for detecting optical evidence of jamming. Piezo electrics are often used as strain sensors in bridges and other systems. Previous work has used the strain sensor as a purely qualitative way of examining jamming (\cite{thescforsyth}). By relating the force observed on the piezo sensor to the drag coefficient of the sensor in the flowing fluid, and therefore the fluid's Reynold's number, the viscosity can be related to the voltage output of the piezo electric device. 
 	
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
@@ -849,7 +854,6 @@
 	Over the course of the project I have learned a lot. Working with the Raspberry Pi has taught me a lot about how computers work, how they communicate, and how they may be used in industrial processes. Data processing and storage has been an important concern; with the Raspberry Pi taking thousands of measurements every second. The Pi only has limited memory available, which can fill up quickly. This was circumvented by saving the data to file, rather than keeping it in memory. \br
 	Another thing I gained a lot of experience with was data processing. Data recorded from sensors was noisy - due to random fluctuations in temperature, air pressure, vibrations, power supply. The noise was reduced using a filtering algorithm. As I was researching noise filtering I learned about the types of filters and how they work, I learned about how different signal domains (like the frequency domain) can be used to remove unwanted parts of the signal.\br
 	[Unfinished section]
-	% TALK ABOUT UNRELIABLE SENSOR - SOMETIMES HES DROPPED OUT AND REPORTED NEGATIVE CURRENT
 	
 	
 

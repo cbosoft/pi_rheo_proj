@@ -50,7 +50,6 @@ for i in range(2, len(datl) - 2):
 
 filtered_reading = filter(read_pv, read_speed, method="butter", A=2, B=0.0001)
 
-# Speed v Value
 # Set up figure
 f = plt.figure(figsize=(8, 8))
 ax = f.add_subplot(111)
@@ -59,17 +58,23 @@ ax = f.add_subplot(111)
 z = np.polyfit(pv, av_spd, 1)
 tl = np.poly1d(z)
 
+pv = np.array(pv)
+read_pv = np.array(read_pv)
+
+stdfv = [0]*0
+avfv = [0]*0
+for i in range(1, len(filtered_reading[::50000]) - 1):
+    stdfv.append(np.std(read_speed[(i * 50000) - 24999:(i * 50000) + 25000]))
+    avfv.append(np.average(filtered_reading[(i * 50000) - 24999:(i * 50000) + 25000]))
+#filtered_reading[::50000]
 # Plot data and trendline
+print len(((read_pv[::50000] * 0.066) + 2.278)[1:-1]), len(stdfv), len(avfv)
+ax.errorbar(((read_pv[::50000] * 0.066) + 2.278)[1:-1], avfv, yerr=stdfv, marker='o', linestyle='None', label="$Read Motor Speed$")
+#ax.plot((read_pv * 0.066) + 2.278, read_speed, color=(1,0,0,0.1))
+ax.plot((pv * 0.066) + 2.278, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
+ax.plot((pv * 0.066) + 2.278, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
 
-#plt.errorbar(pv, av_spd, yerr=av_spd_err, label="$Actual\ Motor\ Speed$", fmt='bx-', ecolor='g')
-#ax.plot(read_pv, read_speed, 'go', label='$Read\ Motor\ Speed$')
-
-#ax.plot(read_pv, filtered_reading, '.', color=(1,0.5,0.5,1), label="$Filtered\ Speed\ Reading$")
-ax.errorbar(read_pv[::50000], filtered_reading[::50000], yerr=np.std(read_speed), marker='o', linestyle='None')
-ax.plot(pv, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
-ax.plot(pv, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
-
-ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
 plt.legend(loc=2)
@@ -92,10 +97,10 @@ z = np.polyfit(pv[2:-2], av_volt[2:-2], 1)
 tl = np.poly1d(z)
 
 # Plot data
+stdv = np.std(av_volt)
 theo_volt = np.multiply(pv, 0.0636) + 2.423
 ax.plot(pv, theo_volt, "x", label="$Theoretical\ Voltage$")
-#ax.plot(pv, av_volt, "o")
-plt.errorbar(pv, av_volt, yerr=av_volt_err, label="$Motor\ Voltage$", fmt='o', ecolor='g', color='g')
+plt.errorbar(pv, av_volt, yerr=stdv, label="$Motor\ Voltage$", fmt='o', ecolor='g', color='g')
 ax.plot(pv, tl(pv), 'r--', label="$V_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{ms}"))
 
 ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)

@@ -1,3 +1,4 @@
+python updatewordcount.py
 echo "(1/5) Initial report build"
 pdflatex ./pi_report.tex > /dev/null
 echo "(2/5) Building bibliography"
