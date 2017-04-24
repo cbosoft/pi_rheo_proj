@@ -77,7 +77,7 @@ if __name__ == "__main__":
     f_butter = filter(x, y, method="butter")
 
     # Set up figure
-    f = plt.figure(figsize=(8, 8))
+    f = plt.figure(figsize=(4, 8))
     ax = f.add_subplot(111)
 
     # Shorten the data
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     # Filtered data
     ax.plot(x, f_spline[10000:20000], 'b')
 
-    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+    #ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+    #ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
     # Save plot
     plt.grid(which='both', axis='both')
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     ##################################
     # Set up figure
-    f = plt.figure(figsize=(8, 8))
+    f = plt.figure(figsize=(4, 8))
     ax = f.add_subplot(111)
 
     # Plot data and trendline
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     # Filtered data
     ax.plot(x, f_wiener[10000:20000], 'b')
 
-    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+    #ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+    #ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
     # Save plot
     plt.grid(which='both', axis='both')
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 
     ##################################
     # Set up figure
-    f = plt.figure(figsize=(8, 8))
+    f = plt.figure(figsize=(4, 8))
     ax = f.add_subplot(111)
 
     # Plot data and trendline
@@ -134,8 +134,8 @@ if __name__ == "__main__":
     # Filtered data
     ax.plot(x, f_gaussian[10000:20000], 'b')
 
-    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+    #ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+    #ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
     # Save plot
     plt.grid(which='both', axis='both')
@@ -144,7 +144,7 @@ if __name__ == "__main__":
 
     ##################################
     # Set up figure
-    f = plt.figure(figsize=(8, 8))
+    f = plt.figure(figsize=(4, 8))
     ax = f.add_subplot(111)
 
     # Plot data and trendline
@@ -155,8 +155,8 @@ if __name__ == "__main__":
     # Filtered data
     ax.plot(x, f_butter[10000:20000], 'b')
 
-    ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+    #ax.set_xlabel("\n $Time,\ s$", ha='center', va='center', fontsize=24)
+    #ax.set_ylabel("$Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
     # Save plot
     plt.grid(which='both', axis='both')

@@ -93,7 +93,7 @@ ax.plot((cu-cub), ((cu - cub) * eff[0] + eff[1]), label="$T\ =\ {:.3E} * \Delta 
 
 ax.set_xlabel("\n $\Delta Current,\ A$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Torque,\ Nm$\n", ha='center', va='center', fontsize=24)
-#plt.legend(loc=4)
+plt.legend(loc=4)
 plt.grid(which='both', axis='both')
 plt.savefig("./fig_t_cal.png")
 

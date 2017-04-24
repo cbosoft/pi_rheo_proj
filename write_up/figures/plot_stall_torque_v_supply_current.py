@@ -60,7 +60,7 @@ fit, fit_eqn, __ = fit_line(cu, st, 1, "I_{ms}", "Ts")
 # Plot data and trendline
 ststd = np.std(st)
 ax.errorbar(cu, st, yerr=ststd, marker='o', linestyle='None', label="$Read\ Data$")
-ax.plot(cu, fit, 'r--', label=fit_eqn)
+ax.plot(cu, fit, 'g-', label=fit_eqn)
 
 ax.set_xlabel("\n $Current\ Supply,\ A$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$Stall\ Torque,\ Nm$\n", ha='center', va='center', fontsize=24)

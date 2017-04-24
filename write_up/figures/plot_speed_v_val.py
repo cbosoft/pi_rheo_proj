@@ -48,7 +48,7 @@ for i in range(2, len(datl) - 2):
     read_speed.append(316.451 * rv - 162.091)
     read_pv.append(float(splt[3]))
 
-filtered_reading = filter(read_pv, read_speed, method="butter", A=2, B=0.0001)
+filtered_reading = filter(read_pv, read_speed, method="butter", A=2, B=0.001)
 
 # Set up figure
 f = plt.figure(figsize=(8, 8))
