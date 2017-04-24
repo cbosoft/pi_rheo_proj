@@ -18,6 +18,10 @@ def fitf(x, a, b):
 def fit2f(x, a, b):
     return a * (x[0]) + b
 
+# DISABLE THIOS SCRIPT!!!!!
+sys.quit()
+
+    
 # Geometry of the couette cell
 
 roo = 0.044151 / 2.0  # outer cell outer radius in m

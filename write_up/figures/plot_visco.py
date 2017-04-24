@@ -139,6 +139,8 @@ def cal_T(fille, visco, fillvol, l, h):
     return x, y, f, feqn, sp_rpms[l:h], sn_rpms[l:h], pv[l:h], cu[l:h], T[l:h], st[l:h]
 
 if __name__=="__main__":
+    # DISABLE THIOS SCRIPT!!!!!
+    sys.quit()
     l = 100000
     h = -1
     xg, yg, fg, feqng, sp_rpmsg, sn_rpmsg, pvg, cug, Tg, stg = cal_T("./../../logs/glycerol_long_sweep.csv", 1.141, 15, l, h)
