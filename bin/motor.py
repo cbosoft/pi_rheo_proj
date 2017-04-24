@@ -123,6 +123,7 @@ class motor(object):
     
     def start_control(self):
         if self.control_stopped:
+            self.control_stopped = False
             td.start_new_thread(self.control, tuple())
             
     def update_setpoint(self, value):
@@ -167,7 +168,7 @@ class motor(object):
             
             #print fvolts
             self.fdr = fvolts[0]
-            
+            self.speed = self.fdr * self.svf[0] + self.svf[1]
             if self.log_paused:
                 self.log_add_note = True
 
@@ -193,7 +194,7 @@ class motor(object):
         self.tims.append(tim)
 
     def set_pot(self, value):
-        self.pot.set_resistance(value)
+        self.pot.set_resistance(int(value))
                    
     def clean_exit(self):
         self.poll_running = False

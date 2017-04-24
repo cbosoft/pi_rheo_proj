@@ -19,7 +19,7 @@ def fit2f(x, a, b):
     return a * (x[0]) + b
 
 # DISABLE THIOS SCRIPT!!!!!
-sys.quit()
+sys.exit()
 
     
 # Geometry of the couette cell

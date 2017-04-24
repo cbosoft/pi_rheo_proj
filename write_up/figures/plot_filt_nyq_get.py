@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import pandas as pd
 import scipy.fftpack
-    
+
 def fftnoise(f):
     f = np.array(f, dtype='complex')
     Np = (len(f) - 1) // 2
@@ -56,6 +56,7 @@ def get_ft(x, y, f):
     return w, ps_n, ps_f
 
 if __name__ == "__main__":
+    sys.exit()
     # load up some noisy data
     datf = pd.read_csv("./../../logs/long_cal.csv")
     

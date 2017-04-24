@@ -17,6 +17,7 @@ def fitf(x, a, b):
 
 def fit2f(x, a, b, c):
     return a * np.log(x[0]) + c
+
 if False:
     # Geometry of the couette cell
 
@@ -294,7 +295,7 @@ else:
     ax.plot(cuf, outp)
     ax.set_xlabel("\n $Current,\ A$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Torque,\ N.m$\n", ha='center', va='center', fontsize=24)
-    plt.savefig("./fig_T_ref_cal.png")
+    plt.savefig("./fig_t_ref_cal.png")
     plt.close(f)
     
     sp_rpms_sp = 5.13 * pv9873[0] + 15.275
@@ -333,4 +334,4 @@ else:
     #ax.set_yscale('log')
     ax.set_xlabel("\n $Strain\ Rate,\ s^{-1}$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
-    plt.savefig("./fig_T_ref_check.png")
+    plt.savefig("./fig_t_ref_check.png")

@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{8485} % last proper build on Sun 23 April 2017 at 21:43:31
+\def\thewords{9093} % last proper build on Mon 24 April 2017 at 11:08:54
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -206,7 +206,8 @@
 	% - paragraph summarising remainder of report (?)
 	
 	% BACKGROUND AND MOTIVATION
-	This project aimed to design, build, and test a control system for a bespoke rheometer which will focus on recording time varying properties of colloidal suspensions in order to better understand jamming. Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, more efficient and more effective techniques can be developed to clear a jammed system - or to avoid a jam entirely.\br
+	This project aimed to design, build, and test a control system for a bespoke rheometer which will focus on recording time varying properties of colloidal suspensions in order to better understand jamming. Jamming is a form of discontinuous shear thickening where a fluid experiencing shear appears to become solid. This causes problems in pharmaceuticals, food processing; industries where powders and suspensions are common. Jamming mainly causes transportation and mixing problems - situations where the fluid is sheared. With better understanding of how jamming comes about, a better understanding of the rules governing it, more efficient and more effective techniques can be developed to better manage a jammed system (reduce the likelihood of jams, improve efficiency of jam disruption methods).
+	\br
 	% OBJECTIVES & DESIGN CRITERIA
 	The rheometer will be used to examine jamming events in colloidal suspensions in order to obtain more information - focussing in on time varying aspects of the jam - how often does the suspension jam? How is this jamming frequency related to the shear stress or strain rate experienced by the fluid? The rheometer mainly consists of a Couette shear cell - two concentric cylinders between which is the fluid to be tested. The final design should:
 	\begin{itemize}
@@ -214,13 +215,16 @@
 		\item be operationally modular (easy to alter the exact parameters with which it runs).
 		\item be low-cost (under \pounds 100).
 	\end{itemize}
+	Being able to measure the viscosity of a fluid with respect to time is an important consideration. This is the main criteria for the project. The modularity of the script would make the device useful beyond just a jamming rheometer (a rheometer able to automatically reset and perform another experiment under different conditions, for example). Finally, the cost constraint makes the rheometer attractive as an alternative to other (pre-existing) devices that could be used in the same situation: "from about \$40,000 for an 'entry-level' rheometer to “upwards of \$200,000” for a full-featured and fully configurable research-level system" \cite{refrheomprice}.
+	\br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
 	% SUMMARY OF REMAINDER (WORK DONE, RESULTS)
 	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
 	The rheometer itself was a Couette shear cell rheometer composed of two cylinders; the outer one hollow and contained the fluid; the inner one solid. The inner cylinder is rotated to shear the fluid. Sensors were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
 	The rheometer's ability to measure viscosity by using it to test the viscosity of several newtonian fluids of known viscosity (as tested in a laboratory rheometer). \cbh
-	%\br
-	%This report summarises the final design at the end of the 12 weeks. Chapter 2 gives background information on the concepts involved (the Raspberry Pi, non-Newtonian fluids and jamming). Chapter 3 is a detailed description of what the project involved; how the hardware was put together, what software was written, and how the calibrations and evaluations were undertaken. Chapter 4 consists of concluding remarks about the procedure; an summary of the results that were found, an evaluation of the final device, and a summary of future work. Chapter 5 gives my personal reflection on the project, how I have learned from the process, and what I felt could have been done better.
+	\br
+	This report summarises the final design at the end of the 12 week long project. Chapter 2 gives background information on the concepts involved (the Raspberry Pi, non-Newtonian fluids and jamming). % Chapter 3 gives a background on the University of Strathclyde and the Chemical and Process Engineering Department. 
+	Chapter 3 is a detailed description of what the project involved; how the hardware was put together, what software was written, and how the calibrations and evaluations were undertaken. Chapter 4 consists of concluding remarks about the procedure; an summary of the results that were found, an evaluation of the final device, and a summary of future work. Chapter 5 gives my personal reflection on the project, how I have learned from the process, and what I felt could have been done better.
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
@@ -268,18 +272,17 @@
 	\br
 	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST). In CST the viscosity increases proportionally to shear after a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also supports the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite{backbrownjaegrev}. 
 	\br
-	DST is linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}. \br 
-	%Volume fraction of the suspension mixture is an important property when looking at jamming. A suspension's volume fraction (\( \Phi \)) is the ratio of the volume of suspended particles to the volume of fluid in the suspension. For spherical particles, there is a maximum fraction. The closest packing that can occur (face-centred cubic) results in a particle volume fraction of \( \Phi = 0.74 \). However, at this packing the suspension is no longer a suspension and the particles are all in constant contact. The highest volume fraction of a suspension that still allows fluid to pass between the particles (particles are lubricated) is \( \Phi = 0.64 \) \cite{backguypoonjam}. As volume fraction increases, the likelihood of a suspension to undergo jamming increases. 
-	%\br
-	%The equivalence of particles to hard spheres is an approximation of the physical properties of the particles in a suspension. A "hard sphere" particle is a particle which is roughly spherical and with a fixed (non-intersectable) volume. \cbh 
-	%\br
+	DST is linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}.
+	\br 
 	An interesting phenomenon that occurs in jamming suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
+	
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.4]{images/cfors_cracks.png}
 		\caption{Suspension Surface Cracks (taken from \cite{thescforsyth})}
 		\label{cforscracks}
 	\end{figure}
+	
 	\section*{Raspberry Pi}
 	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
 	\begin{figure}[!htb]
@@ -287,7 +290,9 @@
 		\includegraphics[scale=0.3]{images/annotpidia.png} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
 		\caption{Raspberry Pi 3 Model B (adapted from  \cite{pi3info})}
 		\label{pidia}
-	\end{figure} \newline% \noindent
+	\end{figure} 
+	\newline
+	\noindent
 	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. 
 	\br
 	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. As a research tool, the Raspberry Pi has been used as a miniature server for researching the traffic patterns in data centres (the Pis were emulating the behaviours of full scale servers) \cite{piglasgowdc}.
@@ -306,14 +311,22 @@
 	\noindent
 	In addition to simple GPIO functionality, some of the Raspberry Pi's GPIO pins have special functionality, like the ability to use serial communication making inter-device communication much easier. To send the number 1750 to an integrated circuit, the Raspberry Pi would need at least 11 free GPIO pins. While this is not impossible, the number of GPIO pins used for this single action is inconvenient. This can easily be sent via serial connection with just two wires. There are several serial communication options built into the Raspberry Pi: $I^2C$ (Inter-Integrated Circuit) and SPI (Serial Peripheral Interface) are two. SPI uses up to four wires for communication: a clock line for synchronising data transfer, a master-out-slave-in data line (MOSI), a master-in-slave-out (MISO), %not the soup
 	and a chip select line for selecting which slave device the master is communicating with.
-	%\br
-	%Pins 3 and 5 can also be used to communicate with integrated circuits with the \(I^2 C\) protocol (Inter-Integrated Circuit). This allows bytes of data to be sent over only two wires \cite{backwhatisi2c}. This is done by \textit{serial communication}. Serial communication is where each bit of data (starting with the most significant bit, the highest value bit) is sent one after the other down a wire (the "data" line) \cite{backwhatisserpar} while another wire is used to synchronise the communication beteween devices (the "clock" line). Pins 19, 21, 23, 24, and 26 are used for another serial communications protocol, the Serial Peripherial Interface (SPI) protocol \cite{backwhatisspi}. SPI is similar to \(I^2 C\), although it differs in a few key ways.  \(I^2 C\) manages sub devices on the network using an address system which enables anything up to 128 devices connected together in one go, however SPI uses a simple select system where a signal is sent from a GPIO to the SPI device to tell it to expect instruction. This makes the SPI device far easier to work with, but less useful as the number of daisy-chained devices is limited by the number of free GPIO pins. 
-	%\br
-	%The high level languages used to create programs on desktop computers can be similarly used to write software on the Raspberry Pi. There are a number of software packages available for facilitating the communication with the GPIO pins. Built in to the Raspberry Pi are some basic packages, but for greater functionality third-party libraries are available for anyone to download and use\cite{pilibswiringpi, pilibspigpio}. The programming language "Python" is popular among software developers. Python is a high level, object oriented, interpreted language; making it well suited to quickly develop clean and easy to use software. Due to its popularity, Python has a vast number of packages available to perform any number of functions.
+	
+	\section*{Process Control}
+	Process control is an important area of process design; the process (whatever it may be) has parameters which must be controlled so that the process continues under the design parameters; at the correct temperature, pressure, etc. Process control has historically been achieved through the use of analogue equipment, using pressurised air to send and receive signals from process equipment. Modern process control is achieved through the use of computers and digital electronics, where the analogue measured signals are converted into digital signals, so that a computer can understand the data. The controller applies an algorithm to calculate the control action required to maintain the desired value of the variable. The modern digital controller can deal with almost any form of input, guarding against a wide variety of disturbances. If it can be measured, it can be controlled.
+	\br
+	At the heart of the modern controller is the control algorithm. This is the calculation which determines what change to the control output needs to be made (the control action). Control algorithms vary with application. The most commonly used algorithm is the Proportional-Integral-Derivative algorithm (PID control), consisting of three sections which can be turned off or on depending on the needs of the situation:
+	\begin{itemize}
+		\item Proportional control increases the control action proportional to the size of the error (the difference between the set point and the measured value). This is easy to tune and set up, however it suffers from offset bias. This bias arise from the control action being balanced out in the process by the error such that the control action is not sufficient to change the process to compensate for the error. The error will remain, and the controller will do no more to correct for it, thus an offset is sustained. This must be manually corrected for.
+		\item Integral control increases the control action depending on the integral of the error with respect to time (the longer the error goes on, the higher the control action). Integral action is useful to eliminate the offset bias of proportional control.
+		\item Finally, derivative control increases control action with the derivative of the error with respect to time, so a quickly rising error is met with a large change in control action. Derivative action is difficult to tune and highly sensitive to noise in the circuit - this means it is rarely used. If it is used, it requires some form of noise filter on the signal and careful tuning. The most common version of the PID algorithm only uses proportional and integral action (no derivative) - the PI controller. PI control allows for easy tuning and quick response, without the difficulties of derivative action, or the offset bias of proportional control.
+	\end{itemize}
+	Each control element has an associated gain parameter which affects how strongly that element is represented in the control action. These parameters must be set properly before controller can be used. This is done in a process called tuning. There are a variety of methods for tuning the controller, most commonly used is the Ziegler-Nichols method, involving tuning the controller such that the measured value oscillates in a sustained way. Then using the period of oscillation along with other measured parameters to decide on the optimum controller tuning. After tuning using a method such as Ziegler-Nichols it is often required to tweak the tuning manually to obtain the most effective controller for the situation. This is done mostly by trial and error. Trial and error tuning can also be used to fully tune the device, although this would take a long time to do by hand.
 
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
-	% \nc{Description of the Organisation}
+	%\nc{Description of the Organisation}
 	% Paragraph on what strathcyde is here
+
 	
 	\nc{Description of the Work}
 	%Elaborate on issues mentioned in introduction. Use a logical development, not necessarily in chronological order. Explain the significance, purpose and nature of your work. Describe methods used and outcomes. Try to ensure a balanced treatment of issues, in accordance with their relative importance, and excluding irrelevant material. Present results and discuss around them. Explain the significance of these results and their impact on the organisation. Comment on technical difficulties you may have experienced. In a long report, subdivide with appropriate sub-headings, or divide this section into different sections. Equations should be numbered sequentially.
@@ -832,14 +845,6 @@
     \noindent
 	Due to the Butterworth's nature as a frequency filter, it could cause issue with reading the intermittent jumps up in viscosity due to jamming. This could be circumvented by developing a filter which recognises the different magnitude of jamming to the noise signal. Or the noise could be analysed for constituent signals: the noise could be originating from the 50Hz power supply, or another regular source. Repeated application of different band-stop filters would eliminate the known sources of noise, therefore any remaining disruption in the signal is useful data.
 
-%	\begin{figure}[!htb]
-%		{\centering
-%			\includegraphics[scale=0.3]{figures/fig_filt_demonstra.png}
-%			\caption{Butterworth Filter Demonstration}
-%			\label{figfilterdemon}}
-%		{\footnotesize Actual data readings (faint blue) were passed through a Butterworth filter to obtain a noise-reduced signal (bright blue).\newline {\bfseries a)} Graph of a steady increase in motor supply voltage, excpeted result is a series of 11 steps.\newline {\bfseries b)} Graph showing speed variance with a random intermittent load applied to the motor (an approximation of a shear thickening fluid)\newline {\bfseries c)} Fourier Transform of the response in b); faint blue line shows the fourier transform of the raw (noisy) data, bright blue shows the filtered response, clearly showing the effect of the filter on the resulting data.}
-%	\end{figure}
-
 	\subsection*{Rheometry}
 	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids. The rheometer was calibrated with aqueous glycerol solutions (see Table \ref{tabreffluvisc}), before verifying the calibrations by calculating the viscosity of the reference fluids from logged data.
 	\br
@@ -862,32 +867,27 @@
 	\subsection*{Control}
 	The control system was tested by writing a script to read in the motor's speed, which was converted into a control action using the control class which was applied to the digital potentiometer. This was repeated every 0.1s for 5 minutes. The motor class was used in the script to read the motor's speed, and to set the new supply voltage. The script was extended to log information (potentiometer value, speed, current, control action) about the process' response to a change in set point and amongst disturbances.
 	\br
-	Before the controller could be used, it needed to be tuned. The tuning was obtained by first introducing a step change in the supply voltage to gauge how the speed (controller input) is affected by the potentiometer value (controller output). The resulting data was plotted (Figure \ref{figsteptest}). A First Order Plus Dead Time (FOPDT) transfer function model was used to model the controller's response under different tunings, the optimal tuning settings found simply by trial and error. The testing script was run with this optimal tuning, the resulting response plotted on Figure \ref{figcontrtest}.
+	Before the controller could be used, it needed to be tuned. The tuning was obtained by first introducing a step change in the supply voltage to gauge how the speed (controller input) is affected by the potentiometer value (controller output). A First Order Plus Dead Time (FOPDT) transfer function model was used to model the controller's response under different tunings, the optimal tuning settings found simply by trial and error.
+	\br
+	Trial and error tuning is simple, but it is very time consuming. To reduce the time required, a script was written that simulates the process' response to the controller and compares the results under a set range of tunings. This allowed hundreds of tunings to be examined in a short space of time. This gave a good starting point for the final tuning which was obtained by manually optimising - "fine-tuning". The testing script was then run with the optimal tuning. The resulting response plotted on Figure \ref{figcontrtest}.
 	
 	\begin{figure}[!htb]
 		\centering
-		\begin{subfigure}{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.45]{figures/placeholderfig.png}
-			\caption{Process Step Test}
-			\label{figsteptest}
-			\footnotesize 
-		\end{subfigure}
-		\begin{subfigure}{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.45]{figures/placeholderfig.png}
-			\caption{Controller Test}
-			\label{figcontrtest}
-			\footnotesize 
+		\includegraphics[scale=0.45]{figures/fig_contr_test.png}
+		\caption{Controller Test}
+		\label{figcontrtest}
+		\begin{subfigure}{0.6\textwidth}
+			\footnotesize Raw dynamo reading data plotted against time (faint blue line). Filtered dynamo readings plotted against time (bright blue line). The oscillation in the response can be seen clearly.
 		\end{subfigure}
 	\end{figure}
 	
 	\noindent
-	discussion of results, why wasn't included, 200 words \cbh \cbh \cbh \cbh \br
+	Figure \ref{figcontrtest} shows the ineffectiveness of the control system. The response oscillates around the set point. This could be an issue with the tuning (gains set too high). This could also be an issue with resolution; the digital potentiometer can only give 128 different combinations (therefore 128 possible different supply voltages). In addition, the live filter applied to the data used by the control system creates dead time of around 100ms (100 samples of lag), meaning that the control system doesn't react to outside stimuli fast enough to limit oscillation. 
+	\br
 	There is a clear need for the control system. Looking at Figure \ref{figrheotestres}, it can be seen that the different fluids are sheared at different rates due to their different viscosities. If the viscosity is not known (as would be expected for a fluid placed into a rheometer) this drift from the zero viscosity strain rate cannot be predicted. Instead, a control system should be in place to monitor the speed of the motor and maintain it at a set point to ensure that a desired strain rate is maintained.
 %=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 
-	\nc{Conclusions}
+	\nc{Conclusion and Discussion}
 	%Summarise findings and inferences mentioned in the core of the report. Try to be as brief as possible, with concise statements. Include recommendations, where appropriate. 
 	The rheometer does not meet its design criteria. The electronics worked well - the motor supply voltage check proved the circuit delivered the expected voltages, the dynamo and Hall effect sensors read the speed and current adequately too. The system's failing lie in the calibrations and calculation assumptions. When calibrating the torque as a function of motor supply current, the resulting linear fit equation is not sufficient to give the torque at different shear rates - further calibration is required. The motor output torque not only varies with the fluid's viscosity, but also the friction of the gearing attached to the motor. As the speed increases, this friction increases. \cbh
 	\br
@@ -971,7 +971,7 @@ As mentioned previously, the software was split up into different sections. This
 \apsubsect{ADC Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
-\begin{Verbatim}[frame=single]
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
 #
 # adc.py
 #
@@ -1095,7 +1095,7 @@ class MCP3008(object):
 \end{Verbatim}
 \apsubsect{Digital Potentiometer Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\begin{Verbatim}[frame=single]
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
 #
 # dig_pot.py
 #
@@ -1170,17 +1170,17 @@ class MCP4131(object):
 \end{Verbatim}
 \apsubsect{Motor Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\begin{Verbatim}[frame=single]
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
 INSERT_FROM("./../bin/motor.py")
 \end{Verbatim}
 \apsubsect{Controller class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\begin{Verbatim}[frame=single]
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
 INSERT_FROM("./../bin/control.py")
 \end{Verbatim}
 \apsubsect{Filtering}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\begin{Verbatim}[frame=single]
+\begin{Verbatim}[frame=single,fontsize=\footnotesize]
 INSERT_FROM("./../bin/filter.py")
 \end{Verbatim}
 \apsect{Alternative Designs}
@@ -1199,25 +1199,5 @@ The Hall Effect Sensor is powered by the Raspberry Pi's 5v line and connected to
 This circuit does not measure the instantaneous rotational speed of the motor. Instead it measures the average speed. By using more magnets, and a smaller time-frame, the speed measured becomes closer to an instantaneous speed. The advantage of using this circuit is that it is simple to set up and use, other speed detection circuits require the use of lasers and photodiodes/phototransistors, or dc dynamos and analogue to digital converters. However, the main downside lies in having to attach magnets at regular intervals to the rotating cylinder, which will have to be done accurately. Another downside is the range of the hall effect sensor. The sensor must be within 10mm of the magnet for it to be able recognise it. \newline \newline \noindent
 \large Light Sensor \normalsize \br
 The rotational speed of the motor was measured using a light-gate type set up. An IR-LED and IR-phototransistor were set up near the inner cylinder. A metal trip was attached to the cylinder such that it broke the light beam between the LED and the phototransistor. The transistor was set up as a switch such that when light was allowed to fall onto the transistor, a complete circuit was made between GPIO23 (pulled high by the build in resistor) and ground on the Raspberry pi, thus a low value is read. When the beam is broken, this circuit breaks too, causing the value of GPIO23 to go high. On the software side, this value change can be detected and the timing of which can be used to calculate the speed. \newline
-
-\apsect{Further Information} %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-\apsubsect{Signal Filtering}%-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-Analogue readings of real world data can be corrupted by noise. Noise can appear due to fluctuations in atmospheric conditions, electrical supply, or thermodynamic fluctuation in the reading material (to name a few). For the data to be useful, there must be some provision for reducing the noise. Signal filters can be used to reduce the amount of noise, these can be hardware or software filters. Both represent the same concepts, but in different implementations. Hardware implementation is in continuous time, while software uses discrete time approximations of the same models and functions as hardare filtering. Discussed here are software filtering techniques. \br
-
-% notes -->>
-% transform based signal processing methods
-%	"express a signal in terms of a combination of a set of elementary signals [... that can be easily analysed]"
-% source-filter model based signal processing
-%	use a model to obtain the true form of the signal - expressing the predictable structures of the signal, expected patterns.
-%	sensitive to deviations from the model
-%	used in voice recognition, telephony, video encoding, high-res spectral analysis
-% bayesian statistical model based signal processing
-%	uses cost-weighted (bayesian philosophical) probability to obtain a model of the "statistical average" values
-% neural networks XX
-% <<-- notes from wileyadvsignproc.pdf
-
-% from messing around, butterworth seems to give the best representation of the data as noiselessly and as correct as possible.
-
-%Appendix Bibliography
 
 \end{document}
