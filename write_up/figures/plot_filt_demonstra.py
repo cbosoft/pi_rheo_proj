@@ -86,7 +86,7 @@ if __name__ == "__main__":
     ps_offs = 0
     #ax_tr.set_ylim([0, 500000])
     ax_tr.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.1e'))
-    print x2
+    
     ax_tr.plot(w[ps_offs:], ps_n[ps_offs:len(w)], 'b', color=(0,0,1,0.2))
     ax_tr.plot(w[ps_offs:], ps_f[ps_offs:len(w)], 'b')
     ax_tr.set_xlabel("\n $Frequency,\ Hz$", ha='center', va='center', fontsize=24)
