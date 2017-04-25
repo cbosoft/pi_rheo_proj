@@ -21,7 +21,7 @@ plt.margins(0, 0.1)
 plt.grid(which='both', axis='both')
 
 ax.set_xlabel("\n $\omega_f,\ Frequency$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$G,\ Gain Response,\ dB$\n", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$G,\ Gain\ Response,\ dB$\n", ha='center', va='center', fontsize=24)
 
 plt.axvline(cutoff / (2 * np.pi), color='green') # cutoff frequency
 

@@ -176,7 +176,7 @@ z3z = np.polyfit(tl(pv), tlo(pv), 1)
 t3l = np.poly1d(z3z)
 
 # Plot data and trendline
-ax.plot(tl(pv), t3l(tl(pv)), 'r-', label="$v_{2} = {0:.3f} V_D {1:.3f}$".format(z3z[0], z3z[1], "{m}"))
+ax.plot(tl(pv), t3l(tl(pv)), 'r-', label="$\omega = {0:.3f} {2} {1:.3f}$".format(z3z[0], z3z[1], r"\times V_D"))
 
 ax.errorbar(av_rvs, av_spd, yerr=std, xerr=stdv, linestyle='None', marker='o', label="$Logged Data$")
 

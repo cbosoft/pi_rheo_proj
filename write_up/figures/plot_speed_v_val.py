@@ -77,7 +77,7 @@ ax.plot((pv * 0.066) + 2.278, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}
 ax.set_xlabel("\n" + r"$V_{ms},\ Supply\ Voltage,\ \rmV$", ha='center', va='center', fontsize=24)
 ax.set_ylabel(r"$\omega,\ Motor\ Speed,\ \rmRPM$" + "\n", ha='center', va='center', fontsize=24)
 
-plt.legend(loc=2)
+plt.legend(loc=4)
 
 
 # Show plot

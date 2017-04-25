@@ -201,11 +201,10 @@ ax.errorbar(np.average(x[3]), np.average(y[3]), xerr=np.std(x[3]), yerr=np.std(y
 ax.errorbar(np.average(x[4]), np.average(y[4]), xerr=np.std(x[4]), yerr=np.std(y[4]), marker='o', linestyle='None')
 
 ax.set_xlabel("\n" + r"$\dot\gamma,\ Strain\ Rate,\ \rm s^{-1}$", ha='center', va='center', fontsize=24)
-#ax.set_ylabel(r"$\mu,\ Viscosity\,\ \rm Pa\,s$" + "\n", ha='center', va='center', fontsize=24)
-ax.set_ylabel(r"$\tau,\ Shear\ Stress\,\ \rm Pa$" + "\n", ha='center', va='center', fontsize=24)
-#ax.set_ylim([-100, 100])
+ax.set_ylabel(r"$\mu,\ Viscosity\,\ \rm Pa\,s$" + "\n", ha='center', va='center', fontsize=24)
+
 plt.grid(which='both', axis='both')
-#plt.legend()
+plt.legend(["98.73 vol%", "96.23 vol%", "93.75 vol%", "88.87 vol%"], loc=1)
 plt.savefig("./fig_mu_res.png")
 
 

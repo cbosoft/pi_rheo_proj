@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{10614} % last proper build on Tue 25 April 2017 at 18:35:51
+\def\thewords{11052} % last proper build on Tue 25 April 2017 at 22:46:49
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -135,11 +135,9 @@
 		\item be operationally modular (easy to alter the exact parameters with which it runs).
 		\item be low-cost (under \pounds 100).
 	\end{itemize}
-	The main hardware was pre-existing and, apart from a new inner cylinder, it remained unchanged. Electronic circuits were designed to automatically and precisely control the motor (used to shear the fluid). Also developed were several sensors, but due to issues with the core structure of the Raspberry Pi's operating system, only a qualitative speed sensor was available in the final design (empirically calibrated to obtain a quantitative response). 
+	The main hardware was a Taylor-Couette shear cell. Electronic circuits were designed to automatically and precisely control the motor (used to shear the fluid). Also developed were several sensors used to read the data necessary to calculate the viscosity. Software was written to allow the Raspberry Pi to manage and communicate with the hardware. 
 	\br
-	Software was written to allow the Raspberry Pi to manage and communicate with the hardware. The rheometer was tested by using it to measure the viscosity of reference Newtonian fluids (aqueous solutions of Glycerol) to evaluate the its ability to accurately gauge a fluid's viscosity. 
-	\br
-	Time became a constraint in this project, such that the final test using a colloidal suspension had to be left out. Colloidal suspensions are suspensions of particles around a micrometer in diameter. These suspensions can jam when sheared. The use of colloidal suspensions to evaluate the validity of the rheometer will be future work.
+	The rheometer was tested by using it to measure the viscosity of reference Newtonian fluids (aqueous solutions of Glycerol) to evaluate the its ability to accurately gauge a fluid's viscosity.  The use of colloidal suspensions to evaluate the validity of the rheometer will be future work.
 	
 	
 	\newpage \begin{center} \large \space \normalsize \end{center}
@@ -156,11 +154,11 @@
 	\newpage
 	\def\achapter{Contents}
 	\tableofcontents
-	\jc{Acknowledgements} courtesy that acknowled
-	%IT is a matter of honesty andgement is made to those who helped you in your work.
-	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project. Without Dr. Lue's essential advice, \cbh
+	\jc{Acknowledgements} 
+	%IT is a matter of honesty and courtesy that acknowledgement is made to those who helped you in your work.
+	First, I'd like to thank Dr. Leo Lue for his help and inspiration throughout this project.
 	\br
-	I'd like to thank Aditi Mukhopadhyay for her help and encouragement over the last few months! And her great help in using the equipment in the lab using the DHR-2.
+	I'd like to thank Aditi Mukhopadhyay for her help and encouragement over the last few months! Also for her essential aid in the lab using the DHR-2.
 	\br
 	Special thanks to Jim Murphy, who made the Couette cylinders himself, and I'd also like to thank Christopher Jones help with the lab equipment.
 	\br
@@ -191,7 +189,7 @@
 		\item be operationally modular (easy to alter the exact parameters with which it runs).
 		\item be low-cost (under \pounds 100).
 	\end{itemize}
-	Being able to measure the viscosity of a fluid with respect to time is an important consideration. This is the main criteria for the project. The modularity of the script would make the device useful beyond just a jamming rheometer (a rheometer able to automatically reset and perform another experiment under different conditions, for example). Finally, the cost constraint makes the rheometer attractive as an alternative to other (pre-existing) devices that could be used in the same situation: "from about \$40,000 for an 'entry-level' rheometer to “upwards of \$200,000” for a full-featured and fully configurable research-level system" \cite{refrheomprice}.
+	Being able to measure the viscosity of a fluid with respect to time is an important consideration. This is the main criteria for the project. The modularity of the script would make the device useful beyond just a jamming rheometer (a rheometer able to automatically reset and perform another experiment under different conditions, for example). Finally, the cost constraint makes the rheometer attractive as an alternative to other (pre-existing) devices that could be used in the same situation: ``from about \$40,000 for an 'entry-level' rheometer to `upwards of \$200,000' for a full-featured and fully configurable research-level system" \cite{refrheomprice}.
 	\br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
 	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
@@ -211,8 +209,7 @@
 	% Background
 	\nc{Background}	
 	\section*{Rheometry}
-	% SCHEMATICS OF THE DIFFERENT RHEOMETER TYPES
-	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it deforms(shear rate, \(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
+	The viscosity of a fluid is a measure of how resistant it is to flow. This is an important concept in process engineering: most processes involve fluids, many products have fluid components. The viscosity (\(\mu\)) of a fluid can be calculated from the shear stress (\(\tau\)) imposed on a fluid and the rate at which it deforms (shear rate, \(\dot{\gamma}\)) using Newton's Law of Viscosity (Equation \ref{eqnvisco}) \cite{backfluidmech}.
 	\begin{equation}
 	\mu = \frac{\tau}{\dot{\gamma}}
 	\label{eqnvisco}
@@ -238,7 +235,7 @@
 			Viscosity vs. Shear stress for a shear thickening fluid ($\phi=0.5$, colloidal latex particles dispersed in water). The initial shear thinning region can be seen before the fluid acts Newtonian until the shear stress reaches a critical yield stress and the fluid appears to thicken. At high stress, the fluid once again acts Newtonian.
 		\end{subfigure}
 		\label{figshearthinthick}
-		\caption{Non-Newtonian Behaviour: Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
+		\caption{Viscosity vs Shear Stress (adapted from \cite{figshearthin, figshearthick})}
 	\end{figure}
 	
 	\noindent
@@ -249,13 +246,13 @@
 	The Taylor-Couette shear cell built in this project uses a DC motor as a transducer to both read shear stress information from the cell and to provide the shearing force. Calibrations and characteristics of the motor used are used in order to calculate the information required to obtain the viscosity of the fluid in the shear cell.
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.5]{figures/placeholderfig.png}
+		\includegraphics[scale=0.45]{images/capschem.png}
 		\caption{Rheometer Schematics}
 		\label{figrheomschem}
 		\footnotesize 
-		\textbf{(a)} Cone-and-plate rheometer schematic\\
-		\textbf{(b)} Capillary rheometer schematic\\
-		\textbf{(c)} Taylor-Couette shear cell rheometer schematic
+		\textbf{(a)} Cone-and-plate rheometer schematic (adapted from \cite{tadhrbrochure})\\
+		\textbf{(b)} Capillary rheometer schematic (adapted from \cite{figcapschem})\\
+		\textbf{(c)} Taylor-Couette shear cell rheometer schematic (adapted from \cite{couetteshearcell})
 	\end{figure}
 	
 	\section*{Colloidal Suspensions and Jamming}
@@ -263,9 +260,9 @@
 	\br
 	Shear thickening can be split further into continuous shear thickening (CST) and discontinuous shear thickening (DST). In CST the viscosity increases proportionally to shear after a yield stress. However, with DST the viscosity suddenly (almost asymptotically) jumps upwards. DST has been associated with an apparent decrease in volume fraction of suspensions - hence its alternative name of dilatency. This effect also supports the order-disorder-transition theory of shear thickening: you would expect the volume fraction to decrease (void fraction to increase) if the particles are going from a neat, ordered arrangement into extreme disorder \cite{backbrownjaegrev}. 
 	\br
-	DST is linked to the concept of jamming, which is \textit{"the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}.
+	DST is linked to the concept of jamming, which is \textit{``the conversion of a liquid system into a solid by imposed stress"} \cite{backhawjam}. Jamming is found in many different systems: in solids entering a hopper \cite{back2djam}, in pedestrians walking down a corridor \cite{backpedjam}, and in traffic \cite{backcarjam}. This can cause problems in processes: halting flow, damaging mixing equipment \cite{backshearjambertrand}.
 	\br 
-	An interesting phenomenon that occurs in jamming suspensions is the formation and dissipation of "cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of "dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
+	An interesting phenomenon that occurs in jamming suspensions is the formation and dissipation of ``cracks" on the surface of the suspension. This can be directly seen in Figure \ref{cforscracks}. The cracks have been associated with a localized change in volume faction of the suspended particles \cite{backhawjam}. Another interesting optical property of jammed suspensions: the surface of a shear suspension has been found to alter texture, evidence of ``dilation" \cite{backbrownjaegrev}: caused by the particles in shear attempting to move around each other but having to take an inefficient route therefore decreasing the volume fraction of the suspension. This draws more fluid into the bulk and then the surface appears rough in texture, as opposed to glossy. 
 	
 	\begin{figure}[!htb]
 		\centering
@@ -279,7 +276,7 @@
 	\br
 	The behaviour of the motor can be predicted using characteristic equations. These equations describe how the motor performs under load at a supply voltage. Figure \ref{figmotcharexample} is an example of a plot of these characteristic equations for a DC motor. At the right hand side, the torque is the stall torque --- a load high enough to halt movement of the motor. At the left hand side, the motor is unloaded and the speed is at a maximum --- the no-load speed. This plot is for a single supply voltage: the stall torque and supply voltage both vary with voltage. 
 	\br
-	It can be seen that the current draw line does not pass through the origin - there is some 'minimum' current. This 'minimum' current is the current drawn by the voltage passing through the coils ($I_{coil}$) in the motor - by Ohm's law ($V = I \times R$) this varies with voltage by the resistance of the coils. The 'top' current (or EMF current, $I_{emf}$) on top of the coil current is the current drawn by the magnetic field of the coils acting against the magnetic fields of the permanent magnets within the motor. If nothing was blocking motor's movement, there would be no force acting through the rotor and armature of the motor and therefore no back-emf requiring a higher current draw. If there is a force (some load on the motor) a force will be transmitted back through the shaft to the rotating armature, which will slow down. This slowing can be interpreted as reverse movement of the magnets around the coils and thus causing an increase in current draw. Therefore this current is proportional to the load (torque) on the motor. Equations \ref{eqnmotcharI} \& \ref{eqnmotcharO} are the equations of the two lines on the characteristic curve of a DC motor.
+	It can be seen that the current draw line does not pass through the origin - there is some `minimum' current. This `minimum' current is the current drawn by the voltage passing through the coils ($I_{coil}$) in the motor - by Ohm's law ($V = I \times R$) this varies with voltage by the resistance of the coils. The 'top' current (or EMF current, $I_{emf}$) on top of the coil current is the current drawn by the magnetic field of the coils acting against the magnetic fields of the permanent magnets within the motor. If nothing was blocking motor's movement, there would be no force acting through the rotor and armature of the motor and therefore no back-emf requiring a higher current draw. If there is a force (some load on the motor) a force will be transmitted back through the shaft to the rotating armature, which will slow down. This slowing can be interpreted as reverse movement of the magnets around the coils and thus causing an increase in current draw. Therefore this current is proportional to the load (torque) on the motor. Equations \ref{eqnmotcharI} \& \ref{eqnmotcharO} are the equations of the two lines on the characteristic curve of a DC motor.
 	\begin{equation}
 		I_{ms} = I_{emf} \times \frac{T}{T_S} + I_{coil}
 		\label{eqnmotcharI}
@@ -291,7 +288,7 @@
 	
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.45]{figures/fig_mot_char_example.png}
+		\includegraphics[scale=0.35]{figures/fig_mot_char_example.png}
 		\caption{Example DC Motor Characteristic Curve (adapted from \cite{dvdmotordat})}
 		\label{figmotcharexample}
 		\begin{subfigure}{0.9\textwidth}
@@ -300,7 +297,7 @@
 	\end{figure}
 	
 	\section*{Raspberry Pi}
-	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85mm x 56mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called "Raspian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
+	It was noticed that people were not properly learning about how computers work in schools and universities and so a team of academics at the University of Cambridge created the Raspberry Pi Foundation, and developed the Raspberry Pi Model A as a platform to facilitate education \cite{pihistory}. The Raspberry Pi is a small (85\,mm x 56\,mm \cite{pi3mechdraw}) computer. By default, it runs a version of GNU/Linux called ``Raspbian". There are a number of alternative operating systems suitable for different applications (media center, embedded smart technology) \cite{piotheros}.  \newline
 	\begin{figure}[!htb]
 		\centering
 		\includegraphics[scale=0.3]{images/annotpidia.png} %https://www.draw.io/#Hcbosoft%2Fpi_rheo_proj%2Fmaster%2Fwrite_up%2Fimages%2Fannot_pi_dia.xml
@@ -309,13 +306,13 @@
 	\end{figure} 
 	\newline
 	\noindent
-	The first Raspberry Pi (Model A) had a single core 700MHz processor and 256MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2GHz and 1GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. 
+	The first Raspberry Pi (Model A) had a single core 700\,MHz processor and 256\,MB of RAM \cite{pi1info}, while the current Raspberry Pi 3 Model B has a quad core 1.2\,GHz and 1\,GB of RAM (also including built in WiFi and Bluetooth) \cite{pi3info}. 
 	\br
 	Despite being initially designed for educational purposes, the Raspberry Pi has found success in other areas such as with hobbyists \cite{pihobbynotedu} and in industry \cite{pimorethanedu}. As a research tool, the Raspberry Pi has been used as a miniature server for researching the traffic patterns in data centres (the Pis were emulating the behaviours of full scale servers) \cite{piglasgowdc}.
 	\br
 	What makes the Raspberry Pi attractive as a process controller are the GPIO pins (General Purpose Input/Output, see Figure \ref{pidia}) made available on the main board, similar to a microcontroller. These pins allow electronic circuits to interface with the Raspberry Pi, and thus software to interact with the real world in a way that is not easy to accomplish with a traditional computer. This marriage of microcontroller and desktop computer allows for development, and testing in a single package. In addition, the Raspberry Pi retails (at the time of writing) for \pounds 30.00 \cite{picost}, making it a very cost effective alternative to other control solutions (which can cost several hundred pounds \cite{otherpcucost}). 
 	\br
-	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins, some are grounded, most are GPIO pins. Each GPIO pin supports digital signals. Resistors attached to the GPIO pins can be used to "pull-up" or "pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and are activated/deactivated programmatically.
+	The GPIO pins are the heart of the Raspberry Pi. Each pin is numbered so that they can be referenced and distinguished between their functions. Some of the pins on the GPIO header are power pins, some are grounded, most are GPIO pins. Each GPIO pin supports digital signals. Resistors attached to the GPIO pins can be used to ``pull-up" or ``pull-down" the signal. If a pin is pulled down, its signal is normally low - it needs to be actively raised high. If a signal is pulled up, it is normally high - it can be lowered by connecting it to ground, but without that it will try to be high. These pull-up and pull-down resistors are included in the Raspberry Pi internally and are activated/deactivated programmatically.
 	
 	\begin{figure}[!htb]
 		\centering
@@ -342,7 +339,7 @@
 	\subsection*{Noise Filter}
 	Data read by sensors from the real world is often noisy: it will rarely be a single value. Instead, the signal will vary between values around the actual value. This varying of the signal is called noise. Noise can originate from many sources: power supply variations, temperature, or even air pressure. Some noise can be easily predicted and identified (e.g. a 50\,Hz noise waveform in the signal is probably due to the power supply) but others cannot be so easily predicted. 
 	\br
-	Filtering techniques can be used to eliminate noise from a signal. Frequency filters remove certain frequencies from the signal. Other filtering techniques include: fitting polynomial equations to sections of the data ("splines") - a more graphical method of removing the noise; using a probabilistic analysis of the data to determine the main response; or using a moving average of the data (which can be weighted to favour the data surrounding the current point being filtered).
+	Filtering techniques can be used to eliminate noise from a signal. Frequency filters remove certain frequencies from the signal. Other filtering techniques include: fitting polynomial equations to sections of the data (``splines") - a more graphical method of removing the noise; using a probabilistic analysis of the data to determine the main response; or using a moving average of the data (which can be weighted to favour the data surrounding the current point being filtered).
 	\br
 	Another set of filtering algorithms are frequency filters which remove the parts of the signal which have a frequency or range of frequencies. High pass filters remove low frequency signals while letting high frequency parts of the signal through. Similarly, low-pass signals maintain low frequency signals and block high frequency signals (like noise). The latter is of particular interest when cleaning noise from a signal. Frequency filtering works by moving the signal into the frequency domain by Fourier transform. Then, a function is applied which drops off to zero very quickly - this selects desired frequencies and removes undesired frequencies. Noise in the signal is high frequency, therefore a low pass filter is desired to allow low frequency signals to pass through (the data) and the high frequency signals (noise) to be eliminated. One such function that can be applied is the Butterworth function (transfer function Equation \ref{eqnbuttgain}). This function is well suited as a frequency filter as it drops of steeply after the cutoff frequency, ensuring most unsuitable parts of the signal are removed. \cite{backsignalbutter}. The Butterworth gain transfer function (Equation \ref{eqnbuttgain}) is applied to the frequency domain signal - responding as in Figure \ref{figbutter}.
 	
@@ -410,7 +407,7 @@
 		\label{tabcellgeom}
 		\begin{tabular}{|c|c|}
 			\hline
-			Reading 						& Value ($mm$) \\
+			Reading 						& Value ($\rm mm$) \\
 			\hline
 			Inner Cylinder, Diameter 		& $30.5 \pm 0.590 \%$\\
 			Inner Cyliner, Height 			& $46.8 \pm 0.577 \%$\\
@@ -452,12 +449,13 @@
 	\noindent
 	The dynamo speed sensor was the final choice after two other methods were attempted. A Hall effect sensor was used to detect the presence of a magnet attached to the inner cylinder. This was set up such that the Raspberry Pi could (via the HES) calculate the number of rotations in a given time period, or measure the length of time in the gap between rotations. A similar method used a light gate (a UV LED and a phototransistor) and a mask attached to the inner cylinder. As the cylinder rotates, the mask blocks the UV light from shining on the phototransistor and thus the transistor blocks the flow of electrons between its gate and source pins - which can be detected by the Raspberry Pi. Issues arose, however, with the Rapsberry Pi's ability to measure time accurately. This is because the python environment is not well suited to accurately reporting time due to the memory management processes enacted by python and even the underlying linux kernel in the operating system \cite{backrpibadrealtime}. This lead to the dynamo qualitative speed sensor to be used in favour of the quantitative speed sensors due to its ease of use and reliability.
 	\br
-	To sense the current drawn by the motor, a Hall Effect Current Sensor, or HECS (ACS712, 30\,A sensing range) is used. A Hall effect sensor produces a voltage proportional to the strength of a magnetic field which is produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The normal output (at zero amps sensed) is half of the supply voltage of 5\,V. The direction of the current will determine whether the voltage will increase above 2.5\,V or decrease below 5\,V. The current draw by the motor will only ever be in a single direction, so the directional information is unnecessary. Due to the large possible range of the device (being able to sense from -30\,A to +30\,A), the voltage will be boosted to allow the ADC to see a better range of values. In addition, the direction information is removed by subtracting 2.5\,V. The singal is then amplified by 10 and fed into the ADC (channel \#1). 
+	To sense the current drawn by the motor, a Hall Effect Current Sensor, or HECS (ACS712, 30\,A sensing range) is used. A Hall effect sensor produces a voltage proportional to the strength of a magnetic field which is produced by running a current through a coil with a magnetically permeable core. The sensor package contains both the coil and the hall effect sensor such that when a current is passed between the sensor pins, a voltage proportional to this current is produced accross the output pins. The normal output (at zero amps sensed) is half of the supply voltage of 5\,V. The direction of the current will determine whether the voltage will increase above 2.5\,V or decrease below 5\,V. The current draw by the motor will only ever be in a single direction, so the directional information is unnecessary. Due to the large possible range of the device (being able to sense from -30\,A to +30\,A), the voltage will be boosted to allow the ADC to see a better range of values. In addition, the direction information is removed by subtracting 2.5\,V. The singal is then amplified by 10 and fed into the ADC. 
 	\br
 	To reduce noise in the HECS reading, a further two sensors (both ACS712s, 5\,A sensing range) were used together with the original sensor. The second and third sensors had a smaller sensing range, which was better suited to this application and they did not require boosting to improve the resolution of the signal. The data from the three sensors is averaged together in data processing to provide a more reliable signal.
 	
 	\subsection*{\textit{Motor Speed Control}} % last edited 21/3/2017
-	The speed of the motor is controlled by altering the supply voltage to the motor. A higher supply voltage, a higher rotational speed. The Raspberry Pi sends a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131) which then sets its wiper resistance accordingly. The potentiometer is part of a voltage divider, the output voltage of which varies with the potentiometers resistance and therefore can be controlled by the Raspberry Pi.\br
+	The speed of the motor is controlled by altering the supply voltage to the motor. A higher supply voltage, a higher rotational speed. The Raspberry Pi sends a digital serial signal (using the SPI protocol) to a digital potentiometer (MCP4131) which then sets its wiper resistance accordingly. The potentiometer is part of a voltage divider, the output voltage of which varies with the potentiometers resistance and therefore can be controlled by the Raspberry Pi.
+	\br
 	Within the potentiometer: \(R_{AW}\) is the resistance between terminal A and the wiper pin, and \(R_{WB}\) is the resistance between the wiper and terminal B. The data sent to the potentiometer determines the values of \(R_{AW}\) and \(R_{WB}\), which will total a constant value: \(R_{pot} = 10\,{\rm k\Omega} \). The digital potentiometer is used in a voltage divider configuration, which allows the voltage in a parallel circuit to be controlled. When the resistance is changed to a new value, the voltage across the motor will change according to Equation \ref{eqnvoldiv}. Resistor \(R_2\) is used to set the minimum output voltage. At \(R_2 = 0\,{\rm\Omega}\), the output would vary between 0\,V and 5\,V. While this would also be useful, it limits the resolution of the potentiometer as the bottom volt of this range will not be able to sufficiently power the motor. To bring this minimum up (and thus be able to utilise more of the potentiometer) \(R_2\) is set at \(3\,{\rm k\Omega} \). The digital potentiometer can only handle voltages up to 5\,V across its terminals, an amplifier (gain = 2.1) is used to boost the voltage range from 1.2\,V to 5\,V up to 2.52\,V to 10.5\,V. A transistor (BD243C) is used to boost the current output from the amplifier, which can only supply around 20\,mA. The transistor boosts this up to 2\,A (hFE = 100).
 	\begin{equation}
 	V_{out} = V_{in}\times \frac{R_2 + R_{WB}}{R_2 + R_{pot}}
@@ -480,8 +478,9 @@
 	\nomenclature{$R_{AW}$}{Resistance value ofthe resistor between B terminal on the potentiometer and ground\hfill $\Omega$}
 	
 	\noindent
-	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path taken through the circuit, the higher the number, the higher \(R_{WB}\) will be. When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this.\br
-	A 7-bit number has a maximum value of 127 ($2^7 - 1 = 127$). Therefore the potentiometer terminal B-wiper resistance will increase by $78.7 \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
+	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path taken through the circuit, the higher the number, the higher \(R_{WB}\) will be. When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this therefore increasing the motor's speed.
+	\br
+	A 7-bit number has a maximum value of 127 ($2^7 - 1 = 127$). Therefore the potentiometer terminal B-wiper resistance will increase by $78.7\,\rm \Omega$ given a unit increment in potentiometer value (Equation \ref{eqnpotres}). Combining this with Equation \ref{eqnvoldiv} gives an equation for motor supply voltage (also knowing the gain of the operational amplifier circuit) - Equation \ref{eqnmotsupvol}.
 	
 	\begin{equation}
 	V_{wiper} = V_{AB}\times \frac{3{\,\rm k\Omega} + \left(78.7{\,\rm\Omega} \times pv\right)}{13{\,\rm k\Omega}}
@@ -501,7 +500,7 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	\section{Software}
-	The Raspberry Pi runs a version of GNU/Linux called "Raspbian" - specially developed for the Raspberry Pi's ARM Processor. Raspbian is a desktop operating system, and can perform all of the tasks a full size computer can (text processing, internet browsing, etc.). This presents one of the main features of the Raspberry Pi - it can be both development station and testbed. Software was written to enable the Raspberry Pi to communicate with the hardware using the Python language. Python was chosen as it is a very popular, easy to use, and easy to read language (there are rules about how python should be properly written in order to maintain easy-to-read code \cite{pep8ref}). Its popularity means that there is an abundance of software packages available for inclusion. 
+	The Raspberry Pi runs a version of GNU/Linux called ``Raspbian" - specially developed for the Raspberry Pi's ARM Processor. Raspbian is a desktop operating system, and can perform all of the tasks a full size computer can (text processing, internet browsing, etc.). This presents one of the main features of the Raspberry Pi - it can be both development station and testbed. Software was written to enable the Raspberry Pi to communicate with the hardware using the Python language. Python was chosen as it is a very popular, easy to use, and easy to read language (there are rules about how python should be properly written in order to maintain easy-to-read code \cite{pep8ref}). Its popularity means that there is an abundance of software packages available for inclusion. 
 	\br
 	Packages used here:
 	\begin{itemize}
@@ -539,14 +538,14 @@
 	\subsection*{Digital Potentiometer} % last edited 13/3/2017
 	This class enables the software to interact with the digital potentiometer (model MCP4131) using the SPI protocol. This class makes use of the \texttt{spidev} package to enable SPI communication. The class contains a function to set a value on the resistor (as an integer number between 0 and 127), and is set up such that multiple digital potentiometers can be included on the same circuit.
 	\br
-	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the "\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: "\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.
+	The class is used, as with all normal classes, by first creating an instance of a class object, passing along the initialisation parameters. These parameters are set in the source code as the parameters to the ``\texttt{\_\_init\_\_}" function. For this class, there is only one initialisation parameter: ``\texttt{chip\_select}", an optional parameter which tells the spidev package which SPI device to talk to. This parameter is 0 by default, but can be changed if the class is used in a different instance to manage another digital potentiometer.
 	\br
-	To set the potentiometer resistance, a value between 0 and 127 (inclusive) is sent to the potentiometer using the "\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. The spidev package is used to send this value to the correct register on the potentiometer, causing it to alter its resistance.
+	To set the potentiometer resistance, a value between 0 and 127 (inclusive) is sent to the potentiometer using the ``\texttt{set\_resistance}" function. This function only requires one parameter - the value to be sent. The spidev package is used to send this value to the correct register on the potentiometer, causing it to alter its resistance.
 	
 	\subsection*{ADC} % last edited 13/3/2017
 	The ADC class enables the software to interact with the analogue to digital converter (both model MCP3008) via the SPI protocol. As with the digital potentiometer, this class makes use of the spidev package. \br
 	The initialisation function for the ADC class has two parameters, both optional. The first is a chip select parameter (used to tell spidev which device we are trying to communicate with on the SPI network) which has a value of 1 by default. The second parameter is the value of the reference voltage (\texttt{vref}), 3.3 by default, used to calculate the voltage read in by the ADC from the 10-bit value read from the ADC. \br
-	Usage of the class is very simple: the "\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the "\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.
+	Usage of the class is very simple: the ``\texttt{read\_data}" function returns the value read from the ADC (a 10-bit number) and takes only 1 parameter (a value from 0 to 7 indicating the channel on the ADC to read from). Further, the ``\texttt{read\_volts}" function will read from the ADC and convert the result to a voltage. This function takes a channel indication parameter.
 	
 	\subsection*{Control} % last edited 13/3/2017
 	This class is a discrete-time implementation of a PI controller based upon the PID algorithm (Equation \ref{eqnpidalg}). Due to the random fluctuations in speed caused by the jamming effect, derivative control is not included because derivative action works on the rate of change of the error, therefore a sudden change in the error is going to elicit an extreme response from  the controller which will upset the process. In addition, there will be noise inherent in the signal (discussed in the next section) which will severely impair the controller if derivative action is turned on. 
@@ -582,9 +581,9 @@
 		\item \texttt{sample\_time} - float. Optional. The interval time between control action updates. By default, this is automatically calculated, but can be set manually here for simulating the response.
 	\end{itemize}
 	
-	Function "\texttt{get\_control\_action(Y)}" is used to obtain the control action in response to the input. This function takes a single argument: the process output. Then the \texttt{scipy.signal} package's transfer function class is used to obtain the result from the controller's transfer function, giving a suitable control action.
+	Function ``\texttt{get\_control\_action(Y)}" is used to obtain the control action in response to the input. This function takes a single argument: the process output. Then the \texttt{scipy.signal} package's transfer function class is used to obtain the result from the controller's transfer function, giving a suitable control action.
 	\br
-	For the controller to be useful, it needs to be tuned. This can be done using a modelled transfer function of the process, such as a First Order Plus Dead-Time (FOPDT) model. Using a model, the controller can be simulated to view how it reacts to different tunings. The class includes a simulation function ("\texttt{do\_sim}") to allow for manual tuning. The function uses a transfer function for the process (a first order model) and simulates process output for a length of time after a step change in set point. The results give an indication of how well the controller can manage the process. 
+	For the controller to be useful, it needs to be tuned. This can be done using a modelled transfer function of the process, such as a First Order Plus Dead-Time (FOPDT) model. Using a model, the controller can be simulated to view how it reacts to different tunings. The class includes a simulation function (``\texttt{do\_sim}") to allow for manual tuning. The function uses a transfer function for the process (a first order model) and simulates process output for a length of time after a step change in set point. The results give an indication of how well the controller can manage the process. 
 	\br
 	There are a number of techniques used to tune controllers, as discussed in chapter 1. Any filtering method used, almost always ends in manual fine-tuning of the results. To speed this process up, a function was written in the control class which iterates through a range of different tunings and decides upon an optimal set. A first order transfer function modelling the process is used in the form of its two main parameters: $\rm\tau_C$, the time constant, and $\rm SSG$, the steady state gain. The time constant gives an indication of the strength of the dynamics of the response, while steady state gain indicates the final value of the response with respect to the given input --- it is the gain after the system has come to steady state. From this model, the process' controlled response is monitored over a simulated minute. The shape of this response is examined to evaluate is optimality (how fast it rises, how much it optimises). This resulting tuning is, as with many other techniques, a starting point for manual fine-tuning. This fine tuning is done by trial and error.
 	
@@ -605,11 +604,9 @@
 	\begin{itemize}
 		\item \texttt{startnow} - a boolean value indicating whether the speed poll thread should begin when the class is first instantiated. \texttt{False} by default.
 		\item \texttt{poll\_logging} - a boolean value indicating whether data should be logged by the motor to file. \texttt{True} by default.
-		\item \texttt{log\_note} - a string added to the log file to give more information about the logged data (the test conditions etc). \texttt{"DATETIME"} by default, replaced by the current date and time when the log is written.
-		\item \texttt{log\_titles} - a list of strings giving the headings to be included above the data in the log.
 		\item \texttt{log\_dir} - string, path to directory where the logged data will be saved.
-		\item \texttt{i\_poll\_rate} - "inverse poll rate", the interval between speed polls. A higher value results in sporadic data and lower processing requirements, a low value results in better data but a higher toll on the Raspberry Pi's resources. \texttt{0.1} by default.
-		\item \texttt{svf} - "speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(312.806, -159.196)} by default.
+		\item \texttt{i\_poll\_rate} - ``inverse poll rate", the interval between speed polls. A higher value results in sporadic data and lower processing requirements, a low value results in better data but a higher toll on the Raspberry Pi's resources. \texttt{0.1} by default.
+		\item \texttt{svf} - ``speed-voltage-function", tuple representing the two coefficients in a linear fit equation for the relationship between the motor's rotational speed and the voltage reading in from the dynamo via the ADC. \texttt{(312.806, -159.196)} by default.
 	\end{itemize}
 	The motor class can be used to set the supply to a motor (using a digital potentiometer), can read in the motor's speed and calculate its current draw (using the ADC).
 	
@@ -621,7 +618,7 @@
 	The viscosity of a fluid can be calculated using Newton's Viscosity Law, Equation \ref{eqnvisco}:
 	\[\mu = \frac{\tau}{\dot{\gamma}}\]
 	\newline
-	The shear stress and strain rate can be calculated from calibrated data from the motor, as well as speed and current supply readings from sensors. From the characteristic curve for a motor (Figure \ref{figmotcharexample}), Equations \ref{eqnmotcharI_obfs} \& \ref{eqnmotcharO_obfs} were read.
+	The shear stress and strain rate can be calculated from calibrated data from the motor, as well as speed and current supply readings from sensors. From a characteristic curve for a motor (Figure \ref{figmotcharexample}), Equations \ref{eqnmotcharI_obfs} \& \ref{eqnmotcharO_obfs} were read.
 	
 	\begin{equation}
 		I_{ms} = I_{emf} \times \frac{T}{T_S} + I_{coil}
@@ -633,7 +630,7 @@
 	\end{equation}
 	
 	\noindent
-	Both $I_{emf}$ and $I_{coil}$, as well as the stall torque $T_S$, vary with voltage supplied to the motor ($V_{ms}$) and calibrations were obtained for $I_{coil} (_{V_{ms}})$ and $\frac{I_{emf}}{T_S} (_{V_{ms}})$, Equations \ref{eqnemftscalea} \& \ref{eqnicocalea}). With the supply current being measured and the supply voltage known, the motor torque can then be calculated using Equation \ref{eqntorqueget}.
+	Both $I_{emf}$ and $I_{coil}$, as well as the stall torque $T_S$, vary with voltage supplied to the motor ($V_{ms}$) and calibrations were obtained for coil current as a function of supply voltage($I_{coil} (_{V_{ms}})$) and EMF current divided by stall torque as a function of supply voltage ($\frac{I_{emf}}{T_S} (_{V_{ms}})$): Equations \ref{eqnemftscalea} \& \ref{eqnicocalea}). The supply current is measured, and the supply voltage is controlled, the motor torque can then be calculated using Equation \ref{eqntorqueget}.
 
 	\begin{equation}
 		T = \frac{I_{ms} - I_{coil} (_{V_{ms}})}{\frac{I_{emf}}{T_S} (_{V_{ms}})}
@@ -679,7 +676,7 @@
 	\subsection*{Calibrated Method}
 	A further method for calculating the viscosity was used. The rheometer was calibrated with several reference fluids at a single voltage to obtain an expression for the motor's torque as a function of the supply current. This can then be used in a similar manner to above, using the torque calibration to obtain the viscosity from the current reading and the speed of rotation of the motor.
 	\br
-	It is known that the motor torque varies with both supply current and supply voltage. By setting the voltage to a single value, the output torque can be calibrated against the current drawn by the motor. This method differs from the previous method by using Equation \ref{eqntrefcal} rather than Equation \ref{eqntorqueget}.
+	It is known that the motor torque varies with both supply current and supply voltage. By setting the voltage to a single value, the output torque can be calibrated against the current drawn by the motor. This method differs from the previous method in the way the torque is calculated: using Equation \ref{eqntrefcal} rather than Equation \ref{eqntorqueget}.
 	\begin{equation}
 	T = A_{TI} \times I_{ms} + B_{TI}
 	\label{eqntrefcal}
@@ -691,12 +688,12 @@
 	\section{Calibrations}
 	
 	\subsection*{Dynamo Calibration}
-	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(v_m ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The clean dynamo data was then compared to the speed readings taken from the tachometer. The \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}. 
+	The goal is to find a function of the dynamo output voltage that gives the rotational rate of the motor (i.e. \(\omega ({V_D})\)). To do this, the motor's speed was varied by varying the supply voltage (using the digital potentiometer) to different discrete levels. The \texttt{motor} class was used to perform this so that sensor readings were logged automatically. At each voltage level, the speed was read several times using a contact tachometer to give the actual speed. The dynamo readings were taken from the logs and filtered using the \texttt{filter} package. The clean dynamo data was then compared to the speed readings taken from the tachometer. The \texttt{numpy} package was used to form a first-order empirical relationship between the variables: Equation \ref{eqnspdvvr}. 
 	\br
 	The digital potentiometer was to give a supply voltages between 2.275 and 10.723, in steps of 0.528. At each supply voltage, A tachometer was used to read the speed (in m/s). The reading was taken five times per supply voltage and the dynamo voltage level was recorded at intervals of 100ms by the Raspberry Pi. The contact tachometer had to be used carefully, it had to make strong enough contact with the cylinder in order to transfer the speed to the tachometer's rotor, but without impacting the speed of the motor and thus obtain an incorrect reading. The average value of each speed reading, and the dynamo voltage readings were plotted on Figure \ref{figspeedvrvolt}.
 	
 	\begin{equation}
-	v_m = 308.768 \times {V_D} - 167.080
+	\omega = 308.768 \times {V_D} - 167.080
 	\label{eqnspdvvr}
 	\end{equation}
 	
@@ -764,17 +761,17 @@
 	\subsection*{Reference Fluid Viscosity}
 	A relationship between the motor's torque output and the current drawn by the motor was obtained. This was done by putting a fluid of known viscosity into the rheometer and running it at constant shear rate. With the viscosity known and the strain rate known, the shear stress can be calculated. This shear stress was compared with the current draw and a linear equation was fit. 
 	\br
-	The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between $\mu_{water} = 0.001\,Pa\,s$ and $\mu_{glycerol} = 1.41\,Pa\,s$. This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The temperature in the laboratory is roughly 15$^oC$, and so the solutions' viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$. Table \ref{tabreffluvisc} shows both the theoretical and actual viscosities of the solutions used. 30ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5ml) and the required water with a micro-pipette (ErgoOne, 20$\mu l$ to 200$\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20ml to be used in the rheometer, and another filled up to 10ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). 
+	The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between $\mu_{water} = 0.001\rm\,Pa\,s$ and $\mu_{glycerol} = 1.41\rm\,Pa\,s$. This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The temperature in the laboratory is roughly 15$\,\rm^oC$, and so the solutions' viscosity at this temperature was interpolated from data at 10$\,\rm^oC$ and 20$\,\rm^oC$. Table \ref{tabreffluvisc} shows both the theoretical and actual viscosities of the solutions used. 30\,ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5\,ml) and the required water with a micro-pipette (ErgoOne, 20$\,\rm\mu l$ to 200$\,\rm\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20\,ml to be used in the rheometer, and another filled up to 10\,ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). 
 	\br
-	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3\,Pa\,s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
+	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40\,mm parallel plate head at strain rates from 5$\,\rm s^{-1}$ to 250$\,\rm s^{-1}$. each sample was tested 3 times to confirm the result. The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0.00\% to 11.13\% by volume results in the viscosity dropping by 2.3\,Pa\,s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
 	\newline
 	\begin{table}
 		\centering
-		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
+		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$\,\rm^oC$}
 		\label{tabreffluvisc}
 		\begin{tabular}{| c | c | c |}
 			\hline
-			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
+			Composition (vol\% glycerol) & Theoretical Viscosity ($\rm Pa\,s$) & Actual Viscosity ($\rm Pa\,s$)\\
 			\hline
 			100.0\% & 2.656 & 1.328 \\
 			98.73\% & 2.120 & 1.129 \\
@@ -803,10 +800,10 @@
 	\end{figure}
 	
 	\noindent
-	With no loading on the motor, the measured current is the current through the coil ($I_{coil}$). Therefore, the measured current data can be compared with the supply voltage to obtain the coefficients for the desired calibration. The motor supply voltage was varied over the course of ten minutes between 2.52\,V and 10.5\,V. This was done via a script written for the purpose using the software written previously. The motor class was used both to manage the supply voltage, and to log the current sensor readings. The resulting information was plotted on a graph (Figure \ref{figicocal}) and a linear equation was fit: $A_{Icoil} = 0.02629\,\rm\frac{A}{V}$ and $B_{Icoil} = 0.3989\,\rm A$: Equation \ref{eqnicocalend}.
+	With no loading on the motor, the measured current is the current through the coil ($I_{coil}$). Therefore, the measured current data can be compared with the supply voltage to obtain the coefficients for the desired calibration. The motor supply voltage was varied over the course of ten minutes between 2.52\,V and 10.5\,V. This was done via a script written for the purpose using the software written previously. The motor class was used both to manage the supply voltage, and to log the current sensor readings. The resulting information was plotted on a graph (Figure \ref{figicocal}) and a linear equation was fit: $A_{Icoil} = 0.02948\,\rm\frac{A}{V}$ and $B_{Icoil} = 0.4506\,\rm A$: Equation \ref{eqnicocalend}.
 	
 	\begin{equation}
-	I_{coil} (V_{ms}) = 0.02629\,\frac{A}{V} \times V_{ms} + 0.3989\,A
+	I_{coil} (V_{ms}) = 0.02948\,\frac{A}{V} \times V_{ms} + 0.4506\,A
 	\label{eqnicocalend}
 	\end{equation}
 	
@@ -830,6 +827,11 @@
 			\footnotesize 
 		\end{subfigure}
 	\end{figure}
+
+	\begin{equation}
+		\frac{I_{emf}}{T_S} (V_{ms}) = -0.1662 \times V_{ms} + 2.278
+		\label{eqnemftsend}
+	\end{equation}
 	
 	\subsection*{Torque Calibration}
 	At constant voltage, the loading on the motor was varied to produce a calibration giving the torque load on the motor as a function of the motor current supply. Each of the reference fluids (compositions on Table \ref{tabreffluvisc}) were, in turn, loaded into the motor and run at a set supply voltage. The current drawn by the motor was logged using the motor class, also used to manage the supply voltage (via the potentiometer).
@@ -890,7 +892,7 @@
 	Figures \ref{fighes30a} \& \ref{fighes5a} show how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. These values are in good agreement, although the data is somewhat noisy despite the applied filtering.
 	
 	\subsection*{Data Filtering}
-	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and "drawing" a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise.
+	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and ``drawing''a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise.
 	\br
 	Figure \ref{figfiltcomp} compares the different filtering methods. A sample of noisy data (dynamo reading data) had different filters applied. The settings of each filter were altered to obtain the smoothest (noise-reduced) data without losing accuracy.
 	\newline
@@ -936,7 +938,7 @@
 	\subsection*{Rheometry}
 	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids, Table \ref{tabreffluvisc} displays the compositions and viscosities of these reference fluids.
 	\br
-	To facilitate loading of the rheometer, the scissor lift was lowered. The outer cylinder of the rheometer was then loaded with 15ml of the first fluid using a 5ml syringe (taking care to avoid bubbles). The scissor lift was then raised into the working position; the two cylinders as close together as possible without touching. The cylinders were then aligned by turning on the motor and observing the flow of the fluid. The fluid would climb up the side of the cylinder if the inner cylinder was too close. On the Raspberry Pi a script was written which will load the motor class, with the appropriate settings, and log the data required to calculate the viscosity of the fluid in the rheometer. The script also dictates how the speed of the motor should vary, if at all. The motor's speed (and therefore the rate of strain experienced by the fluid) was kept constant for 5 minutes. This was repeated for each of the four reference solutions, and both pure glycerol and water. The resulting calculated viscosities for each fluid were compared with the results obtained from the DHR-2, as plotted on Figure \ref{figrheotestres}.
+	To facilitate loading of the rheometer, the scissor lift was lowered. The outer cylinder of the rheometer was then loaded with 15\,ml of the first fluid using a 5\,ml syringe (taking care to avoid bubbles). The scissor lift was then raised into the working position; the two cylinders as close together as possible without touching. The cylinders were then aligned by turning on the motor and observing the flow of the fluid. The fluid would climb up the side of the cylinder if the inner cylinder was too close. On the Raspberry Pi a script was written which will load the motor class, with the appropriate settings, and log the data required to calculate the viscosity of the fluid in the rheometer. The motor's speed (and therefore the rate of strain experienced by the fluid) was kept constant for 5 minutes. This was repeated for each of the four reference solutions. The data was used to calculate the viscosities of the solutions as set out earlier on. The first method producing the results plotted on Figure \ref{figmures}. ed viscosities for each fluid were compared with the results obtained from the DHR-2, as plotted on Figure \ref{figrheotestres}.
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $\rm Pa\,s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $\rm Pa\,s$}
@@ -944,16 +946,29 @@
 	\noindent
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.45]{figures/fig_mu_res.png}
-		\caption{Mu Calculation}
-		\label{figrheotestres}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.35]{figures/fig_mu_res.png}
+			\caption{Method 1 Results}
+			\label{figmures}
+		\end{subfigure}
+		\begin{subfigure}{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.35]{figures/fig_t_ref_check.png}
+			\caption{Method 2 Results}
+			\label{figrheotestres}
+		\end{subfigure}
 		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Viscosity of reference fluids plotted against time. Each colour represents a different composition of reference solution (blue - 98.73v\%, green - 96.23v\%, red - 93.75v\%, and cyan - 88.87v\%). The error bars represent one standard deviation. The small circles are the expected viscosities for each of the solutions. The yellow dashed line shows the set strain rate for each of the solutions.
+			\footnotesize Viscosity of reference fluids plotted against time. Each colour represents a different composition of reference solution (blue - 98.73v\%, green - 96.23v\%, red - 93.75v\%, and cyan - 88.87v\%). The error bars represent one standard deviation. On \textbf{(b)} the expected viscosities for each of the solutions (small circles) are also plotted as well as set strain rate for all runs (yellow dashed line).
 		\end{subfigure}
 	\end{figure}
+
+	Figures \ref{figmures} \& \ref{figrheotestres} show the results of the rheometry test. The method 1 results (the results calculated by calibrating the rheometer against specific aspects of the motor's characteristic - `Calculated Method') were off the expected result by a large margin. This indicates that either the calculations and calibrations were not performed correctly, or that there was something not taken into account, or perhaps one of the assumptions made was wrong. The coil current calibration should result in a linear equation which goes directly through the origin (as it should parallel Ohm's Law). However, it was found to have an offset, indicating that that assumption is not as strong as it should be.
+	\br
+	Method 2's results (results from a straight calibration of the motor's torque to the supply current at constant voltage - `Calibrated Method') agree better with the expected results (3 out of 4 runs gave an average viscosity in good agreement to the expected viscosity). The second result could be an outlier for several reasons: it could have been slightly warmer than expected (temperature was not recorded), or water could have contaminated the sample. However, the latter is unlikely: the samples were sealed shortly after they were produced and not opened again until tested. This method provides good results, however it can only be used at constant voltage - therefore there would be no control over either the strain rate or the 
 	
 	\subsection*{Control}
-	The control system was tested by writing a script to read in the motor's speed, which was converted into a control action using the control class which was applied to the digital potentiometer. This was repeated every 0.1s for 5 minutes. The motor class was used in the script to read the motor's speed, and to set the new supply voltage. The script was extended to log information (potentiometer value, speed, current, control action) about the process' response to a change in set point and amongst disturbances.
+	The control system was tested by writing a script to read in the motor's speed, which was converted into a control action using the control class which was applied to the digital potentiometer. This was repeated every 100\,ms for 5 minutes. The motor class was used in the script to read the motor's speed, and to set the new supply voltage. The script was extended to log information (potentiometer value, speed, current, control action) about the process' response to a change in set point and amongst disturbances.
 	\br
 	Before the controller could be used, it needed to be tuned. The tuning was obtained by first introducing a step change in the supply voltage to gauge how the speed (controller input) is affected by the potentiometer value (controller output). A First Order Plus Dead Time (FOPDT) transfer function model was used to model the controller's response under different tunings, the optimal tuning settings found simply by trial and error.
 	\br
@@ -971,7 +986,7 @@
 	\end{figure}
 	
 	\noindent
-	Figure \ref{figcontrtest} shows the ineffectiveness of the control system. The response oscillates around the set point. This could be an issue with the tuning (gains set too high). This could also be an issue with resolution; the digital potentiometer can only give 128 different combinations (therefore 128 possible different supply voltages). In addition, the live filter applied to the data used by the control system creates dead time of around 100ms (100 samples of lag), meaning that the control system doesn't react to outside stimuli fast enough to limit oscillation. 
+	Figure \ref{figcontrtest} shows the ineffectiveness of the control system. The response oscillates around the set point. This could be an issue with the tuning (gains set too high). This could also be an issue with resolution; the digital potentiometer can only give 128 different combinations (therefore 128 possible different supply voltages). In addition, the live filter applied to the data used by the control system creates dead time of around 100\,ms (100 samples of lag for the motor speed measurement process, but only 1 sample as far as the control system is concerend). This means that the control system doesn't react to outside stimuli as fast as it could; this is maybe why it oscillates. A Smith predictor (used to compensate for lag, also known as dead-time), but the model of the process would have to be improved for this to be a viable option \cite{smithref}.
 	\br
 	There is a clear need for the control system. Looking at Figure \ref{figrheotestres}, it can be seen that the different fluids are sheared at different rates due to their different viscosities. If the viscosity is not known (as would be expected for a fluid placed into a rheometer) this drift from the zero viscosity strain rate cannot be predicted. Instead, a control system should be in place to monitor the speed of the motor and maintain it at a set point to ensure that a desired strain rate is maintained.
 	
@@ -988,24 +1003,28 @@
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Conclusion and Discussion
-	\nc{Conclusion and Discussion}
-	
+	\nc{Conclusions and Future Work}
+	The rheometer works, but only for giving mean values of viscosity and when calibrated at a specific supply voltage. This is not enough for it to meet the brief, and there is work yet to be done for it to meet all of the objectives. The first method of calculating the viscosity is a very promising model, but is not complete as yet. This is one area that could be used to improve the results. In addition, quantitative speed and current sensors could be used to get a direct idea of the current supply to the motor and its speed. This would also eliminate the possibility of sensor drift - the sensor giving different readings over time and therefore the calibrations no longer being valid. Also, a temperature sensor should be added to monitor the temperature the system is measuring viscosity at. Temperature has a not-insignificant effect on the viscosity of several fluids (glycerol has a viscosity of around 3\,Pa\,s at 10$\rm^oC$) and 1.4\,Pa\,s at 20$\rm^oC$) and therefore it would be useful to record this information. 
+	\br
 	% FUTURE WORK
-	There is a lot of work that could be done to this system. Future work includes changing out the motor for a motor torque-sensitive model, introducing a piezo-electric stress sensor, and adding a camera for detecting optical evidence of jamming. Piezo electrics are often used as strain sensors in bridges and other systems. Previous work has used the strain sensor as a purely qualitative way of examining jamming (\cite{thescforsyth}). By relating the force observed on the piezo sensor to the drag coefficient of the sensor in the flowing fluid, and therefore the fluid's Reynold's number, the viscosity can be related to the voltage output of the piezo electric device. 
+	Future work could include: changing out the motor for a motor torque-sensitive model, introducing a piezo-electric stress sensor, and adding a camera for detecting optical evidence of jamming. Piezo electrics are often used as strain sensors in bridges and other systems. Previous work has used the strain sensor as a purely qualitative way of examining jamming (\cite{thescforsyth}). By relating the force observed on the piezo sensor to the drag coefficient of the sensor in the flowing fluid, and therefore the fluid's Reynold's number, the viscosity can be related to the voltage output of the piezo electric device. 
 	\br
 	Another future step to take with the project would be to use the control system developed along with the addition of some current control circuit to be able to control the shear stress (by controlling the motor torque). This would increase the utility of the rheometer by adding a second operational mode with controlled/constant shear stress as opposed to constant shear rate as it is at the moment.
+	\br
+	Complementary to the temperature sensor mentioned previous, some temperature control system would be extremely useful for the rheometer. Temperature control is normally included in other lab-based rheometers, usually in the form of a water jacket.
 	
 	%% APPENDIX %%
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Reflection and Review
 	
 	\nc{Reflection and Review}
-	The goal of this project was to design, build, and test a rheometer using a Raspberry Pi and open source software.\br
-	Over the course of the project I have learned a lot. Working with the Raspberry Pi has taught me a lot about how computers work, how they communicate, and how they may be used in industrial processes. Data processing and storage has been an important concern; with the Raspberry Pi taking thousands of measurements every second. The Pi only has limited memory available, which can fill up quickly. This was circumvented by saving the data to file, rather than keeping it in memory. 
+	Over the course of the project I have learned a lot. I have had to learn new things; I have had to improve pre-existing skills. The python language (and \LaTeX) was completely new to me at the start of the project. Although I have previous programming experience; I had to very quickly become familiar with new concepts and ways of thinking. The software development process was very segmented - some parts could be written and tested very quickly, others had to be tested with the rheometer hardware. Also, with hardware changes, the software had to be altered to suit. Sometimes, this meant loss of hours of work due to the code no longer being required. But this time was not lost. For example, I spent a day examining the datasheet for an ADC and pouring over the specification sheets for the $\rm I^2C$ serial communication protocol. However, I couldn't solder the ADC onto the breakout-board (I lacked both the skills and equipment). Rather than sinking more time into fine-tuning my soldering skills, a new ADC was found (which did not require soldering but had a lower resolution). This ADC used the SPI protocol and so didn't need the $\rm I^2C$ code I had written previously. However, with my experience of working with serial data transfer and reading datasheets, the new SPI code didn't take any time at all to write.
+	\br
+	Working with the Raspberry Pi has taught me a lot about how computers work, how they communicate, and how they may be used in industrial processes. Data processing and storage has been an important concern; with the Raspberry Pi taking thousands of measurements every second. The Pi only has limited memory available, which can fill up quickly. This was circumvented by saving the data to file, rather than keeping it in memory. 
 	\br
 	Another thing I gained a lot of experience with was data processing. Data recorded from sensors was noisy - due to random fluctuations in temperature, air pressure, vibrations, power supply. The noise was reduced using a filtering algorithm. As I was researching noise filtering I learned about the types of filters and how they work, I learned about how different signal domains (like the frequency domain) can be used to remove unwanted parts of the signal.
 	\br
-	[Unfinished section]
+	The project has had me trying new ideas and testing them to see if they work; if they don't I had to move on, to try something else. A good example of this is the speed sensor. Originally I was going to use a hall effect sensor to sense the presence of a magnet - this could be recorded by the Raspberry Pi and used to calculate the speed. However (despite my many attempts and alterations) this method did not work. I moved on, tried a similar method using a light gate. This method resulted in similar disappointment so I moved on to a fully different method - the dynamo. This method is not as accurate as the other methods tried would have been, but it is reliable. This is typical of many things I tried in the report: try, fail, try again. 
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Nomenclature

@@ -291,11 +291,12 @@ else:
 
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
-    ax.errorbar(cus, Tss, xerr=custd, yerr=Tstd, marker='o', linestyle='None', label="Calulated Torque")
+    ax.errorbar(cus, Tss, xerr=custd, yerr=Tstd, marker='o', linestyle='None', label="$Calulated\ Torque$")
     ax.plot(cuf, outp, label=fiteqn)
     ax.set_xlabel("\n $Current,\ A$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Torque,\ N.m$\n", ha='center', va='center', fontsize=24)
     plt.legend(loc=2)
+    plt.grid(which='both', axis='both')
     plt.savefig("./fig_t_ref_cal.png")
     plt.close(f)
     
@@ -333,6 +334,8 @@ else:
     ax.axvline(gam_dot_sp, linestyle='--', marker='None', color='y')
     
     #ax.set_yscale('log')
-    ax.set_xlabel("\n $Strain\ Rate,\ s^{-1}$", ha='center', va='center', fontsize=24)
-    ax.set_ylabel("$Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
+    ax.set_xlabel("\n" + r"$\dot\gamma,\ Strain\ Rate,\ \rm s^{-1}$", ha='center', va='center', fontsize=24)
+    ax.set_ylabel(r"$\mu,\ Viscosity,\ \rm Pa\,s$" + "\n", ha='center', va='center', fontsize=24)
+    plt.legend(["98.73 vol%", "96.23 vol%", "93.75 vol%", "88.87 vol%"], loc=1)
+    plt.grid(which='both', axis='both')
     plt.savefig("./fig_t_ref_check.png")
