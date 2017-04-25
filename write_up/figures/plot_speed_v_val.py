@@ -68,7 +68,7 @@ for i in range(1, len(filtered_reading[::50000]) - 1):
     avfv.append(np.average(filtered_reading[(i * 50000) - 24999:(i * 50000) + 25000]))
 #filtered_reading[::50000]
 # Plot data and trendline
-print len(((read_pv[::50000] * 0.066) + 2.278)[1:-1]), len(stdfv), len(avfv)
+#print len(((read_pv[::50000] * 0.066) + 2.278)[1:-1]), len(stdfv), len(avfv)
 ax.errorbar(((read_pv[::50000] * 0.066) + 2.278)[1:-1], avfv, yerr=stdfv, marker='o', linestyle='None', label="$Read Motor Speed$")
 #ax.plot((read_pv * 0.066) + 2.278, read_speed, color=(1,0,0,0.1))
 ax.plot((pv * 0.066) + 2.278, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
@@ -103,8 +103,8 @@ ax.plot(pv, theo_volt, "x", label="$Theoretical\ Voltage$")
 plt.errorbar(pv, av_volt, yerr=stdv, label="$Motor\ Voltage$", fmt='o', ecolor='g', color='g')
 ax.plot(pv, tl(pv), 'r--', label="$V_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{ms}"))
 
-ax.set_xlabel("\n $Potentiometer\ Value,\ unitless$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$Average\ Supply\ Voltage,\ V$\n", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $Potentiometer\ Value,\ 10-bit$", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$V_{ms},\ Supply\ Voltage,\ V$\n", ha='center', va='center', fontsize=24)
 
 plt.legend(loc=4)
 

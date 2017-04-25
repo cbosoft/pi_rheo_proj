@@ -68,8 +68,8 @@ for i in range(0, len(mu)):
     ax.errorbar(gam_dot[i], mu[i], xerr=0.0, yerr=yerrs[i], fmt='o', label="$Read\ Data$")
 
 ax.set_ylim([0, 2])
-ax.set_xlabel("\n $Shear\ Rate,\ s^{-1}$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n" + r"$\dot\gamma,\ Shear\ Rate,\ s^{-1}$", ha='center', va='center', fontsize=24)
+ax.set_ylabel(r"$\mu,\ Viscosity,\ Pa.s$" + "\n", ha='center', va='center', fontsize=24)
 
 # Show Legend
 plt.legend(["100 vol%", "98.87 vol%", "96.23 vol%", "93.75 vol%", "88.87 vol%"], loc=1)

@@ -176,13 +176,12 @@ z3z = np.polyfit(tl(pv), tlo(pv), 1)
 t3l = np.poly1d(z3z)
 
 # Plot data and trendline
-#ax.plot(rv, av_speed_long, 'o', label="$Recorded\ Speed$")
 ax.plot(tl(pv), t3l(tl(pv)), 'r-', label="$v_{2} = {0:.3f} V_D {1:.3f}$".format(z3z[0], z3z[1], "{m}"))
 
 ax.errorbar(av_rvs, av_spd, yerr=std, xerr=stdv, linestyle='None', marker='o', label="$Logged Data$")
 
-ax.set_xlabel("\n $Dynamo\ Voltage,\ V$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $V_D,\ Dynamo\ Voltage,\ V$", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$\omega,\ Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
 
 # Show Legend
 plt.legend(loc=4)

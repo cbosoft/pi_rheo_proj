@@ -10,7 +10,7 @@ import numpy as np
 import glob
 
 import pandas as pd
-from plothelp import fit_line
+from plothelp import fit_line, svf, cvf1, cvf2, vsvf
 
 
 
@@ -31,15 +31,15 @@ crmc3 = filter(st, crmc3, method="butter", A=2, B=0.001)
 cr2amc3 = filter(st, cr2amc3, method="butter", A=2, B=0.001)
 cr2bmc3 = filter(st, cr2bmc3, method="butter", A=2, B=0.001)
 
-cu = ((16.573 * crmc3 - 29.778) + (11.307 * cr2amc3 - 29.066) + (11.307 * cr2bmc3 - 29.066)) / 3
+cu = (cvf1(crmc3) + cvf2(cr2amc3) + cvf2(cr2bmc3)) / 3
 custd = [0] * len(cu)
 for i in range(0, len(cu)):
-    custd[i] = (max((11.307 * cr2amc3[i] - 29.066), (11.307 * cr2bmc3[i] - 29.066), (16.573 * crmc3[i] - 29.778)) - min((11.307 * cr2amc3[i] - 29.066), (11.307 * cr2bmc3[i] - 29.066), (16.573 * crmc3[i] - 29.778)))
+    custd[i] = (max(cvf1(crmc3[i]), cvf2(cr2amc3[i]), cvf2(cr2bmc3[i])) - min(cvf1(crmc3[i]), cvf2(cr2amc3[i]), cvf2(cr2bmc3[i])))
 
-sv = 0.066 * pv + 2.278
+sv = vsvf(pv)
     
 # Chop off outlying data
-start = 2500
+start = 3000
 stop = -1
 skip = 2000
 
@@ -55,12 +55,16 @@ ax = f.add_subplot(111)
 ax.errorbar(sv, cu, yerr=custd, linestyle='None', marker='o', label="$Read\ data$")
 ax.plot(sv, fit, label=fiteqn)
 
-ax.set_xlabel("\n $V_{ms}\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$I_{coil}\ Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n $V_{ms},\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$I_{coil},\ Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
 plt.grid(which='both', axis='both')
 plt.legend(loc=4)
 plt.savefig("./fig_ico_cal.png")
 plt.close(f)
+
+def ico(vms):
+    return icoilcoeffs[0] * vms + icoilcoeffs[1]
+
 
 ############ MOTOR EMF CURRENT AND STALL TORQUE CALIBRATION (MCST) ############
 
@@ -70,7 +74,7 @@ datmcst = pd.read_csv("./../../logs/g1000v.csv")
 stmcst = np.array(datmcst['t'], np.float64)
 stmcst = stmcst - stmcst[0]
 
-start2 = 15000
+start2 = 35000
 stop2 = -1
 skip2 = 10000
 crmcst = filter(st, np.array(datmcst['cr'], np.float64), method="butter", A=2, B=0.001)[start2:stop2:skip2]
@@ -79,7 +83,7 @@ cr2bmcst = filter(st, np.array(datmcst['cr2b'], np.float64), method="butter", A=
 drmcst = filter(st, np.array(datmcst['dr'], np.float64), method="butter", A=2, B=0.001)[start2:stop2:skip2]
 pvmcst = filter(st, np.array(datmcst['pv'], np.float64), method="butter", A=2, B=0.001)[start2:stop2:skip2]
 
-cumcst = ((16.573 * crmcst - 29.778) + (11.307 * cr2amcst - 29.066) + (11.307 * cr2bmcst - 29.066)) / 3
+cumcst = (cvf1(crmcst) + cvf2(cr2amcst) + cvf2(cr2bmcst)) / 3
 
 
 # Geometry of the couette cell
@@ -114,28 +118,94 @@ for i in range(0, len(T)):
     custdcst[i] = (max((11.307 * cr2amcst[i] - 29.066), (11.307 * cr2bmcst[i] - 29.066), (16.573 * crmcst[i] - 29.778)) - min((11.307 * cr2amcst[i] - 29.066), (11.307 * cr2bmcst[i] - 29.066), (16.573 * crmcst[i] - 29.778)))
     custdcst[i] = custdcst[i] / np.average(Ts)
 
-fit, fiteqn, coeffs = fit_line(svmcst, ys, 1, x_name="V_{ms}", y_name="I_{emf}/T_S")
+fit, fiteqn, emftscoeffs = fit_line(svmcst, ys, 1, x_name="V_{ms}", y_name="I_{emf}/T_S")
 
 f = plt.figure(figsize=(8,8))
 ax = f.add_subplot(111)
-print ys
-print custdcst
+
 ax.errorbar(svmcst, ys, yerr=custdcst, linestyle='None', marker='o', label="$Read\ Data$")
 ax.plot(svmcst, fit, 'g', label=fiteqn)
 
-ax.set_xlabel("\n $V_{ms}\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$I_{emf}/T_S\,\ A/N\,m$\n", ha='center', va='center', fontsize=24)
-ax.set_ylim([0, 8])
+ax.set_xlabel("\n $V_{ms},\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
+ax.set_ylabel("$I_{emf}/T_S,\ A/N\,m$\n", ha='center', va='center', fontsize=24)
+ax.set_ylim([0, max(ys)])
 plt.grid(which='both', axis='both')
 plt.legend()
 plt.savefig("./fig_emf_ts_cal.png")
 plt.close(f)
 
+def emfts(vms):
+    return emftscoeffs[0] * vms + emftscoeffs[1]
+
+############ VISCOSITY CALCULATION USING ABOVE CORRELATIONS ############
+
+def getmu(filename, start=0, stop=-1, skip=1):
+    dat = pd.read_csv(filename)
+    st = np.array(dat['t'], np.float64)
+    st = st - st[0]
+    dr = np.array(dat['dr'], np.float64)
+    cr = np.array(dat['cr'], np.float64)
+    cra = np.array(dat['cr2a'], np.float64)
+    crb = np.array(dat['cr2b'], np.float64)
+    pv = np.array(dat['pv'], np.float64)
+
+    cu1 = cvf1(cr)
+    cu2a = cvf2(cra)
+    cu2b = cvf2(crb)
+
+    cu = (cu1 + cu2a + cu2b) / 3
 
 
+    cu = filter(st, cu, method="butter", A=2, B=0.0001)
+    dr = filter(st, dr, method="butter", A=2, B=0.0001)
 
+    sv = vsvf(pv)
 
+    T = (cu - ico(sv)) / (emfts(sv))
+    tau = T / (2 * np.pi * ri * ri * fill_height) 
 
+    sp_rpms = svf(dr)
+    sp_rads = (sp_rpms * 2 * np.pi) / 60
+    gam_dot = (sp_rads * ri) / (ro - ri)
+
+    mu = tau / gam_dot
+
+    # Chop off unwanted data
+    st = st[start:stop:skip]
+    mu = mu[start:stop:skip]
+    gam_dot = gam_dot[start:stop:skip]
+    tau = tau[start:stop:skip]
+    return st, gam_dot, mu, tau
+
+st = [0] * 5
+gam_dot = [0] * 5
+mu = [0] * 5
+tau = [0] * 5
+
+st[0], gam_dot[0], mu[0], tau[0] = getmu("./../../logs/g1000v.csv")
+st[1], gam_dot[1], mu[1], tau[1] = getmu("./../../logs/g9873c.csv", start=100000)
+st[2], gam_dot[2], mu[2], tau[2] = getmu("./../../logs/g9623c.csv", start=30000)
+st[3], gam_dot[3], mu[3], tau[3] = getmu("./../../logs/g9375c.csv", start=30000)
+st[4], gam_dot[4], mu[4], tau[4] = getmu("./../../logs/g8887c.csv", start=30000)
+
+f = plt.figure(figsize=(8, 8))
+ax = f.add_subplot(111)
+
+x = gam_dot
+y = mu
+
+ax.errorbar(np.average(x[1]), np.average(y[1]), xerr=np.std(x[1]), yerr=np.std(y[1]), marker='o', linestyle='None')
+ax.errorbar(np.average(x[2]), np.average(y[2]), xerr=np.std(x[2]), yerr=np.std(y[2]), marker='o', linestyle='None')
+ax.errorbar(np.average(x[3]), np.average(y[3]), xerr=np.std(x[3]), yerr=np.std(y[3]), marker='o', linestyle='None')
+ax.errorbar(np.average(x[4]), np.average(y[4]), xerr=np.std(x[4]), yerr=np.std(y[4]), marker='o', linestyle='None')
+
+ax.set_xlabel("\n" + r"$\dot\gamma,\ Strain\ Rate,\ \rm s^{-1}$", ha='center', va='center', fontsize=24)
+#ax.set_ylabel(r"$\mu,\ Viscosity\,\ \rm Pa\,s$" + "\n", ha='center', va='center', fontsize=24)
+ax.set_ylabel(r"$\tau,\ Shear\ Stress\,\ \rm Pa$" + "\n", ha='center', va='center', fontsize=24)
+#ax.set_ylim([-100, 100])
+plt.grid(which='both', axis='both')
+#plt.legend()
+plt.savefig("./fig_mu_res.png")
 
 
 

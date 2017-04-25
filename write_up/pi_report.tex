@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{10573} % last proper build on Tue 25 April 2017 at 00:01:36
+\def\thewords{10740} % last proper build on Tue 25 April 2017 at 14:52:36
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -277,13 +277,26 @@
 	\section*{DC Motor}
 	DC motors use the current flowing through coils of wire to create a magnetic field. This field acts against permanent magnets within the motor creating a force pushing on the coils. The coils are mounted in a rotating structure called an armature. This is set up such that as the coil produces a field of one polarity in the direction of the magnet, the coil is pushed away from a magnetic pol and pulled towards its polar opposite. But as it passes this magnet to which it is attracted, the supply is switched within the motor causing the flow of current in the coil to reverse and thus the polarity of the magnetic field produced. The coil is then pushed away from the magnetic pole, and towards its polar opposite. This procedure is undergone by several coils in an optimal pattern within the motor to produce a constant velocity \cite{backdcmotor}.
 	\br
-	The behaviour of the motor can be predicted using so-called "characteristic equations" or "characteristic curves" \br \cbh \cbh \cbh
+	The behaviour of the motor can be predicted using characteristic equations. These equations describe how the motor performs under load at a supply voltage. Figure \ref{figmotcharexample} is an example of a plot of these characteristic equations for a DC motor. At the right hand side, the torque is the stall torque --- a load high enough to halt movement of the motor. At the left hand side, the motor is unloaded and the speed is at a maximum --- the no-load speed. This plot is for a single supply voltage: the stall torque and supply voltage both vary with voltage. 
+	\br
+	It can be seen that the current draw line does not pass through the origin - there is some 'minimum' current. This 'minimum' current is the current drawn by the voltage passing through the coils ($I_{coil}$) in the motor - by Ohm's law ($V = I \times R$) this varies with voltage by the resistance of the coils. The 'top' current (or EMF current, $I_{emf}$) on top of the coil current is the current drawn by the magnetic field of the coils acting against the magnetic fields of the permanent magnets within the motor. If nothing was blocking motor's movement, there would be no force acting through the rotor and armature of the motor and therefore no back-emf requiring a higher current draw. If there is a force (some load on the motor) a force will be transmitted back through the shaft to the rotating armature, which will slow down. This slowing can be interpreted as reverse movement of the magnets around the coils and thus causing an increase in current draw. Therefore this current is proportional to the load (torque) on the motor. Equations \ref{eqnmotcharI} \& \ref{eqnmotcharO} are the equations of the two lines on the characteristic curve of a DC motor.
+	\begin{equation}
+		I_{ms} = I_{emf} \times \frac{T}{T_S} + I_{coil}
+		\label{eqnmotcharI}
+	\end{equation}
+	\begin{equation}
+		\omega = \omega_N \times \left(1 - \frac{T}{T_S}\right)
+		\label{eqnmotcharO}
+	\end{equation}
 	
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.45]{figures/placeholderfig.png}
-		\caption{Example DC Motor Characteristic Curve}
+		\includegraphics[scale=0.45]{figures/fig_mot_char_example.png}
+		\caption{Example DC Motor Characteristic Curve (adapted from \cite{dvdmotordat})}
 		\label{figmotcharexample}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Motor current draw plotted against torque load (blue line) and motor rotational speed plotted against torque (red line).
+		\end{subfigure}
 	\end{figure}
 	
 	\section*{Raspberry Pi}
@@ -366,7 +379,9 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Sponsoring Organisation
 	\nc{University of Strathclyde}
-	% Paragraph on what strathcyde is here
+	The project was undertaken at the University of Strathclyde, in the Chemical and Process Engineering (CPE) department. The CPE department at Strathclyde is involved in research that cab be split into three main areas \cite{strathresearch}: nanostructured materials, process development and monitoring, and multiscale simulation and theory.
+	\br
+	The University 
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -378,8 +393,7 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Methodology
 	\nc{Methodology}
-	This section describes \cbh \cbh \cbh 
-	\br
+	This section describes the final design of the rheometer, in several sections. Section 1 (Hardware Setup) describes that main components of the rheometer, the geometry, and the general layout. Section 2 (Electronic Circuits) describes the purpose and function of the circuits developed for the rheometer. Section 3 (Software) describes the available software, what was used, and what was written. Section 4 (Viscosity Calculation) describes how the viscosity was calculated using the information logged from the rheometer. Finally, Section 5 (Calibrations) describes how the hardware and sensor data was calibrated to be able to obtain useful information.
 	\section{Hardware Setup}
 	The experiment is based around a Couette cell consisting of two concentric cylinders with a fluid in between. The inner cylinder can be rotated by a DC motor (model 970D161) while the outer cylinder is fixed. The motor is controlled by a Raspberry Pi, which sets the rotational speed and reads the torque load on the motor. This is used to calculate the viscosity of the fluid. Motor speed is read in using a secondary motor acting as a dynamo. The dynamo is spun by the inner cylinder motor and produces a voltage proportional to its rotational speed. This voltage is then read in by the Raspberry Pi.
 	Figure \ref{expdia} gives a diagram of the set-up, dimensions of the Taylor-Couette cell are summarised in Table \ref{tabcellgeom}.
@@ -606,7 +620,7 @@
 	The viscosity of a fluid can be calculated using Newton's Viscosity Law, Equation \ref{eqnvisco}:
 	\[\mu = \frac{\tau}{\dot{\gamma}}\]
 	\newline
-	The shear stress and strain rate can be calculated from calibrated data from the motor, as well as speed and current supply readings from sensors. From the characteristic curve for a motor (Figure \ref{figmotcharexample}), Equations \ref{eqnmotcharI_obfs} \& \ref{eqnmotcharO_obfs} can be obtained. 
+	The shear stress and strain rate can be calculated from calibrated data from the motor, as well as speed and current supply readings from sensors. From the characteristic curve for a motor (Figure \ref{figmotcharexample}), Equations \ref{eqnmotcharI_obfs} \& \ref{eqnmotcharO_obfs} were read.
 	
 	\begin{equation}
 		I_{ms} = I_{emf} \times \frac{T}{T_S} + I_{coil}
@@ -618,9 +632,7 @@
 	\end{equation}
 	
 	\noindent
-	$I_{emf}$ represents the current drawn by the motor to overcome back-emf forces from resistances encountered in spinning the motor: if nothing was blocking its movement, there would be no force acting through the rotor and armature of the motor and therefore no back-emf force drawing more current. This comes about due to the force slowing down the rotation of the motor, while a current is still demanding movement of the motor. This can be interpreted as reverse movement of the magnets around the coils and thus causing an increase in current draw. $I_{coil}$ is the current drawn by the motor to overcome the resistance in the coils in the wire. This simply follows Ohm's law (\(V=I\times R\)), however the resistance of the armature coils is difficult to predict since the coils are constantly reversing direction and are actually in square wave AC (rather than straight DC). 
-	\br
-	Both of these currents vary with voltage supplied to the motor ($\rm V_{ms}$) and calibrations were obtained for each of the two ($I_{emf} (V_{ms})$ and $I_{coil} (V_{ms})$, Equation \ref{eqnemftscalea} \& \ref{eqnicocalea}), as well as stall torque ($T_S (V_{ms})$). With the supply current being measured and the supply voltage known, the motor torque can then be calculated using Equation \ref{eqntorqueget}.
+	Both $I_{emf}$ and $I_{coil}$, as well as the stall torque $T_S$, vary with voltage supplied to the motor ($V_{ms}$) and calibrations were obtained for $I_{coil} (_{V_{ms}})$ and $\frac{I_{emf}}{T_S} (_{V_{ms}})$, Equations \ref{eqnemftscalea} \& \ref{eqnicocalea}). With the supply current being measured and the supply voltage known, the motor torque can then be calculated using Equation \ref{eqntorqueget}.
 
 	\begin{equation}
 		T = \frac{I_{ms} - I_{coil} (_{V_{ms}})}{\frac{I_{emf}}{T_S} (_{V_{ms}})}
@@ -634,19 +646,6 @@
 		\frac{I_{emf}}{T_S} (_{V_{ms}}) = A_{IemfTs} \times V_{ms} + B_{IemfTs}
 		\label{eqnemftscalea}
 	\end{equation}
-
-	\noindent
-	Equation \ref{eqnmotcharO_obfs} is Equation \ref{eqntcomplex} from \cite{backdcmotor} with two limits applited: at a load high enough that the motor can no longer spin, the torque output is the stall torque (\(T_s\)). At no load, the speed is at its highest and is called the no-load speed (\(\omega_N\)).
-	\begin{equation}
-	T = \frac{k_v V_a}{r_a} - \frac{{{k_v}^2} \omega}{r_a}
-	\label{eqntcomplex}
-	\end{equation}
-	
-	\nomenclature{$T$}{Motor torque\hfill $\rm Nm$}
-	\nomenclature[g]{$\omega$}{Motor rotational speed\hfill $\rm rad s^{-1}$}
-	\nomenclature{$k_v$}{EMF created in motor armature \hfill $\rm N/m$}
-	\nomenclature[aV ]{$V_a$}{Motor armature volume\hfill $\rm m^3$}
-	\nomenclature{$r_a$}{Motor armature radius\hfill $\rm m$}
 	
 	Torque is a force acting rotationally from a point source through a length. This length, in this case, is the radius of the inner cylinder of the Taylor-Couette cell. The torque is divided by this length, giving the force applied by the motor. This is the force applied to the fluid which causes the shear: the area over which this is applied is used to obtain the shear stress applied to the fluid (Equation \ref{eqntaut}).
 	
@@ -799,7 +798,7 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Evaluation
 	\nc{Evaluation}
-	(How well did the bits work? How well does the rheometry calculation turn out) \cbh \cbh \br
+	In this chapter, the calibrations and assumptions made throughout are tested for validity, and the rheometer is evaluated against its design criteria.
 	\subsection*{Voltage Control}
 	To test the efficacy of the voltage control circuit, the voltage was varied (from 2.278\,V to 10.726\,V) using the digital potentiometer and measured using a voltmeter. This data was compared with the theoretical result from Equation \ref{eqnmotsupvol} and plotted in Figure \ref{figvoltvval}. This shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
@@ -899,9 +898,9 @@
 	Due to the Butterworth's nature as a frequency filter, it could cause issue with reading the intermittent jumps up in viscosity due to jamming. This could be circumvented by developing a filter which recognises the different magnitude of jamming to the noise signal. Or the noise could be analysed for constituent signals: the noise could be originating from the 50Hz power supply, or another regular source. Repeated application of different band-stop filters would eliminate the known sources of noise, therefore any remaining disruption in the signal is useful data.
 	
 	\subsection*{Rheometry}
-	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids. The rheometer was calibrated with aqueous glycerol solutions (see Table \ref{tabreffluvisc}), before verifying the calibrations by calculating the viscosity of the reference fluids from logged data.
+	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids, Table \ref{tabreffluvisc} displays the compositions and viscosities of these reference fluids.
 	\br
-	The scissor lift was lowered. The outer cylinder of the rheometer was loaded with 15ml of the first fluid using a 5ml syringe (taking care to avoid bubbles). The scissor lift was then raised into the working position; the two cylinders as close together as possible without touching. The cylinders were then aligned by turning on the motor and observing the flow of the fluid. The fluid would climb up the side of the cylinder if the inner cylinder was too close. On the Raspberry Pi a script was written which will load the motor class, with the appropriate settings, and log the data required to calculate the viscosity of the fluid in the rheometer. The script also dictates how the speed of the motor should vary, if at all. The motor's speed (and therefore the rate of strain experienced by the fluid) was kept constant for 5 minutes. This was repeated for each of the four reference solutions, and both pure glycerol and water. The resulting calculated viscosities for each fluid were compared with the results obtained from the DHR-2, as plotted on Figure \ref{figrheotestres}.
+	To facilitate loading of the rheometer, the scissor lift was lowered. The outer cylinder of the rheometer was then loaded with 15ml of the first fluid using a 5ml syringe (taking care to avoid bubbles). The scissor lift was then raised into the working position; the two cylinders as close together as possible without touching. The cylinders were then aligned by turning on the motor and observing the flow of the fluid. The fluid would climb up the side of the cylinder if the inner cylinder was too close. On the Raspberry Pi a script was written which will load the motor class, with the appropriate settings, and log the data required to calculate the viscosity of the fluid in the rheometer. The script also dictates how the speed of the motor should vary, if at all. The motor's speed (and therefore the rate of strain experienced by the fluid) was kept constant for 5 minutes. This was repeated for each of the four reference solutions, and both pure glycerol and water. The resulting calculated viscosities for each fluid were compared with the results obtained from the DHR-2, as plotted on Figure \ref{figrheotestres}.
 	
 	\nomenclature[g]{$\mu_{glycerol}$}{Viscosity of glycerol\hfill $\rm Pa\,s$}
 	\nomenclature[g]{$\mu_{water}$}{Viscosity of water\hfill $\rm Pa\,s$}
@@ -940,22 +939,17 @@
 	\br
 	There is a clear need for the control system. Looking at Figure \ref{figrheotestres}, it can be seen that the different fluids are sheared at different rates due to their different viscosities. If the viscosity is not known (as would be expected for a fluid placed into a rheometer) this drift from the zero viscosity strain rate cannot be predicted. Instead, a control system should be in place to monitor the speed of the motor and maintain it at a set point to ensure that a desired strain rate is maintained.
 	
+	\subsection*{Design Criteria}
+	The design criteria laid out at the beginning were that the rheometer should:
+	\begin{itemize}
+		\item 
+	\end{itemize}
+	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Conclusion and Discussion
 	\nc{Conclusion and Discussion}
-	%REWRITE
-	The rheometer does not meet its design criteria. The electronics worked well - the motor supply voltage check proved the circuit delivered the expected voltages, the dynamo and Hall effect sensors read the speed and current adequately too. The system's failing lie in the calibrations and calculation assumptions. When calibrating the torque as a function of motor supply current, the resulting linear fit equation is not sufficient to give the torque at different shear rates - further calibration is required. The motor output torque not only varies with the fluid's viscosity, but also the friction of the gearing attached to the motor. As the speed increases, this friction increases. \cbh
-	\br
-	The motor was not sensitive at all to changes in torque. A large (several orders of magnitude) change in torque represented a tiny change in the current. The motor was a relatively high power model (up to 15v, 20,000RPM) which was geared to reduce speed. The ratio was 16:1, meaning speed was reduced by a factor of 16, but torque output was increased by a factor of 16. Going backwards, this means that a torque requirement increase at the shaft is reduced 16 times at the motor outlet further decreasing its sensitivity to torque. Given that this was an integral part of the design a new (more sensitive) motor should be sought, or a different method of measuring the shear stress experienced by the fluid should be found. This (more sensitive motor) will allow for more accurate torque measurement by allowing the sensors to pick up a bigger range of current supplies.
-	\br
-	There was a huge amount of noise in the readings which had to be filtered out. The filter used was a low-pass frequency filter. Any high frequency noise was removed. If a jamming event is high frequency, then this filter will remove it along with the noise resulting in a loss of useful data. Alternative filters are available - Gaussian weighted average, spline smoothing, or Wiener probabilistic filter - however these were discounted for reasons stated earlier. A solution would be to identify the sources of noise in the signal, and specifically remove the noise with a band-stop frequency filter while hopefully leaving the important information in the signal. 
-	\br
-	One possible source of the noise is variance in the mains power supply. Mains electricity is single phase 50Hz AC - it is a single sinusoidal wave varying from +230V to -230V. When this is converted to DC, the signal is first converted to its absolute value, and is then smoothed out. This may not be done perfectly, resulting in a trace of the original sinusoid in the DC signal. This noise will have a frequency of 50Hz. 
-	\br
-	The voltage reference used by the ADC to convert real world signals into digital signals could vary if not properly regulated. The 3.3V reference used by the ADC comes from the Raspberry Pi's GPIO header and is regulated by the Raspberry Pi and should not, and does not, vary. A voltmeter was attached and the signal was found to stay constant at 3.3V for the duration and is therefore unlikely as a source of noise. 
-	\br
-	The sensors themselves are potential sources for noise. The dynamo gave off very noisy data. This noise could arise from the way the dynamo is constructed: a series of coils which, when rotated in a magnetic field, produce a voltage. Since the magnetic field produced by the permanent magnets in the motor is not continuous and homogeneous, the output is going to vary as the motor rotates. Therefore the signal will dip and rise at a frequency of some multiple of the rotation rate. This noise can be reduced by calculating exactly what multiple of the rotation rate (the number of coils in the armature) and also knowing the shape of the noise waveform. Alternatively, other speed measurement methods could be sought. 
-	\br % FUTURE WORK
+	
+	% FUTURE WORK
 	There is a lot of work that could be done to this system. Future work includes changing out the motor for a motor torque-sensitive model, introducing a piezo-electric stress sensor, and adding a camera for detecting optical evidence of jamming. Piezo electrics are often used as strain sensors in bridges and other systems. Previous work has used the strain sensor as a purely qualitative way of examining jamming (\cite{thescforsyth}). By relating the force observed on the piezo sensor to the drag coefficient of the sensor in the flowing fluid, and therefore the fluid's Reynold's number, the viscosity can be related to the voltage output of the piezo electric device. 
 	\br
 	Another future step to take with the project would be to use the control system developed along with the addition of some current control circuit to be able to control the shear stress (by controlling the motor torque). This would increase the utility of the rheometer by adding a second operational mode with controlled/constant shear stress as opposed to constant shear rate as it is at the moment.

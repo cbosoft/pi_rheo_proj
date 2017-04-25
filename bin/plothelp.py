@@ -53,3 +53,19 @@ def get_error(variable):
     return get_abs_sol_comp_unc(29.62, 0.38, err_glyc_vol_9887_abs / 29.62, err_wat_vol_9887_abs / 0.38)
 
 
+svf_raw = [308.768, -167.080]
+cvf1_raw = [15.93, -28.59]
+cvf2_raw = [11.07, -28.44]
+vsvf_raw = [0.066, 2.278]
+
+def svf(val):
+    return svf_raw[0] * val + svf_raw[1]
+
+def cvf1(val):
+    return cvf1_raw[0] * val + cvf1_raw[1]
+
+def cvf2(val):
+    return cvf2_raw[0] * val + cvf2_raw[1]
+
+def vsvf(val):
+    return vsvf_raw[0] * val + vsvf_raw[1]

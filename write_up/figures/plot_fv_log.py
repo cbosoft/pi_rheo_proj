@@ -80,7 +80,7 @@ if False:
 
     # Relate the stall torque to the current supply
     eff, __ =  curve_fit(fit2f, [(cu - cub)], T)
-    print eff
+    
 
     # Calculate the viscosity using the read data and the fit #####################################################################################################################################
     Tg_fc       = eff[0] * np.log((cu - cub)) + eff[2]
@@ -301,7 +301,7 @@ else:
     sp_rpms_sp = 5.13 * pv9873[0] + 15.275
     sp_rads_sp = 1
     gam_dot_sp = (((5.13 * 48 + 15.275) * 2 * np.pi) / 60 * 0.01525) / ((0.039111 / 2.0) - 0.01525)
-    print gam_dot_sp
+    
     # Use calibration to calculate the viscosity of each solution
     muc9873 = calc_mu(sp_rpms9873, cu9873, pv9873, eff, 15)
     muc9623 = calc_mu(sp_rpms9623, cu9623, pv9623, eff, 15)
