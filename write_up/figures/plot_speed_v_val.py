@@ -74,8 +74,8 @@ ax.errorbar(((read_pv[::50000] * 0.066) + 2.278)[1:-1], avfv, yerr=stdfv, marker
 ax.plot((pv * 0.066) + 2.278, av_spd, 'b-', label="$Actual\ Motor\ Speed$")
 ax.plot((pv * 0.066) + 2.278, tl(pv), 'g--', label="$v_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{NL}"))
 
-ax.set_xlabel("\n $Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$Motor\ Speed,\ RPM$\n", ha='center', va='center', fontsize=24)
+ax.set_xlabel("\n" + r"$V_{ms},\ Supply\ Voltage,\ \rmV$", ha='center', va='center', fontsize=24)
+ax.set_ylabel(r"$\omega,\ Motor\ Speed,\ \rmRPM$" + "\n", ha='center', va='center', fontsize=24)
 
 plt.legend(loc=2)
 
@@ -99,12 +99,13 @@ tl = np.poly1d(z)
 # Plot data
 stdv = np.std(av_volt)
 theo_volt = np.multiply(pv, 0.0636) + 2.423
-ax.plot(pv, theo_volt, "x", label="$Theoretical\ Voltage$")
-plt.errorbar(pv, av_volt, yerr=stdv, label="$Motor\ Voltage$", fmt='o', ecolor='g', color='g')
-ax.plot(pv, tl(pv), 'r--', label="$V_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{ms}"))
 
-ax.set_xlabel("\n $Potentiometer\ Value,\ 10-bit$", ha='center', va='center', fontsize=24)
-ax.set_ylabel("$V_{ms},\ Supply\ Voltage,\ V$\n", ha='center', va='center', fontsize=24)
+ax.plot(pv, theo_volt, "-", label="$Theoretical\ Voltage$", color='g')
+plt.errorbar(pv, av_volt, yerr=stdv, label="$Motor\ Voltage$", fmt='o', color='b')
+ax.plot(pv, tl(pv), 'rx--', label="$V_{2} = {0:.3f}pv + {1:.3f}$".format(z[0], z[1], "{ms}"))
+
+ax.set_xlabel("\n" + r"$Potentiometer\ Value,\ \rm10-bit$", ha='center', va='center', fontsize=24)
+ax.set_ylabel(r"$V_{ms},\ Supply\ Voltage,\ \rmV$" + "\n", ha='center', va='center', fontsize=24)
 
 plt.legend(loc=4)
 

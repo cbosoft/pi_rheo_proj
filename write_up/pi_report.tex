@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{10740} % last proper build on Tue 25 April 2017 at 14:52:36
+\def\thewords{10614} % last proper build on Tue 25 April 2017 at 18:35:51
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -195,10 +195,10 @@
 	\br
 	The hardware was controlled by a Raspberry Pi computer. This computer (originally developed as an educational item, to better computing skills in students) is around the size of a credit card, uses micro-USB for power, and can directly communicate with hardware over its General Purpose Input-Output ports (GPIO).
 	The hardware connected to the Raspberry Pi was relatively simply: a programmable motor driver circuit, and two sensors (one for rotational speed, and another for motor current supply).\br
-	The rheometer itself was a Taylor-Couette shear cell rheometer composed of two cylinders; the outer one hollow and contained the fluid; the inner one solid. The inner cylinder is rotated to shear the fluid. Sensors were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity.\br
-	The rheometer's ability to measure viscosity by using it to test the viscosity of several newtonian fluids of known viscosity (as tested in a laboratory rheometer). \cbh
-	\br
-	\cbh \br This report summarises the final design at the end of the 12 week long project. Chapter 2 gives background information on the concepts involved (the Raspberry Pi, non-Newtonian fluids and jamming). Chapter 3 gives a background on the University of Strathclyde and the Chemical and Process Engineering Department. Chapter 4 is a detailed description of the methods involved in the project; how the hardware was put together, what software was written, and how the calibrations and evaluations were undertaken. Chapter 5 evaluates the final build of the rheometer against the design criteria and discusses where it fell short and how improvements may be made. Chapter 6 consists of concluding remarks about the procedure; a summary of the results that were found, an evaluation of the final device, and a summary of future work. Chapter 7 gives my personal reflection on the project, how I have learned from the process, and what I felt could have been done better.
+	The rheometer itself was a Taylor-Couette shear cell rheometer composed of two cylinders; the outer one hollow and contained the fluid; the inner one solid. The inner cylinder is rotated to shear the fluid. Sensors were used to detect the torque and speed involved in rotating the cylinder, information which is used to calculate the viscosity. The rheometer's ability to measure viscosity by using it to test the viscosity of several newtonian fluids of known viscosity (as tested in a laboratory rheometer).
+	\br 
+	This report summarises the final design at the end of the 12 week long project. Chapter 2 gives background information on the concepts involved (the Raspberry Pi, non-Newtonian fluids and jamming). Chapter 3 is a detailed description of the methods involved in the project; how the hardware was put together, what software was written, and how the calibrations and evaluations were undertaken. Chapter 4 evaluates the final build of the rheometer against the design criteria and discusses where it fell short and how improvements may be made. Chapter 5 consists of concluding remarks about the procedure; a summary of the results that were found, an evaluation of the final device, and a summary of future work. Chapter 6 gives my personal reflection on the project, how I have learned from the process, and what I felt could have been done better.
+	%This report summarises the final design at the end of the 12 week long project. Chapter 2 gives background information on the concepts involved (the Raspberry Pi, non-Newtonian fluids and jamming). Chapter 3 gives a background on the University of Strathclyde and the Chemical and Process Engineering Department. Chapter 4 is a detailed description of the methods involved in the project; how the hardware was put together, what software was written, and how the calibrations and evaluations were undertaken. Chapter 5 evaluates the final build of the rheometer against the design criteria and discusses where it fell short and how improvements may be made. Chapter 6 consists of concluding remarks about the procedure; a summary of the results that were found, an evaluation of the final device, and a summary of future work. Chapter 7 gives my personal reflection on the project, how I have learned from the process, and what I felt could have been done better.
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -363,8 +363,8 @@
 	\end{equation}
 	
 	\nomenclature{$|G(j\omega_f)|$}{Frequence response, or gain\hfill dB}
-	\nomenclature{$\omega_f$}{Passed signal frequency\hfill $\pi radians/sample$}
-	\nomenclature{$\omega_{cf}$}{Signal cutoff frequency\hfill $\pi radians/sample$}
+	\nomenclature{$\omega_f$}{Passed signal frequency\hfill $\rm \left(\pi\ radians\right)/sample$}
+	\nomenclature{$\omega_{cf}$}{Signal cutoff frequency\hfill $\rm \left(\pi\ radians\right)/sample$}
 	
 	\noindent
 	
@@ -378,10 +378,10 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Sponsoring Organisation
-	\nc{University of Strathclyde}
-	The project was undertaken at the University of Strathclyde, in the Chemical and Process Engineering (CPE) department. The CPE department at Strathclyde is involved in research that cab be split into three main areas \cite{strathresearch}: nanostructured materials, process development and monitoring, and multiscale simulation and theory.
-	\br
-	The University 
+	%\nc{University of Strathclyde}
+	%The project was undertaken at the University of Strathclyde, in the Chemical and Process Engineering (CPE) department. The CPE department at Strathclyde is involved in research that cab be split into three main areas \cite{strathresearch}: nanostructured materials, process development and monitoring, and multiscale simulation and theory.
+	%\br
+	%The University 
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -505,7 +505,7 @@
 	\br
 	Packages used here:
 	\begin{itemize}
-		\item \texttt{RPi.GPIO}\cite{citerpigpio}: comes pre-installed on Raspian and was used for accessing the GPIO pins from a Python environment.
+		\item \texttt{RPi.GPIO} \cite{citerpigpio}: comes pre-installed on Raspian and was used for accessing the GPIO pins from a Python environment.
 		\item \texttt{spidev} \cite{srcspidev}: used to communicate with devices in an electric circuit using the Serial Peripheral Interface (SPI) protocol.
 		\item \texttt{numpy} \cite{numpyref}: used to perform calculations efficiently in the python environment and to fit equations to empirical data (using the \texttt{numpy.polyfit} function).
 		\item \texttt{scipy} \cite{scipyref}: used to perform scientific manipulations of data. Primarily used in this project to filter data using functions from the \texttt{scipy.optimise} package.
@@ -617,6 +617,7 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	\section{Viscosity Calculation}
+	\subsection*{Calculated Method}
 	The viscosity of a fluid can be calculated using Newton's Viscosity Law, Equation \ref{eqnvisco}:
 	\[\mu = \frac{\tau}{\dot{\gamma}}\]
 	\newline
@@ -647,6 +648,13 @@
 		\label{eqnemftscalea}
 	\end{equation}
 	
+	\nomenclature{$I_{coil}$}{Current drawn due to resistance in motor coils\hfill $\rm A$}
+	\nomenclature{$I_{emf}$}{Current drawn due to motor loading\hfill $\rm A$}
+	\nomenclature{$A_{Icoil}$}{Coefficient in coil current calibration\hfill $\rm A\,V^{-1}$}
+	\nomenclature{$B_{Icoil}$}{Y-intercept in coil current calibration\hfill $\rm A$}
+	\nomenclature{$A_{IemfTs}$}{Coefficient in emf current/stall torque calibration\hfill $\rm A\,Nm^{-1}\,V^{-1}$}
+	\nomenclature{$B_{IemfTs}$}{Y-intercept in emf current/stall torque calibration\hfill $\rm A\,Nm^{-1}$}
+	
 	Torque is a force acting rotationally from a point source through a length. This length, in this case, is the radius of the inner cylinder of the Taylor-Couette cell. The torque is divided by this length, giving the force applied by the motor. This is the force applied to the fluid which causes the shear: the area over which this is applied is used to obtain the shear stress applied to the fluid (Equation \ref{eqntaut}).
 	
 	\begin{equation}
@@ -654,7 +662,7 @@
 	\label{eqntaut}
 	\end{equation}
 	
-	\nomenclature{$\tau$}{Shear stress\hfill $\rm pa$}
+	\nomenclature{$\tau$}{Shear stress\hfill $\rm Pa$}
 	\nomenclature{$H$}{Fill depth of the Taylor-Couette cell\hfill $\rm m$}
 	
 	\noindent
@@ -668,6 +676,16 @@
 	\nomenclature{$r_i$}{Inner cylinder radius\hfill $\rm m$}
 	\nomenclature{$r_o$}{Outer cylinder radius\hfill $\rm m$}
 	
+	\subsection*{Calibrated Method}
+	A further method for calculating the viscosity was used. The rheometer was calibrated with several reference fluids at a single voltage to obtain an expression for the motor's torque as a function of the supply current. This can then be used in a similar manner to above, using the torque calibration to obtain the viscosity from the current reading and the speed of rotation of the motor.
+	\br
+	It is known that the motor torque varies with both supply current and supply voltage. By setting the voltage to a single value, the output torque can be calibrated against the current drawn by the motor. This method differs from the previous method by using Equation \ref{eqntrefcal} rather than Equation \ref{eqntorqueget}.
+	\begin{equation}
+	T = A_{TI} \times I_{ms} + B_{TI}
+	\label{eqntrefcal}
+	\end{equation}
+	\nomenclature{$A_{TI}$}{Coefficient in torque calibration\hfill $\rm Nm\,A^{-1}$}
+	\nomenclature{$B_{TI}$}{Y-intercept in torque calibration\hfill $\rm Nm$}
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	\section{Calibrations}
@@ -704,11 +722,15 @@
 	\end{equation}
 	
 	
-	\subsection*{HES Calibration}
-	The goal for this was to find a function of the HES output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)). The current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HES voltage output with the current reading. The current supply was plotted against the HES sensor voltage output (see Figure \ref{figcurevalres}). A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqncurvcr}.
+	\subsection*{HECS Calibration}
+	The goal for this was to find a function of the HECS output voltage reading that gives the current drawn by the motor (i.e. \(I_{ms} ({V_{HES}})\)) for both types of HECS sensor. The current was read at different supply voltages from a multimeter placed in the circuit. The logged data during this run was examined to compare the HECS voltages with the ammeter current reading. The current supply was plotted against the HECS sensor voltages output (see Figures \ref{fighes30a} \& \ref{fighes5a}). A first order equation was fit to the data (using the \texttt{numpy} package) to give Equation \ref{eqnhescal} for the 30A sensor and Equation \ref{eqndualhescal} for the two 5A sensors.
+	\begin{equation}
+	I_{ms} = 15.93 {\rm \, \frac{A}{V}} \times {V_{HES}} - 28.59 {\rm \, A}
+	\label{eqnhescal}
+	\end{equation}
 	\begin{equation}
 	I_{ms} = 3.580 {\rm \, \frac{A}{V}} \times {V_{HES}} - 7.784 {\rm \, A}
-	\label{eqncurvcr}
+	\label{eqndualhescal}
 	\end{equation}
 	
 	\nomenclature{$I_{ms}$}{Motor supply current\hfill $\rm A$}
@@ -717,15 +739,39 @@
 	\noindent
 	Where \(I_{ms}\) is the motor supply current, in amps, and \(V_{HES}\) is the voltage output from the Hall Effect Sensor as it enters the ADC, in volts.
 	
+	\begin{figure}[!htb]
+		\centering
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_hes_cal.png}
+			\caption{30A HECS Calibration}
+			\label{fighes30a}
+			\footnotesize
+			Supply current plotted against the filtered 30A HECS input (blue cirles). Error bars represent one standard deviation in the data. A 1$\rm ^{st}$ order polynomial was fit to the data (green line).
+		\end{subfigure}
+		\begin{subfigure}[t]{0.45\textwidth}
+			\centering
+			\includegraphics[scale=0.3]{figures/fig_dual_hes_cal.png}
+			\caption{Dual 5A HECS Calibration}
+			\label{fighes5a}
+			\footnotesize
+			Supply current plotted against the filtered 5A HECS input (blue cirles). Error bars represent one standard deviation in the data. A 1$\rm ^{st}$ order polynomial was fit to the data (green line).
+		\end{subfigure}
+		\label{hescalcomp}
+		\caption{HECS Calibration Results}
+	\end{figure}
+	
 	\subsection*{Reference Fluid Viscosity}
 	A relationship between the motor's torque output and the current drawn by the motor was obtained. This was done by putting a fluid of known viscosity into the rheometer and running it at constant shear rate. With the viscosity known and the strain rate known, the shear stress can be calculated. This shear stress was compared with the current draw and a linear equation was fit. 
 	\br
 	The compositions of the reference solutions were chosen to give solutions of viscosities evenly spaced between $\mu_{water} = 0.001\,Pa\,s$ and $\mu_{glycerol} = 1.41\,Pa\,s$. This was estimated by using tabulated data \cite{seguroberglycsolvisc}. The temperature in the laboratory is roughly 15$^oC$, and so the solutions' viscosity at this temperature was interpolated from data at 10$^oC$ and 20$^oC$. Table \ref{tabreffluvisc} shows both the theoretical and actual viscosities of the solutions used. 30ml of each solution was prepared by measuring out the required volume of glycerol with a syringe (BD Plastic, 5ml) and the required water with a micro-pipette (ErgoOne, 20$\mu l$ to 200$\mu l$) (the pure glycerol solution was far too viscous for the pipette to be able to measure out the volumes accurately). The solutions were split into two containers, one filled up to 20ml to be used in the rheometer, and another filled up to 10ml to be tested separately by a Discovery Hybrid Rheometer 2 (DHR-2). 
 	\br
-	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3Pa.s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
+	The DHR-2 was used to obtain an exact value for the viscosity of the solutions used. A small amount of each solution was tested with the DHR-2's 40mm parallel plate head at strain rates from 5$s^{-1}$ to 250$s^{-1}$. each sample was tested 3 times to confirm the result. The theoretically estimated data and the actual viscosity readings differ slightly. This is likely due to water contamination of the glycerol used to produce the solutions. Glycerol is very hydrophillic and will draw moisture out of the air. The viscosity of a glycerol water solution is highly sensitive to the presence of water (increasing water content from 0vol\% to 100vol\% results in the viscosity dropping by 2.3\,Pa\,s) therefore even a tiny amount of water in the glycerol source fluid is going to alter the viscosity hugely. It would be better to use higher viscosity solutions for a better range of values, but the important thing is that the reference solutions are of accurately known viscosity. 
 	\newline
 	\begin{table}
 		\centering
+		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
+		\label{tabreffluvisc}
 		\begin{tabular}{| c | c | c |}
 			\hline
 			Composition (vol\% glycerol) & Theoretical Viscosity ($Pa.s$) & Actual Viscosity ($Pa.s$)\\
@@ -737,8 +783,6 @@
 			88.87\% & 0.358 & 0.4005 \\
 			\hline
 		\end{tabular}
-		\caption{Compositions and Viscosities of Selected Aqueous Glycerol Solutions at 15$^o C$}
-		\label{tabreffluvisc}
 	\end{table}
 	
 	\subsection*{Motor Coil Current Calibration}
@@ -787,6 +831,21 @@
 		\end{subfigure}
 	\end{figure}
 	
+	\subsection*{Torque Calibration}
+	At constant voltage, the loading on the motor was varied to produce a calibration giving the torque load on the motor as a function of the motor current supply. Each of the reference fluids (compositions on Table \ref{tabreffluvisc}) were, in turn, loaded into the motor and run at a set supply voltage. The current drawn by the motor was logged using the motor class, also used to manage the supply voltage (via the potentiometer).
+	\br
+	The cell was loaded with 15ml of the reference fluid. The motor was run at a supply voltage of 5.4\,V. The motor was left to run for several minutes to allow the system to come to steady state. Data from the current sensors and the dynamo was logged every millisecond. This was repeated for each of the reference fluids. With the viscosity of the reference fluids known, the torque load on the motor is therefore also known. This torque is plotted against the current drawn for each reference fluid, and a linear equation was then fit to the results, see Figure \ref{figtical}.
+	\newline
+	\begin{figure}[!htb]
+		\centering
+		\includegraphics[scale=0.45]{figures/fig_t_ref_cal.png}
+		\caption{Torque Calibration Results}
+		\label{figtical}
+		\begin{subfigure}{0.9\textwidth}
+			\footnotesize Torque load on the motor plotted against supply current (minus free load current) at constant supply voltage (blue circles). Error bars show one standard deviation. Also plotted is a linear fit equation (green line).
+		\end{subfigure}
+	\end{figure}
+	
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -798,7 +857,7 @@
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Evaluation
 	\nc{Evaluation}
-	In this chapter, the calibrations and assumptions made throughout are tested for validity, and the rheometer is evaluated against its design criteria.
+	In this chapter, the calibrations used in the project are tested for validity, and the rheometer is evaluated against its design criteria.
 	\subsection*{Voltage Control}
 	To test the efficacy of the voltage control circuit, the voltage was varied (from 2.278\,V to 10.726\,V) using the digital potentiometer and measured using a voltmeter. This data was compared with the theoretical result from Equation \ref{eqnmotsupvol} and plotted in Figure \ref{figvoltvval}. This shows the read voltage supply being very close to the theoretically predicted result. A linear equation was fit to the results and compared to the theoretical, again there was excellent agreement. The circuit worked as expected.
 	\begin{figure}[!htb]
@@ -824,36 +883,11 @@
 	\end{figure}
 	
 	\subsection*{Speed Measurement} % last edited 14/3/2017
-	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using a tachometer. The recorded speeds (the tachometer results and the calibrated dynamo results) were plotted on Figure \ref{figdynocheck}. The two signals correspond fairly well, indicating that the speed measurement system works well. However, there was a fairly large amount of noise in the speed measurement signal from the dynamo. This can be seen on Figure \ref{figdynocheck} in the large error bars. The filtering algorithm works well to remove the noise to obtain a useful signal. On Figures \ref{fignoisehistolow} \& \ref{fignoisehistolow}, histograms of the noise at low supply voltage and high supply voltage were plotted respectively. The noise [talk about the shape of the noise (is the histo flat, is it a normal distribution etc etc)]\br
-	\begin{figure}[!htb]
-		\centering
-		\begin{subfigure}{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/placeholderfig.png}
-			\caption{Dynamo Raw Data Histogram (Low Speed)}
-			\label{fignoisehistolow}
-		\end{subfigure}
-		\begin{subfigure}{0.45\textwidth}
-			\centering
-			\includegraphics[scale=0.35]{figures/placeholderfig.png}
-			\caption{Dynamo Raw Data Histogram (High Speed)}
-			\label{fignoisehistohigh}
-		\end{subfigure}
-	\end{figure}
+	The rotational speed of the motor needed to be measured accurately and quickly, to be able to calculate the viscosity, and to ensure high enough sample rate that the jamming phenomenon can be seen. This was achieved by using a second motor as a dynamo, linked to the controlled motor via a belt. The dynamo will be spun and generate a voltage proportional to the rate at which it is spun, similar to the speedometer in a car. The magnitude of the voltage can be read in using an ADC by the Raspberry Pi (up to 200,000 samples per second). Accuracy of the set-up was tested using a tachometer. The recorded speeds (the tachometer results and the calibrated dynamo results) were plotted on Figure \ref{figdynocheck}. The two signals correspond fairly well, indicating that the speed measurement system works well. However, there was a fairly large amount of noise in the speed measurement signal from the dynamo. This can be seen on Figure \ref{figdynocheck} from the relatively large error bars. 
 	
 	\subsection*{Current Sensor}
-	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data (see Figure \ref{figcurevalres}).to give an equation for the current in terms of the HES voltage. A 3$\rm ^{rd}$ order equation was found to best fit the experimental results.\br
-	Figure \ref{figcurevalres} shows how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. The values are in agreement, although the data is somewhat noisy despite the applied filtering.
-	
-	\begin{figure}[!htb]
-		\centering
-		\includegraphics[scale=0.35]{figures/fig_hes_cal.png}
-		\caption{Current Sensor Evaluation Results}
-		\label{figcurevalres}
-		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Supply current plotted against the filtered HES input (blue cirles). Error bars represent one standard deviation in the data. A 1$\rm ^{st}$ order polynomial was fit to the data (green line).
-		\end{subfigure}
-	\end{figure}
+	The sensor was calibrated by reading in from the sensor and comparing this value with the actual current reading obtained using a standard lab multimeter, repeating this at different voltages (thus also different rotational speeds and different currents). An equation was fit to the data to give an equation for the current in terms of the HES voltage. A 1$\rm ^{st}$ order equation was found to best fit the experimental results.\br
+	Figures \ref{fighes30a} \& \ref{fighes5a} show how the calibrated current readings (after filtering) compare with actual values obtained using a multimeter. These values are in good agreement, although the data is somewhat noisy despite the applied filtering.
 	
 	\subsection*{Data Filtering}
 	There were a number of options for data filtering methods to choose from. Each altered the data in different ways. The final chosen method was a Butterworth low-pass frequency filter. The other choices were a gaussian weighted average method, a Wiener filter, and using spline interpolation. Spline interpolation filters the signal by observing the shape of the response and "drawing" a clean signal best suited. It was ruled out for not accurately following the path of the signal. The Gaussian method is a moving average, with the samples weighted according to a Gaussian normal distribution. Gaussian filtering was ruled out as it reacted to slowly to sharp changes in input readings. Wiener filtering uses statistics to estimate the desired output. The Butterworth signal was chosen as the best filter for use in the rheometer as it provided the best tracking of fluctuations in the data whilst eliminating noise.
@@ -896,6 +930,8 @@
 	
 	\noindent
 	Due to the Butterworth's nature as a frequency filter, it could cause issue with reading the intermittent jumps up in viscosity due to jamming. This could be circumvented by developing a filter which recognises the different magnitude of jamming to the noise signal. Or the noise could be analysed for constituent signals: the noise could be originating from the 50Hz power supply, or another regular source. Repeated application of different band-stop filters would eliminate the known sources of noise, therefore any remaining disruption in the signal is useful data.
+	\br
+	In addition to Figure \ref{figfiltbu}'s example use of the Butterworth Filter, the efficacy of the algorithm can be see elsewhere. In Figure \ref{figdynocheck}, the error bars show the noise in the speed reading taken by the Dynamo. Despite the noisy signal, the filtering algorithm is able to ascertain the useful data within the signal and able to report the correct speed signal fairly accurately.
 	
 	\subsection*{Rheometry}
 	The rheometer's ability to accurately report the viscosity of a test fluid was evaluated by using the rheometer to measure the viscosity of reference fluids of known viscosity. The results were then compared to the viscosity measurement taken using a standard lab rheometer. The rheometer was used to measure the viscosity of several reference fluids, Table \ref{tabreffluvisc} displays the compositions and viscosities of these reference fluids.
@@ -908,11 +944,11 @@
 	\noindent
 	\begin{figure}[!htb]
 		\centering
-		\includegraphics[scale=0.45]{figures/fig_t_ref_check.png}
-		\caption{Torque Calibration Check}
+		\includegraphics[scale=0.45]{figures/fig_mu_res.png}
+		\caption{Mu Calculation}
 		\label{figrheotestres}
 		\begin{subfigure}{0.9\textwidth}
-			\footnotesize Viscosity of reference fluids plotted against time. Each colour represents a different composition of reference solution (blue - 98.73v\%, green - 96.23v\%, red - 93.75v\%, and cyan - 88.87v\%). The large circles represent the average calculated viscosity for each fluid, the error bars represent one standard deviation. The small circles are the expected viscosities for each of the solutions. The yellow dashed line shows the set strain rate for each of the solutions.
+			\footnotesize Viscosity of reference fluids plotted against time. Each colour represents a different composition of reference solution (blue - 98.73v\%, green - 96.23v\%, red - 93.75v\%, and cyan - 88.87v\%). The error bars represent one standard deviation. The small circles are the expected viscosities for each of the solutions. The yellow dashed line shows the set strain rate for each of the solutions.
 		\end{subfigure}
 	\end{figure}
 	
@@ -942,8 +978,13 @@
 	\subsection*{Design Criteria}
 	The design criteria laid out at the beginning were that the rheometer should:
 	\begin{itemize}
-		\item 
+		\item be able to calculate the viscosity of a fluid as it varies with time.
+		\item be operationally modular (easy to alter the exact parameters with which it runs).
+		\item be low-cost (under \pounds 100).
 	\end{itemize}
+	The final design consisted of a Raspberry Pi (\pounds 30), some electronic hardware (ADC -- \pounds 3, HECS sensors -- \pounds 5 $\times$ 3, resistors -- \pounds nil, operational amplifiers -- \pounds 7, breadboard -- \pounds 10, and wires -- \pounds nil), a DC motor (\pounds 5), Two cylinders (estimated \pounds 11) and various pieces of lab equipment (clamp stand, scissor lift etc.). All of this together (around \pounds 70) is below the target of \pounds 100 and well below the cost of a satndard laboratory rheometer (on the order of tens of thousands of pounds). In this regard, the rheometer has met its target.
+	The device is controlled entirely via scripts using the python classes developed over the course of this project, resulting in a system which can be tweaked and altered depending on the needs of the situation. Again, in this regard the rheometer has met its target.
+	Finally, the rheometer did not quite meet its target for 
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Conclusion and Discussion

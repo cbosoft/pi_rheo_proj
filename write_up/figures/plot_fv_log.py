@@ -287,14 +287,15 @@ else:
     cuf = [cus[0], cus[1], cus[3]]
     Tsf = [Tss[0], Tss[2], Tss[3]]
     
-    outp, fiteqn, eff = fit_line(cuf, Tsf, 1)
+    outp, fiteqn, eff = fit_line(cuf, Tsf, 1, x_name="I_{ms}", y_name="T")
 
     f = plt.figure(figsize=(8, 8))
     ax = f.add_subplot(111)
-    ax.errorbar(cus, Tss, xerr=custd, yerr=Tstd, marker='o', linestyle='None')
-    ax.plot(cuf, outp)
+    ax.errorbar(cus, Tss, xerr=custd, yerr=Tstd, marker='o', linestyle='None', label="Calulated Torque")
+    ax.plot(cuf, outp, label=fiteqn)
     ax.set_xlabel("\n $Current,\ A$", ha='center', va='center', fontsize=24)
     ax.set_ylabel("$Torque,\ N.m$\n", ha='center', va='center', fontsize=24)
+    plt.legend(loc=2)
     plt.savefig("./fig_t_ref_cal.png")
     plt.close(f)
     

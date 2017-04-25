@@ -10,14 +10,14 @@ import numpy as np
 import glob
 
 import pandas as pd
-from plothelp import fit_line, svf, cvf1, cvf2, vsvf
+from plothelp import fit_line, svf, cvf1, cvf2, vsvf, fit_grad
 
 
 
 ############ MOTOR COIL CURRENT CALIBRATION (MC3) ############
 
 # Read data from empty run .csv
-datmc3 = pd.read_csv("./../../logs/dual_hes_long100.csv")
+datmc3 = pd.read_csv("./../../logs/dual_hes_long1000.csv")
 
 st = np.array(datmc3['t'], np.float64)
 st = st - st[0]
@@ -39,9 +39,9 @@ for i in range(0, len(cu)):
 sv = vsvf(pv)
     
 # Chop off outlying data
-start = 3000
+start = 10000
 stop = -1
-skip = 2000
+skip = 2500
 
 sv = sv[start:stop:skip]
 cu = cu[start:stop:skip]
@@ -57,6 +57,7 @@ ax.plot(sv, fit, label=fiteqn)
 
 ax.set_xlabel("\n $V_{ms},\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$I_{coil},\ Viscosity,\ Pa.s$\n", ha='center', va='center', fontsize=24)
+#ax.set_ylim(0, max(cu))
 plt.grid(which='both', axis='both')
 plt.legend(loc=4)
 plt.savefig("./fig_ico_cal.png")
@@ -109,7 +110,7 @@ tau     = mus * gam_dot
 svmcst  = (pvmcst * 0.066 + 2.278)
 T       = tau * (2 * np.pi * ri * ri * fill_height) 
 Ts      = T / (1.0 - (sp_rpms / sn_rpms))
-icoil   = icoilcoeffs[0] * svmcst + icoilcoeffs[1]
+icoil   = ico(svmcst)
 imsmico = cumcst - icoil
 ys = imsmico / Ts
 
@@ -128,7 +129,7 @@ ax.plot(svmcst, fit, 'g', label=fiteqn)
 
 ax.set_xlabel("\n $V_{ms},\ Supply\ Voltage,\ V$", ha='center', va='center', fontsize=24)
 ax.set_ylabel("$I_{emf}/T_S,\ A/N\,m$\n", ha='center', va='center', fontsize=24)
-ax.set_ylim([0, max(ys)])
+ax.set_ylim([0, max(ys) + 0.4])
 plt.grid(which='both', axis='both')
 plt.legend()
 plt.savefig("./fig_emf_ts_cal.png")

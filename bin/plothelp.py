@@ -1,6 +1,17 @@
 # plot helper
 # useful defs for plotting
 import numpy as np
+from scipy.optimize import curve_fit
+
+def fitf(x, a):
+    return a * x
+
+
+def fit_grad(x, y, number, x_name="x", y_name="y"):
+    coeffs, __ = curve_fit(fitf, x, y)
+    fit_eqn = r"${}\ =\ {:.4f} \times {}$".format(y_name, coeffs[0], x_name) 
+    return fitf(x, *coeffs), fit_eqn, coeffs[0]
+
 
 def fit_line(x, y, dg, x_name="x", y_name="y"):
     x = np.array(x)
