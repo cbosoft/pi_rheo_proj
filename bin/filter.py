@@ -9,16 +9,14 @@ import numpy as np  # for maths
 from scipy.interpolate import UnivariateSpline  # for splining
 from scipy.signal import wiener, filtfilt, butter, gaussian  # for fliter-making
 from scipy.ndimage import filters # for applying filters
-#import scipy.optimize as op
-#import matplotlib.pyplot as plt
         
-def gaussianf(x, y, samples=51, sigma=7):
-	b = gaussian(samples, sigma)
+def gaussianf(x, y, sample_size=51, sigma=7):
+	b = gaussian(sample_size, sigma)
 	ga = filters.convolve1d(y, b/b.sum())
 	return ga
 
 def butterworthf(x, y, order=4, nyq=0.008):
-	b, a = butter(order, nyq)  # cutoff frequency normalised to the nyquist frequency
+	b, a = butter(order, nyq)
 	fl = filtfilt(b, a, y)
 	return fl
  
@@ -26,8 +24,8 @@ def wienerf(y, sample_size=29):
 	wi = wiener(y, sample_size)
 	return wi
  
-def splinef(x, y, samples=100):
-	sp = UnivariateSpline(x, y, s=samples)
+def splinef(x, y, sample_size=100):
+	sp = UnivariateSpline(x, y, s=sample_size)
 	return sp(x)
     
 def filter(x, y, method="butter", A=0.314, B=0.314):
@@ -57,8 +55,11 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
     output = [0] * 0
 
     if method == "wiener":
-
-        output = wienerf(y)
+        
+        if not use_A:
+            A = 29
+        
+        output = wienerf(y, sample_size=A)
 
     elif method == "gaussian":
 
@@ -68,7 +69,7 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
         if not use_B:
             B = 7
         
-        output = gaussianf(x, y, samples=A, sigma=B)
+        output = gaussianf(x, y, sample_size=A, sigma=B)
 
     elif method == "butter":
 
@@ -81,8 +82,11 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
         output = butterworthf(x, y, order=A, nyq=B)
 
     elif method == "spline":
+        
+        if not use_A:
+            A = 100
 
-        output = splinef(x, y)
+        output = splinef(x, y, sample_size=A)
 
     else:
 

@@ -2,7 +2,7 @@
 \def\atitle{Development of a Rheometer Controller Using a Raspberry Pi}
 \def\shorttitle{Development of a Rheometer Controller}
 \def\theauthor{Christopher Boyle}
-\def\thewords{11052} % last proper build on Tue 25 April 2017 at 22:46:49
+\def\thewords{10326} % last proper build on Wed 26 April 2017 at 01:15:35
 \def\br{\newline \newline \noindent}
 \def\hi{\huge{!!!}}
 \def\nohi{!!!! \normalsize}
@@ -30,6 +30,7 @@
 
 % Preamble
 \makenomenclature
+\renewcommand*{\ttdefault}{qcr}
 \renewcommand{\nomlabel}[1]{\hfil #1\hfil}
 \nomenclature[a  a]{Symbol}{Description\hfill Units}
 \geometry{top=2cm, bottom=2.5cm, left=3cm, right=2.5cm}  % Sets the mnargins
@@ -438,13 +439,13 @@
 	The speed of the motor was gauged using a second motor acting as a dynamo. The dynamo motor was linked to the first motor by a belt and pulley system. The dynamo motor produces a voltage proportional to the speed it is spun at. This sensor therefore provides a qualitative indication of the speed. A pulley was attached to the dynamo, and a rubber belt was used to transfer rotation from the inner cylinder of the Couette cell to the dynamo. The output from the dynamo was fed into an ADC (MCP3008). The ADC works by comparing an input voltage to a reference voltage. Here, the reference voltage was a 3.3\,V line direct from the Raspberry Pi. This was chosen as it is regulated by the Raspberry Pi and should remain constant thus limiting error in the ADC measurements. The output signal from the ADC is a number between 0 and 1023 (a 10-bit binary number) scaled depending on the input voltage and the reference voltage, and rounded to the nearest integer. See Equation \ref{eqnadc}.
 	
 	\begin{equation}
-	S_{10} \approx 1023 \times \frac{V_{in}}{V_{ref}}
+	S_{10} \approx 1023 \times \frac{V_{ADCin}}{V_{ref}}
 	\label{eqnadc}
 	\end{equation}
 	
 	\nomenclature{$S_{10}$}{ADC 10 bit output signal\hfill --}
-	\nomenclature[aV  ]{$V_{in}$}{ADC input voltage\hfill $V$}
-	\nomenclature[aV  ]{$V_{ref}$}{ADC reference voltage\hfill $V$}
+	\nomenclature[aV  ]{$V_{ADCin}$}{ADC input voltage\hfill $\rm V$}
+	\nomenclature[aV  ]{$V_{ref}$}{ADC reference voltage\hfill $\rm V$}
 	
 	\noindent
 	The dynamo speed sensor was the final choice after two other methods were attempted. A Hall effect sensor was used to detect the presence of a magnet attached to the inner cylinder. This was set up such that the Raspberry Pi could (via the HES) calculate the number of rotations in a given time period, or measure the length of time in the gap between rotations. A similar method used a light gate (a UV LED and a phototransistor) and a mask attached to the inner cylinder. As the cylinder rotates, the mask blocks the UV light from shining on the phototransistor and thus the transistor blocks the flow of electrons between its gate and source pins - which can be detected by the Raspberry Pi. Issues arose, however, with the Rapsberry Pi's ability to measure time accurately. This is because the python environment is not well suited to accurately reporting time due to the memory management processes enacted by python and even the underlying linux kernel in the operating system \cite{backrpibadrealtime}. This lead to the dynamo qualitative speed sensor to be used in favour of the quantitative speed sensors due to its ease of use and reliability.
@@ -470,12 +471,12 @@
 	\label{eqnmaxvol}
 	\end{equation}
 	
-	\nomenclature[aV ]{$V_{out}$}{Voltage output \hfill $V$}
-	\nomenclature[aV ]{$V_{in}$}{Voltage input \hfill $V$}
-	\nomenclature{$R_{AW}$}{Resistance between potentiometer wiper and A terminal\hfill $\Omega$}
-	\nomenclature{$R_{WB}$}{Resistance between potentiometer terminal B and wiper\hfill $\Omega$}
-	\nomenclature{$R_{pot}$}{Resistance between terminals A and B on the potentiometer\hfill $\Omega$}
-	\nomenclature{$R_{AW}$}{Resistance value ofthe resistor between B terminal on the potentiometer and ground\hfill $\Omega$}
+	\nomenclature[aV ]{$V_{out}$}{Voltage output \hfill $\rm V$}
+	\nomenclature[aV ]{$V_{in}$}{Voltage input \hfill $\rm V$}
+	\nomenclature{$R_{AW}$}{Resistance between potentiometer wiper and A terminal\hfill $\rm \Omega$}
+	\nomenclature{$R_{WB}$}{Resistance between potentiometer terminal B and wiper\hfill $\rm \Omega$}
+	\nomenclature{$R_{pot}$}{Resistance between terminals A and B on the potentiometer\hfill $\rm \Omega$}
+	\nomenclature{$R_{AW}$}{Resistance value ofthe resistor between B terminal on the potentiometer and ground\hfill $\rm \Omega$}
 	
 	\noindent
 	The Raspberry Pi sets the motor speed by setting the resistance in the digital potentiometer. The Pi sends a 7-bit digital signal to the pot, indicating the resistance desired. Within the potentiometer is a network of resistors, and this number will determine the path taken through the circuit, the higher the number, the higher \(R_{WB}\) will be. When this increases, the voltage across the bottom resistor will decrease and the voltage across the motor will mirror this therefore increasing the motor's speed.
@@ -487,15 +488,15 @@
 	\label{eqnpotres}
 	\end{equation}
 	
-	\nomenclature[aV ]{$V_{wiper}$}{Voltage level at the digital potentiometer output \hfill $V$}
-	\nomenclature[aV ]{$V_{AB}$}{Voltage accross the potentiometer terminals\hfill $V$}
+	\nomenclature[aV ]{$V_{wiper}$}{Voltage level at the digital potentiometer output \hfill $\rm V$}
+	\nomenclature[aV ]{$V_{AB}$}{Voltage accross the potentiometer terminals\hfill $\rm V$}
 	
 	\begin{equation}
 	V_{ms} = 0.0636\, {\rm V} \times pv + 2.423\, {\rm V}
 	\label{eqnmotsupvol}
 	\end{equation}
 	
-	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $V$}
+	\nomenclature[aV ]{$V_{ms}$}{Motor supply voltage\hfill $\rm V$}
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
@@ -1013,7 +1014,7 @@
 	\br
 	Complementary to the temperature sensor mentioned previous, some temperature control system would be extremely useful for the rheometer. Temperature control is normally included in other lab-based rheometers, usually in the form of a water jacket.
 	
-	%% APPENDIX %%
+%% APPENDIX %%
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Reflection and Review
 	
@@ -1022,9 +1023,11 @@
 	\br
 	Working with the Raspberry Pi has taught me a lot about how computers work, how they communicate, and how they may be used in industrial processes. Data processing and storage has been an important concern; with the Raspberry Pi taking thousands of measurements every second. The Pi only has limited memory available, which can fill up quickly. This was circumvented by saving the data to file, rather than keeping it in memory. 
 	\br
-	Another thing I gained a lot of experience with was data processing. Data recorded from sensors was noisy - due to random fluctuations in temperature, air pressure, vibrations, power supply. The noise was reduced using a filtering algorithm. As I was researching noise filtering I learned about the types of filters and how they work, I learned about how different signal domains (like the frequency domain) can be used to remove unwanted parts of the signal.
+	Another area I gained a lot of experience with was data processing. Data recorded from sensors was noisy - due to random fluctuations in temperature, air pressure, vibrations, power supply. The noise was reduced using a filtering algorithm. As I was researching noise filtering I learned about the types of filters and how they work, I learned about how different signal domains (like the frequency domain) can be used to remove unwanted parts of the signal.
 	\br
-	The project has had me trying new ideas and testing them to see if they work; if they don't I had to move on, to try something else. A good example of this is the speed sensor. Originally I was going to use a hall effect sensor to sense the presence of a magnet - this could be recorded by the Raspberry Pi and used to calculate the speed. However (despite my many attempts and alterations) this method did not work. I moved on, tried a similar method using a light gate. This method resulted in similar disappointment so I moved on to a fully different method - the dynamo. This method is not as accurate as the other methods tried would have been, but it is reliable. This is typical of many things I tried in the report: try, fail, try again. 
+	The project has had me trying new ideas and testing them to see if they work; if they don't I had to move on, to try something else. A good example of this is the speed sensor. Originally I was going to use a hall effect sensor to sense the presence of a magnet - this could be recorded by the Raspberry Pi and used to calculate the speed. However (despite my many attempts and alterations) this method did not work. I moved on, tried a similar method using a light gate. This method resulted in similar disappointment so I moved on to a fully different method - the dynamo. This method is not as accurate as the other methods tried would have been, but it is reliable. This is typical of many things I tried in the report. I have definitely learned determination through this project; it would have been easy to lose focus after the first or second mishap, but I learned to keep going and move on and try another idea.
+	\br
+	Twelve weeks may seem like a long time, but it was actually very tight. The development process ran long, resulting in things not being finished, some were not even started. Over the course of the project, I certainly became practised in prioritising some areas of the work over others; The speed sensor was extremely troublesome and time consuming -- but is essential to the project so the time was not wasted. The control system I could not get working perfectly -- but I could not sink too much time into as it was not strictly necessary to obtain a viscosity reading from the rheometer.
 	
 	%=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++=====------++++++
 	% Nomenclature
@@ -1075,32 +1078,672 @@
 
 \apsect{Source Code}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
-As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to maintain. The source code for each class section, as well as the filtering library, is included here.
+As mentioned previously, the software was split up into different sections. This was to make the code more manageable, and easier to maintain. The source code for each class section, as well as the filtering library, is included here:
+\renewcommand{\labelenumi}{\Alph{enumi}}
+\begin{enumerate}
+	\item -- ``adc.py'' -- ADC class source code
+	\item -- ``dig\_pot.py'' -- digital potentiometer class source code
+	\item -- ``motor.py'' -- motor class source code
+	\item -- ``control.py'' -- controller class source code
+	\item -- ``filter.py'' -- filter library source code
+\end{enumerate}
 \apsubsect{ADC Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
-INSERT_FROM("./../bin/motor.py")
+import RPi.GPIO as gpio
+import spidev as spi
+
+
+class MCP3008(object):
+	
+	bus = 0  # holds the bus connection
+	cs_pin = 0  # which GPIO pin is used to talk to this chip? (gpio.BOARD numbering) 
+				# OR which cs channel to use
+	vref = 3.3  # Reference voltage in use
+	
+	def __init__(self, cs_pin=1, vref=3.3):
+		''' 
+		object = adc.MCP3008(**kwargs)
+		
+		Initialise MCP3008 ADC class object.
+		
+		kwargs:
+		cs_pin - SPI chip select. Default is 1.
+		vref - ADC reference voltage. Default is 3.3.
+		'''
+		
+		# Chip select setup
+		self.cs_pin = cs_pin
+		if (cs_pin > 1):  
+			# using the GPIO pins as chip_select pins
+			gpio.setmode(gpio.BOARD)
+			
+			# chip select is normally high, 
+			# pulled up by the RPi, 
+			# just like many GPIO, 
+			# its not electrically low
+			gpio.setup(self.cs_pin, gpio.OUT, pull_up_down=gpio.PUD_UP)
+			
+			gpio.output(self.cs_pin, gpio.HIGH)
+		else:  
+			# using the Pi's built in chip select method
+			pass
+		
+		# Set up bus connection
+		self.bus = spi.SpiDev()
+		
+		# Vref setting
+		self.vref = vref
+	
+	def read_data(self, channel):
+		'''
+		read_data(channel)
+		
+		Converts the voltage (relative to vref) on the specified channel to a 
+		10-bit number.
+		
+		channel - (int, 0-7) the ADC data channel that is to be read from.
+		
+		returns: (int, 0-1023) 10-bit value indicating the voltage on 
+		          the channel specified.
+		'''
+		
+		self.open()
+		indat = self.bus.xfer2([1, 8 + channel << 4, 0])
+		self.close()
+		return ((indat[1] & 3) << 8) + indat[2]
+	
+	def read_volts(self, channel):
+		'''
+		read_volts(channel)
+		
+		Reads the voltage level on the specified channel.
+		
+		channel - (int, 0-7) the ADC data channel that is to be read from.
+		
+		returns float representing the voltage level on the channel specified.
+		'''
+		
+		dat = self.read_data(channel)
+		volts = (float(dat) / 1024.0) * self.vref
+		return volts
+	
+	def write_byte(self, byte):
+		'''
+		write_byte(byte)
+		
+		byte - the 8 bit command to be sent to the ADC.
+		'''
+		
+		self.open()
+		command = [byte, 0]  # Two bytes:
+		                     # first is command shifted 4 bits, 
+		                     # second is zero
+		self.bus.writebytes(command)
+		self.close()
+	
+	def open(self):
+		'''
+		open()
+		
+		opens a channel to the SPI device.
+		
+		Must completed by a following close() call.
+		'''
+		if (self.cs_pin > 1):
+			gpio.output(self.cs_pin, gpio.HIGH)
+			self.bus.open(0, 1)
+			self.bus.max_speed_hz = 10000000
+		else:
+			self.bus.open(0, self.cs_pin)
+			self.bus.max_speed_hz = 10000000
+	
+	def close(self):
+		'''
+		close()
+		
+		closes a (previously opened) channel to the SPI device.
+		'''
+		if (self.cs_pin > 1):
+			gpio.output(self.cs_pin, gpio.LOW)
+			self.bus.close()
+		else:
+			self.bus.close()
 \end{Verbatim}
 \apsubsect{Digital Potentiometer Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
-INSERT_FROM("./../bin/motor.py")
+import spidev as spi
+
+class MCP4131(object):
+	'''
+	SPI 10K Digital Potentiometer
+	'''
+	bus = 0  # holds the bus connection to the digital pot
+	lav = 0
+	chip_select = 0
+	
+	def __init__(self, chipselect=0):
+		'''
+		MCP4131()
+		
+		Creates an instance of the MCP4131 class for communicating over SPI with
+		an MCP4131 digital potentiometer.
+		
+		kwargs:
+		chipselect -  the chip_select address for the MCP4131 chip on the 
+		              SPI network.
+		'''
+		self.bus = spi.SpiDev()
+		self.chip_select = chipselect
+	
+	def set_resistance(self, value):
+		'''
+		set_resistance(value)
+		Sets the value on the potentiometer.
+		
+		value - integer value to set on the potentiometer. The resistance betweeen 
+		        the A terminal and the wiper will vary directly with this value.
+		'''
+		self.lav = value
+		self.write_byte(value)
+	
+	def write_byte(self, byte):
+		'''
+		write_byte(byte)
+		
+		Writes the specified byte to the digital potentiometer.
+		
+		byte - the value to send to the potentiometer.
+		'''
+		self.open()
+		command = [0, byte]
+		self.bus.writebytes(command)
+		self.close()
+	
+	def open(self):
+		'''
+		open()
+		
+		Begins communication with the potentiometer.
+		Must be matched by an accompanying "close()"
+		'''
+		self.bus.open(0, self.chip_select)
+		self.bus.max_speed_hz = 10000000
+	
+	def close(self):
+		'''
+		close()
+		
+		Ends communication with the potentiometer.
+		'''
+		self.bus.close()
 \end{Verbatim}
 \apsubsect{Motor Class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
-INSERT_FROM("./../bin/motor.py")
+import time
+import os
+import thread as td
+import RPi.GPIO as gpio
+import filter
+from glob import glob
+from dig_pot import MCP4131 as dp
+from adc import MCP3008 as ac
+from control import tf_pi_controller as pitf
+
+
+class motor(object):
+
+	# Internal Switches
+	poll_running = False  # is the speed currently being polled?
+	
+	# Logging
+	poll_logging = True  # Will log every (i_poll_rate)s if this is True
+	log_paused = False
+	log_add_note = False
+	log_dir = "./logs"  # where the logged data should be saved
+	i_poll_rate = 0.1  # How often data is polled, should not be less than span
+	this_log_name = ""
+	
+	# Speed calc
+	speed = 0.0  # Output value
+	dr = 0.0
+	fdr = 0.0
+	svf = [300, -150]  # 1st order linear fit equation; 
+	                   # SPEED = svf[0] * VOLTAGE + svf[1];
+	                   # VOLTAGE in volts, SPEED in RPM
+	
+	# Filtering
+	filtlen = 1000    # number of samples to "remember" for filtering purposes
+	srvs = [0.0] * 0  # used to hold the last (filtlen) samples of dynamo volt readings
+	crvs = [0.0] * 0  # used to hold the last (filtlen) samples of current volt readings
+	tims = [0.0] * 0  # time data for ^
+	filtering = "NONE"
+	filter_delay = 100
+	filtA = 2
+	filtB = 0.008
+	
+	# Control thread
+	control_stopped = True
+	
+	# Sub-classes
+	pot = dp()  # potentiometer to control voltage
+	pic = pitf((0.2, 0.15))
+	aconv = ac()  # adc to read current/voltage
+	adc_chan = [0, 1, 2, 3]  # voltage channel, HES30A, HES5A x2
+	
+	def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
+	             poll_logging=True, log_dir="./logs",
+	             log_name="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, 
+	             pic_tuning=(0.2, 0.15), filtering="NONE", filter_samples=100, 
+	             filt_param_A=0.314, filt_param_B=0.314):
+		
+		# Set calibration variables
+		self.svf = svf
+		
+		# controller
+		self.pic = pitf(pic_tuning)
+		
+		# Filtering
+		self.filtering = filtering
+		if not filtering == "NONE": self.filtlen = filter_samples
+		if not filt_param_A == 0.314: self.filtA = filt_param_A
+		if not filt_param_B == 0.314: self.filtB = filt_param_B
+		
+		# Set sensor variables
+		#self.pot = dp()
+		#self.aconv = ac(cs_pin=1, vref=adc_vref)
+		self.i_poll_rate=i_poll_rate
+		
+		# Set up logs
+		self.log_dir = log_dir
+		self.poll_logging = poll_logging
+		self.new_logs(log_name)
+		
+		# Start speed polling (if necessary)
+		if (startnow):
+			self.start_poll()
+	
+	def new_logs(self, log_name="DATETIME"):
+		# Try closing old log file
+		try:
+			logf.close()
+		except:
+			pass
+		
+		# Check if log directory exists. If not, create it.
+		if not os.path.isdir(self.log_dir):
+			os.mkdir(self.log_dir)
+		
+		# Get unique number for the log file
+		un = time.strftime("%H %M %S", time.gmtime())
+		
+		# Creat log
+		if (self.poll_logging):
+			if log_name == "DATETIME":
+				self.this_log_name = self.log_dir + "/log_" + un + ".csv"
+			else:
+				self.this_log_name = self.log_dir + "/" + log_name
+			
+				self.logf = open(self.this_log_name, "w")
+			
+				self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr\n")
+	
+	def log_pause(self):
+		self.log_paused = True
+	
+	def log_resume(self, new_note="resumed"):
+		self.log_note = new_note
+		self.log_paused = False
+	
+	def start_poll(self):
+		if (not self.poll_running):  # if not already running
+			td.start_new_thread(self.poll, tuple())
+	
+	def start_control(self):
+		if self.control_stopped:
+			self.control_stopped = False
+			td.start_new_thread(self.control, tuple())
+	
+	def update_setpoint(self, value):
+		self.pic.set_point = value
+	
+	def control(self):
+		while not self.control_stopped:
+			control_action = self.pic.get_control_action(self.speed)
+			if control_action > 128: control_action = 128
+			if control_action < 0: control_action = 0
+			self.set_pot(control_action)
+			time.sleep(0.1)
+	
+	def stop_control(self):
+		self.control_stopped = True
+	
+	def poll(self):
+	
+		self.poll_running = True
+		
+		while (self.poll_running):
+		
+			t = time.time()
+			
+			# Get speed and current sensor readings
+			volts = [self.aconv.read_volts(self.adc_chan[0]), 
+			         self.aconv.read_volts(self.adc_chan[1]), 
+			         self.aconv.read_volts(self.adc_chan[2]), 
+			         self.aconv.read_volts(self.adc_chan[3])]
+			self.dr = volts[0]
+			fvolts = volts
+			
+			# if desired, apply filtering to input
+			if not (self.filtering == "NONE"):
+				self.update_filt_hist(volts[0], volts[1], t)
+				start_delay = 20
+			
+			if (len(self.tims) >= start_delay):
+				fvolts[0] = filter.filter(self.tims, 
+				                          self.srvs, 
+				                          method=self.filtering, 
+				                          A=self.filtA, 
+				                          B=self.filtB)[-10]
+				fvolts[1] = filter.filter(self.tims, 
+				                          self.crvs, 
+				                          method=self.filtering, 
+				                          A=self.filtA, 
+				                          B=self.filtB)[-10]
+			
+			self.fdr = fvolts[0]
+			self.speed = self.fdr * self.svf[0] + self.svf[1]
+			
+			if self.log_paused:
+				self.log_add_note = True
+			
+			if (self.poll_logging) and (not self.log_paused):
+				if self.log_add_note:
+					self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, 
+					               {7:.3f}, {8:.3f}, {3}, 
+					               {4:.3f}, {5:.3f}, {6} 
+					               \n").format(
+					               t, volts[0], volts[1], 
+					               self.pot.lav, fvolts[0], fvolts[1], 
+					               self.log_note, volts[2], volts[3]))
+					self.log_add_note = False
+				else:
+					self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, 
+					               {6:.3f}, {7:.3f}, {3}, 
+					               {4:.3f}, {5:.3f} 
+					               \n").format(
+					               t, volts[0], volts[1], 
+					               self.pot.lav, fvolts[0], fvolts[1], 
+					               volts[2], volts[3]))
+			
+			# delay for x seconds
+			time.sleep(self.i_poll_rate)
+		
+		print("Motor polling has halted.")
+	
+	def update_filt_hist(self, srv, crv, tim):
+		if (len(self.srvs) + 1) > self.filtlen:
+			self.srvs = self.srvs[1:]
+			self.crvs = self.crvs[1:]
+			self.tims = self.tims[1:]
+		self.srvs.append(srv)
+		self.crvs.append(crv)
+		self.tims.append(tim)
+	
+	def set_pot(self, value):
+		self.pot.set_resistance(int(value))
+	
+	def clean_exit(self):
+		self.poll_running = False
+		self.control_stopped = True
+		time.sleep(0.5)
+		
+		if (self.poll_logging):
+			self.logf.close()
 \end{Verbatim}
 \apsubsect{Controller class}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
-INSERT_FROM("./../bin/control.py")
+from time import time
+from time import sleep
+import sys
+import matplotlib.pyplot as plt
+import scipy.signal as sg
+import numpy as np
+import warnings
+
+class tf_pi_controller(object):
+	'''
+	object = tf_pi_controller(tuning, set_point)
+	
+	Creates an instance of a PI controller.
+	
+	args:
+	tuning      -   tuple: (float, float). Represents the gain parameters Kc and 
+	                Kc/Ti respectively
+	                
+	set_point   -   float. Represents the desired output from the process. 
+	                Default is 0
+	                
+	sample_time -   float. Time between iterations in seconds. 
+	                Default is 0.1
+	
+	accessible data:
+	tuning      -   tuple: (float, float). Represents the gain parameters 
+	                Kc and Kc/Ti respectively
+	                
+	set_point   -   float. Represents the desired output from the process. 
+	                Default is 0
+	
+	Ys          -   list, float. List of past process outputs.
+	Us          -   list, float. List of past controller outputs.
+	Es          -   list, float. List of past error values.
+	
+	remd_len    -   integer. "Remembered Length" number of items to remember. 
+	                Default is 100.
+	'''
+	tuning = [0.0, 0.0]
+	
+	set_point = 0.0
+	
+	Ys = [0.0] * 2
+	Us = [0.0] * 2
+	Es = [0.0] * 2
+	
+	remd_len = 100
+	
+	def __init__(self, tuning, set_point=0.0, sample_time=0.1):
+		'''
+		object = tf_pi_controller(tuning, set_point)
+		
+		Creates an instance of a PI controller.
+		
+		args:
+		tuning      -   tuple: (float, float). Represents the gain parameters 
+		                Kc and Kc/Ti respectively
+		                
+		set_point   -   float. Represents the desired output from the process. 
+		                Default is 0
+		                
+		sample_time -   float. Time between iterations in seconds. 
+		                Default is 0.1
+		'''
+		self.tuning = tuning  # Set tuning
+		self.set_point = set_point  # Set set point
+		with warnings.catch_warnings():
+			warnings.simplefilter("ignore")
+			# create controller transfer function
+			self.Gc = sg.TransferFunction((self.tuning[0], 
+			                               self.tuning[1]), 
+			                               (1, 0), 
+			                               dt=sample_time)
+	
+	def get_control_action(self, Y):
+		# set next input and error values in memory
+		self.Ys.append(Y)
+		self.Es.append(self.set_point - Y)
+	
+		# Tidy up memory
+		if len(self.Ys) > 100: Ys = self.Ys[1:]
+		if len(self.Es) > 100: Ys = self.Es[1:]
+		
+		# apply controller transfer function
+		self.Us = self.Gc.output(self.Es, range(0, len(Es)))[1]
+		
+		return self.Us[-1]
+	
+	def do_sim(self, time_constant, steady_state_gain, sp=0, 
+	           step_to=200, at_t=10, length=100):
+		'''
+		do_sim(time_constant, steady_state_gain, sp_step=200, at_t=10, length=100)
+		
+		Simulates the controller's response to a step change in set point.
+		
+		args:
+		time_constant - float. Coefficient of s in denominator of transfer function
+		steady_state_gain - float. Numerator of transfer function.
+		
+		kwargs**:
+		sp          -   float. Initial set point. 
+		                Default is 0.0
+		                
+		step_to     -   float. Final set point. 
+		                Default is 200.0
+		                
+		at_t        -   integer. Number of samples to wait before stepping up. 
+		                Default is 10
+		                
+		length      -   integer. Number of samples overall to compute. 
+		                Default is 100
+		'''
+		set_point = sp
+		# Set up transfer functions
+		Gp = sg.TransferFunction((steady_state_gain), (time_constant, 1))
+		Gc = sg.TransferFunction((self.tuning[0], self.tuning[1]), (1, 0))
+		
+		# Create initial conditions
+		Ys = [0, 0]
+		Es = [0, 0]
+		Us = [0, 0]
+		
+		for i in range(0, at_t):
+		# Apply process transfer function to inputs
+		Ys.append(Gp.output(Us, range(0, len(Us)))[1][-1])
+		
+		# Get new error
+		Es.append(set_point - Ys[-1])
+		
+		# Apply controller transfer function to inputs
+		Us = Gc.output(Es, range(0, len(Es)))[1]
+		
+		set_point = step_to
+		
+		for i in range(0, length - at_t):
+		# Apply process transfer function to inputs
+		Ys.append(Gp.output(Us, range(0, len(Us)))[1][-1])
+		
+		# Get new error
+		Es.append(set_point - Ys[-1])
+		
+		# Apply controller transfer function to inputs
+		Us = Gc.output(Es, range(0, len(Es)))[1]
+		
+		Ts = np.array(range(0, len(Ys))) * 0.1 - 0.2
+		return (Ys, Es, Us, Ts)
 \end{Verbatim}
 \apsubsect{Filtering}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 \begin{Verbatim}[frame=single,fontsize=\footnotesize]
-INSERT_FROM("./../bin/filter.py")
+import numpy as np
+from scipy.interpolate import UnivariateSpline
+from scipy.signal import wiener, filtfilt, butter, gaussian
+from scipy.ndimage import filters
+
+def gaussianf(x, y, sample_size=51, sigma=7):
+	b = gaussian(sample_size, sigma)
+	ga = filters.convolve1d(y, b/b.sum())
+	return ga
+
+def butterworthf(x, y, order=4, nyq=0.008):
+	b, a = butter(order, nyq)
+	fl = filtfilt(b, a, y)
+	return fl
+
+def wienerf(y, sample_size=29):
+	wi = wiener(y, sample_size)
+	return wi
+
+def splinef(x, y, sample_size=100):
+	sp = UnivariateSpline(x, y, s=sample_size)
+	return sp(x)
+
+def filter(x, y, method="butter", A=0.314, B=0.314):
+	"""
+	Filter for filtering noise out from a signal.
+	
+	Arguments:
+	x - The x data for the singal (usually time)
+	y - The noisy signal data
+	method - Which filter to use. "butter" by default.
+	A, B - Parameters of the filter to be used. Pre-set by to optimal.
+	
+	Returns:
+	A list of filtered y-values, the same length as the input data.
+	"""
+	
+	use_A = True
+	use_B = True
+	
+	if A == 0.314:
+		use_A = False
+	
+	if B == 0.314:
+		use_B = False
+	
+	output = [0] * 0
+	
+	if method == "wiener":
+	
+		if not use_A:
+			A = 29
+		
+		output = wienerf(y, sample_size=A)
+	
+	elif method == "gaussian":
+	
+		if not use_A:
+			A = 51
+		
+		if not use_B:
+			B = 7
+		
+		output = gaussianf(x, y, sample_size=A, sigma=B)
+	
+	elif method == "butter":
+	
+		if not use_A:
+			A = 2
+		
+		if not use_B:
+			B = 0.001
+		
+		output = butterworthf(x, y, order=A, nyq=B)
+	
+	elif method == "spline":
+	
+		if not use_A:
+			A = 100
+		
+		output = splinef(x, y, sample_size=A)
+		
+		else:
+		
+			output = y
+	
+	return output)
 \end{Verbatim}
 \apsect{Alternative Designs}
 %-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=--=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
