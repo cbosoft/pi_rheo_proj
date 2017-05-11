@@ -11,6 +11,16 @@ More Learn Python:
 (I will update with more links as I go)
 
 
+TO DO:
+* Calibration scripts
+* Central calibration storage (not as var in each class!)
+* Redo cals (TS vs. Vms & Iemf vs.  Vms)
+* Analogue filtering?
+* Dead-time compensation?
+* Speed control
+* Temperature control (monitoring)
+
+
 ```
 overall_loop.py                 uses the other libs to achieve the main task
 
