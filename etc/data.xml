@@ -1,4 +1,3 @@
-<?xml version="1.0"?>
 <data>
     <geometry name="icor">
         <size>0.01525</size>
@@ -29,6 +28,18 @@
         <coeff2>-159.196</coeff2>
     </calibration>
     <calibration name="5AHES">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+    <calibration name="IemfVms">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+    <calibration name="IcoVms">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+    <calibration name="TsVms">
         <coeff1>312.806</coeff1>
         <coeff2>-159.196</coeff2>
     </calibration>
