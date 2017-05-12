@@ -29,6 +29,10 @@ cal_dynamo = parse_root("dynamo", "calibration")
 cal_30AHES = parse_root("30AHES", "calibration")
 cal_5AHES = parse_root("5AHES", "calibration")
 
+cal_IemfVms = parse_root("IemfVms", "calibration")
+cal_IcoVms = parse_root("IcoVms", "calibration")
+cal_TsVms = parse_root("TsVms", "calibration")
+
 def writeout(path="./../etc/data.xml"):
     global root
     # update xml tree
