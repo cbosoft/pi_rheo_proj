@@ -9,10 +9,20 @@ import numpy as np
 import pandas as pd
 import resx
 import sys
+import curses
+import math
 
 from motor import motor
 from filter import filter
 from plothelp import fit_line
+
+try:
+    import spidev
+except:
+    debug = True
+else:
+    debug = False
+    
 
 class rheometer(object):
     # misc
@@ -38,82 +48,141 @@ class rheometer(object):
     mot = motor()
     
     def __init__(self, motor_params={'log_dir':'./logs'}):
+        print motor_params
         self.mot = motor(**motor_params)
             
     def get_rheometry(self, strain_rate, run_length):
         pass
     
-    def splash(self):
-        sensible_answer = False
-        sensible_sub_answer = False
-        message = "\n"
-        print ""
-        print r"____________ _       ______ "
-        print r"| ___ \ ___ (_)      | ___ \ "
-        print r"| |_/ / |_/ /_ ______| |_/ /"
-        print r"|    /|  __/| |______|    / "
-        print r"| |\ \| |   | |      | |\ \ "
-        print r"\_| \_\_|   |_|      \_| \_|"
-        print "RaspberryPi-Rheometer  {}".format(self.version)
-        print ""
-        if sys.platform == "win32": print " !! -->> RUNNING IN DEBUG MODE <<-- !!\n"
-        print "This script will operate the RPi-R, testing a \nfluid and reporting the results. This program \ncan also be used to update calibrations and \ngeometries, or otherwise manage the rheometer. \n\nCurrent calibrations are:\n"
-        print "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(self.dynamo_cal[0], self.dynamo_cal[1])
-        print "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes30A_cal[0], self.hes30A_cal[1])
-        print "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes5A_cal[0], self.hes5A_cal[1])
+    def display(self, stdscr, blurb, options, selected=0, get_input=True, options_help="NONE"):
+        self.version
+        global debug
+        stdscr.clear()
+        stdscr.border(0)
+        if options_help == "NONE": options_help = ["There is no help available for this option."] * len(options)
+
+        # RPi-R header
+        stdscr.addstr(3, 3, r"____________ _       ______ ")
+        stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
+        stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
+        stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
+        stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
+        stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
+        stdscr.addstr(10, 3, r"Raspberry Pi Rheometer {}".format(self.version))
+
+        blurbheight = 12        
         
-        while not sensible_answer:
-            print ""
-            if sys.platform == "win32": print " !! -->> RUNNING IN DEBUG MODE <<-- !!\n"
-            print "Actions:{}".format(message)
-            print "\t(1) Recalibrate sensors and motor characteristics"
-            print "\t(2) Recalibrate stall torque"
-            print "\t(3) Test a sample (default settings)"
-            print "\t(4) Test a sample (custom settings)"
-            print "\t(5) Quit"
+        if debug: 
+            stdscr.addstr(blurbheight, 3, r" !! -->> DEBUG MODE <<-- !!")
+            blurbheight += 2
+
+        # Display Blurb
+        for i in range(0, len(blurb)):
+            stdscr.addstr(blurbheight + i, 3, blurb[i])
+        
+        # Show Options
+        for i in range(0, len(options)):
+            if selected == i:
+                stdscr.addstr(blurbheight + len(blurb) + i, 3, options[i], curses.A_STANDOUT)
+            else:
+                stdscr.addstr(blurbheight + len(blurb) + i, 3, options[i])
             
-            r = raw_input(":_")
+        # Show help
+        if get_input:
+            stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 3, options_help[selected])
+
+        # Get Input
+        stdscr.addstr(0,0, "")
+        stdscr.refresh()
+        if get_input:
+            res = stdscr.getch()
+        else:
+            res = 10
+
+        # Return
+        if res == curses.KEY_UP:
+            # up arrow, reduce selection
+            if selected == 0:
+                selected = len(options) - 1
+            else:
+                selected -= 1
+            res = self.display(stdscr, blurb, options, selected, True, options_help)
+        elif res == curses.KEY_DOWN:
+            # down arrow, increase selection
+            if selected == len(options) - 1:
+                selected = 0
+            else:
+                selected += 1
+            res = self.display(stdscr, blurb, options, selected, True, options_help)
+        elif res == curses.KEY_ENTER or res == 10 or res == 13:
+            res = selected
+        else:
+            res = self.display(stdscr, blurb, options, selected, True, options_help)
+        return res
+
+    def menutree(self, stdscr, initsel=0):
+        global debug
+        blurb = ["This script will operate the RPi-R, testing a ", 
+                "fluid and reporting the results. This program ", 
+                "can also be used to update calibrations and ", 
+                "geometries, or otherwise manage the rheometer.", 
+                "", 
+                "Current calibrations are:", 
+                "",
+                "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(self.dynamo_cal[0], self.dynamo_cal[1]),
+                "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes30A_cal[0], self.hes30A_cal[1]),
+                "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes5A_cal[0], self.hes5A_cal[1])]
+        
+        options = [ "> Recalibrate sensors",
+                    "> Recalibrate torque",
+                    "> Quick test",
+                    "> Custom test",
+                    "> Quit"]
+        
+        help = [    "Simple sweep of voltages used to recalibrate sensors.",
+                    "!! - Yet to be implemented.",
+                    "5 minute test of fluid at constant strain (~96.9s^-1).",
+                    "Test fluid using custom settings.",
+                    ""]
+        
+        res = self.display(stdscr, blurb, options, initsel, options_help=help)
+        
+        if res == 0:
+            blurb = ["Sensor recalibration.", "", "Run length:"]
+            options = ["> Long (~10 minutes)", "> Medium (~5 minutes)", "> Short (~2 minutes)"]
+            help = ["  ", "  ", "  "]
+            res = self.display(stdscr, blurb, options, options_help=help)
+
+            if res == 0:
+                step = 5
+            elif res == 1:
+                step = 2.5
+            elif res == 2:
+                step = 0.25
+                
+            self.display(stdscr, ["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
+            ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
             
-            sensible_answer = True
-            if str(r) == "1":
-                # recal sensors (voltage sweep from 0-128 potval)
-                while not sensible_sub_answer:
-                    print ""
-                    if sys.platform == "win32": print " !! -->> RUNNING IN DEBUG MODE <<-- !!\n"
-                    print "Calibration length:{}".format(message)
-                    print "\t(1) Long (~10 minutes)"
-                    print "\t(2) Medium (~5 minutes)"
-                    print "\t(3) Short (~2 minutes)"
-                    
-                    r = raw_input(":_")
-                    
-                    sensible_sub_answer = True
-                    step = 0.5
-                    if str(r) == "1":
-                        step = 5
-                    elif str(r) == "2":
-                        step = 2.5
-                    elif str(r) == "3":
-                        step = 1
-                    else:
-                        message = "\nPlease enter desired option as a number\n"
-                        sensible_sub_answer = False
-                
-                print "Running calibration:"
-                ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
-                self.mot.new_logs(ln)
-                
-                if sys.platform != "win32": self.mot.start_poll()
-                
-                for i in range(0, 129):
-                    self.mot.set_pot(i)
-                    vms = 0.066 * i + 2.422
-                    sys.stdout.write("\r\tSupply voltage set to: {:.3f}V\tTime remaining: {}".format(vms, (128 - i) * step))
-                    sys.stdout.flush()
-                    time.sleep(step)
-                
-                self.mot.clean_exit()
-                
+            if not debug: self.mot.start_poll(ln)
+            
+            for i in range(0, 129):
+                self.mot.set_pot(i)
+                vms = 0.066 * i + 2.422
+                stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s".format(vms, (128 - i) * step))
+                width = 40
+                perc = int(math.ceil((i * float(step) / 128.0) * width))
+                neg_perc = int(math.floor(((128.0 - i) * step / 128.0) * width))
+                stdscr.addstr(17, 3, "[{}{}]".format("#" * perc, " " * neg_perc))
+                stdscr.refresh()
+                time.sleep(step)
+            
+            self.mot.clean_exit()
+            
+            if debug: 
+                tdyncal = self.dynamo_cal
+                t30acal = self.hes30A_cal
+                t5acal = self.hes5A_cal
+            else:
                 # data contained in log file $ln can be used to calibrate dynamo and HES sensor data"
                 datf    = pd.read_csv(ln)
                 st      = np.array(datf['t'], np.float64)
@@ -122,58 +191,40 @@ class rheometer(object):
                 dr      = np.array(datf['dr'], np.float64)
                 cra     = np.array(datf['cr2a'], np.float64)
                 crb     = np.array(datf['cr2b'], np.float64)
-                
-                if sys.platform == "win32": 
-                    tdyncal = self.dynamo_cal
-                    t30acal = self.hes30A_cal
-                    t5acal = self.hes5A_cal
-                else:
-                    tdyncal = self.cal_dynamo(st, dr, pv)
-                    t30acal = self.cal_30ahes(st, cr, pv)
-                    t5acal = self.cal_5ahes(st, cra, crb, pv)
-                
-                sensible_sub_sub_answer = False
-                
-                while not sensible_sub_sub_answer:
-                    print ""
-                    if sys.platform == "win32": print " !! -->> RUNNING IN DEBUG MODE <<-- !!\n"
-                    print "Calibration results:"
-                    print "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1])
-                    print "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(t30acal[0], t30acel[1])
-                    print "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(t5acal[0], t5acal[1])
-                    print "\nActions:{}".format(message)
-                    print "\t(1) Save"
-                    print "\t(2) Discard"
-                    
-                    r = raw_input(":_")
-                    
-                    sensible_sub_sub_answer = True
-                    if str(r) == "1":
-                        resx.cal_dynamo = tdyncal
-                        resx.cal_30AHES = t30acal
-                        resx.cal_5AHES = t5acal
-                        resx.writeout()
-                    elif str(r) == "2":
-                        pass
-                    else:
-                        message = "\nPlease enter desired option as a number\n"
-                        sensible_sub_sub_answer = False
-                
-            elif str(r) == "2":
-                # recal stall torque (requires mass reading)
+
+                tdyncal = self.cal_dynamo(st, dr, pv)
+                t30acal = self.cal_30ahes(st, cr, pv)
+                t5acal = self.cal_5ahes(st, cra, crb, pv)
+            
+            blurb = ["Calibration results:", "",
+                     "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
+                     "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(t30acal[0], t30acal[1]),
+                     "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(t5acal[0], t5acal[1]), ""]
+            options = ["\t(1) Save",
+                       "\t(2) Discard"]
+            help = ["  ", "  "]
+            res = self.display(stdscr, blurb, options, options_help=help)
+            
+            if res == 0:
+                resx.cal_dynamo = tdyncal
+                resx.cal_30AHES = t30acal
+                resx.cal_5AHES = t5acal
+                resx.writeout()
+            elif res == 1:
                 pass
-            elif str(r) == "3":
-                # test a sample (default settings - PV=10, for 5 minutes)
-                pass
-            elif str(r) == "4":
-                # test a sample (custom settings - load from xml or edit default)
-                pass
-            elif str(r) == "5":
-                # quit
-                pass
-            else:
-                message = "\nPlease enter desired action as a number\n"
-                sensible_answer = False
+            return 0
+        elif res == 1:
+            # recal stall torque (requires mass reading)
+            return 1
+        elif res == 2:
+            # test a sample (default settings - PV=10, for 5 minutes)
+            return 2
+        elif res == 3:
+            # test a sample (custom settings - load from xml or edit default)
+            return 3
+        elif res == 4:
+            # quit
+            return 4
     
     def get_viscosity(self, strain_rate, run_length):
         variable_strain = True
@@ -585,9 +636,32 @@ class rheometer(object):
         return z3z[0], z3z[1]
         
 if __name__ == "__main__":
-    # Create rheometer class instance
-    r = rheometer(motor_params={'log_dir':'./'})
-    r.splash()
+    # init
+    stdscr = curses.initscr()
+    curses.noecho()
+    curses.cbreak()
+    stdscr.keypad(1)
+    if debug:
+        mparams={'log_dir':'./','poll_logging':False}
+    else:
+        mparams={'log_dir':'./'}
+    r = rheometer(motor_params=mparams)
+
+    a = r.menutree(stdscr)
+    try:
+        res = 0
+        while res != 4:
+            res = r.menutree(stdscr, initsel=res)
+    except:
+        pass
+    else:
+        pass
+    finally:
+        curses.nocbreak()
+        stdscr.keypad(0)
+        curses.echo()
+        curses.endwin()
+    print a
     # Get list of strains
     #strains = np.linspace(5, 250, 128)
     
