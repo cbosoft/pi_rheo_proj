@@ -141,6 +141,9 @@ class motor(object):
             
     def stop_control(self):
         self.control_stopped = True
+
+    def read_sensors(self):
+        return [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1]), self.aconv.read_volts(self.adc_chan[2]), self.aconv.read_volts(self.adc_chan[3])]
         
     def poll(self):
 
@@ -153,7 +156,7 @@ class motor(object):
             t = time.time()
             
             # Get speed
-            volts = [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1]), self.aconv.read_volts(self.adc_chan[2]), self.aconv.read_volts(self.adc_chan[3])]
+            volts = self.read_sensors()
             self.dr = volts[0]
             fvolts = volts
 
