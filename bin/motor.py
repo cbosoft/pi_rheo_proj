@@ -9,10 +9,10 @@ import sys
 import time
 import os
 import thread as td
-#import RPi.GPIO as gpio
+#import RPi.GPIO as gpio # Not necessary?
 import filter
 
-#from glob import glob
+#from glob import glob # Not necessary?
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
 from control import tf_pi_controller as pitf
@@ -81,11 +81,9 @@ class motor(object):
         # Set up logs
         self.log_dir = log_dir
         self.poll_logging = poll_logging
-        self.new_logs(log_name)
         
         # Start speed polling (if necessary)
-        if (startnow):
-            self.start_poll()
+        if (startnow): self.start_poll(log_name)
 
     def new_logs(self, log_name="DATETIME"):
         # Try closing old log file
@@ -119,7 +117,9 @@ class motor(object):
         self.log_note = new_note
         self.log_paused = False
 
-    def start_poll(self):
+    def start_poll(self, name="DATETIME"):
+        if self.poll_logging:
+            self.new_logs(self.new_logs(name))
         if (not self.poll_running):  # if not already running
             td.start_new_thread(self.poll, tuple())
     
