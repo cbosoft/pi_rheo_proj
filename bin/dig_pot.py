@@ -4,7 +4,8 @@
 # provides support for using an MCP4131 digital potentiometer with the raspberry pi using SPI
 
 # imports
-import spidev as spi
+import sys
+if sys.platform != "win32": import spidev as spi
         
 class MCP4131(object):
     '''
@@ -23,6 +24,8 @@ class MCP4131(object):
         kwargs:
         chipselect -  the chip_select address for the MCP4131 chip on the SPI network.
         '''
+        if sys.platform == "win32": return
+        
         self.bus = spi.SpiDev()
         self.chip_select = chipselect
 
@@ -33,6 +36,8 @@ class MCP4131(object):
         
         value - integer value to set on the potentiometer. The resistance betweeen the A terminal and the wiper will vary directly with this value.
         '''
+        if sys.platform == "win32": return
+        
         self.lav = value
         self.write_byte(value)
        
@@ -44,6 +49,8 @@ class MCP4131(object):
         
         byte - the value to send to the potentiometer.
         '''
+        if sys.platform == "win32": return
+        
         self.open()
         command = [0, byte]
         self.bus.writebytes(command)
@@ -56,6 +63,8 @@ class MCP4131(object):
         Begins communication with the potentiometer.
         Must be matched by an accompanying "close()"
         '''
+        if sys.platform == "win32": return
+        
         self.bus.open(0, self.chip_select)
         self.bus.max_speed_hz = 10000000
 
@@ -65,4 +74,6 @@ class MCP4131(object):
         
         Ends communication with the potentiometer.
         '''
+        if sys.platform == "win32": return
+        
         self.bus.close()

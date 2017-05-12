@@ -5,12 +5,14 @@
 #
 
 # imports
+import sys
 import time
 import os
 import thread as td
-import RPi.GPIO as gpio
+#import RPi.GPIO as gpio
 import filter
-from glob import glob
+
+#from glob import glob
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
 from control import tf_pi_controller as pitf
@@ -97,7 +99,7 @@ class motor(object):
             os.mkdir(self.log_dir)
 
         # Get unique number for the log file
-        un = time.strftime("%H %M %S", time.gmtime()) # str(len(glob(self.log_dir + "/*.csv")))
+        un = time.strftime("%H %M %S", time.gmtime())
 
         # Creat log
         if (self.poll_logging):

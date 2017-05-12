@@ -3,9 +3,9 @@
 #
 # Class library, gives support for using the MCP3008 8-channel 10bit ADC
 #
-
-import RPi.GPIO as gpio
-import spidev as spi
+import sys
+if sys.platform != "win32": import RPi.GPIO as gpio
+if sys.platform != "win32": import spidev as spi
 
 
 class MCP3008(object):
@@ -24,6 +24,7 @@ class MCP3008(object):
         cs_pin - SPI chip select. Default is 1.
         vref - ADC reference voltage. Default is 3.3.
         '''
+        if sys.platform == "win32": return
         
         # Chip select setup
         self.cs_pin = cs_pin
@@ -50,6 +51,7 @@ class MCP3008(object):
         
         returns: (int, 0-1023) 10-bit value representing the voltage level on the channel specified.
         '''
+        if sys.platform == "win32": return
         
         self.open()
         indat = self.bus.xfer2([1, 8 + channel << 4, 0])
@@ -66,6 +68,7 @@ class MCP3008(object):
         
         returns float representing the voltage level on the channel specified.
         '''
+        if sys.platform == "win32": return
         
         dat = self.read_data(channel)
         volts = (float(dat) / 1024.0) * self.vref
@@ -77,6 +80,7 @@ class MCP3008(object):
         
         byte - the 8 bit command to be sent to the ADC.
         '''
+        if sys.platform == "win32": return
         
         self.open()
         command = [byte, 0]  # Two bytes; first is command shifted 4 bits, second is zero
@@ -91,6 +95,8 @@ class MCP3008(object):
         
         Must completed by a following close() call.
         '''
+        if sys.platform == "win32": return
+        
         if (self.cs_pin > 1):
             gpio.output(self.cs_pin, gpio.HIGH)
             self.bus.open(0, 1)
@@ -105,6 +111,8 @@ class MCP3008(object):
         
         closes a (previously opened) channel to the SPI device.
         '''
+        if sys.platform == "win32": return
+        
         if (self.cs_pin > 1):
             gpio.output(self.cs_pin, gpio.LOW)
             self.bus.close()
