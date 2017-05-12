@@ -1,7 +1,7 @@
 # 
 # Resources
 # 
-# Returns data about the rheometer (geomettry, calibrations)
+# Returns data about the rheometer (geometry, calibrations)
 
 import xml.etree.ElementTree as ET
 
