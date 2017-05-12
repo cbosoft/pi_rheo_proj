@@ -27,7 +27,7 @@ else:
 
 class rheometer(object):
     # misc
-    version = "0.1.0 pre alpha"
+    version = "0.1"
     
     # geometry
     roo = resx.ocor                 # outer cell outer radius in m
@@ -323,10 +323,11 @@ class rheometer(object):
                     time.sleep(1)
                 
                 self.mot.clean_exit()
-                visco_res = calc_visc(self, ln, 15)
-                blurb = ["Average Viscosity: {:.3f} Pa.s".format(visco_res)]
-                options = ["> Save results plot", "> Continue"]
-                options_help = ["Save resulting rheometry plot to file", "Discard results, return to menu"]
+                visco_res = self.calc_visc(self, ln, 15)
+                average_viscosity = np.average(visco_res)
+                blurb = ["Finished!","","Results saved in {}".format(ln), "Average Viscosity: {:.3f} Pa.s".format(average_viscosity)]
+                options = ["> Continue"]
+                options_help = ["Return to menu"]
             else:
                 # cancel
                 pass
@@ -337,74 +338,49 @@ class rheometer(object):
         elif res == 4:
             # quit
             return 4
-    
-    def get_viscosity(self, strain_rate, run_length):
-        variable_strain = True
-        
-        self.mot.start_poll()
-        
-        try:
-            iterator = iter(strain_rate)
-        except TypeError:
-            variable_strain = False
-        print "Reading data ({} s)...".format(run_length)
-        try:
-            if variable_strain:
-                for i in range(0, len(strain_rate)):
-                    self.set_strain_rate(strain_rate[i])
-                    time.sleep(run_length / len(strain_rate))
-            else:
-                self.set_strain_rate(strain_rate)
-                time.sleep(run_length)
-
-            self.mot.clean_exit()
-            print "Calculating viscosity..."
-            return self.calc_visc(self.mot.this_log_name)
-
-        except KeyboardInterrupt:
-            self.mot.clean_exit()
-            return 0  # Operation was cancelled
 
     def calc_visc(self, filename, fill_vol):
         self.fill_height = fill_vol / self.dxsa
         datf = pd.read_csv(filename)
 
         # Split up csv columns
-        t = datf['t']
-        st = t - t[0]
-        dr = datf['dr']
-        cr = datf['cr']
-        pv = datf['pv']
-        
-        # Fix out of range current readings
-        for i in range(1, len(cr)):
-            if cr[i] < 2.28: cr[i] = 2.28
-            if cr[i] > 2.4: cr[i] = 2.4
+        t   = np.array(datf['t'], np.float64)
+        st  = t - t[0]
+        dr  = np.array(datf['dr'], np.float64)
+        cr  = np.array(datf['cr'], np.float64)
+        pv  = np.array(datf['pv'], np.float64)
+        cra = np.array(datf['cr2a'], np.float64)
+        crb = np.array(datf['cr2b'], np.float64)
         
         # Filtering: aye or naw?
         if True:
             dr = np.array(filter(st, dr, method="butter",A=2, B=0.001))
             cr = np.array(filter(st, cr, method="butter",A=2, B=0.001))
+            cra = np.array(filter(st, cra, method="butter",A=2, B=0.001))
+            crb = np.array(filter(st, crb, method="butter",A=2, B=0.001))
         
         # Calculate viscosity etc
-        cu      = (-956.06 * (cr ** 3)) + (6543.97 * (cr ** 2)) + (-14924.369 * cr) + 11341.612
-        sp_rpms = dr * 316.451 - 163.091
+        Ims     = resx.cal_30AHES[0] * cr + resx.cal_30AHES[1]
+        Ims    += resx.cal_5AHES[0] * cra + resx.cal_5AHES[1]
+        Ims    += resx.cal_5AHES[0] * crb + resx.cal_5AHES[1]
+        Ims     = Ims / 3
+        sp_rpms = resx.cal_dynamo[0] * dr + resx.cal_dynamo[1]
         sp_rads = (sp_rpms * 2 * np.pi) / 60
         sn_rpms = 5.13 * pv + 15.275
-        vo      = 0.0636 * pv + 2.423
-        pe      = cu * vo
-        T       = 0.000001054 * pe - 0.000001488
+        Vms      = 0.066 * pv + 2.422
+
+        Icoil   = resx.cal_IcoVms[0] * Vms + resx.cal_IcoVms[1]
+        Iemf    = resx.cal_IemfVms[0] * Vms + resx.cal_IemfVms[1]
+        Ts      = resx.cal_TsVms[0] * Vms + resx.cal_TsVms[1]
+
+        T       = (Ims - Icoil) / (Iemf / Ts)
+        
         tau     = T / (2 * np.pi * self.ri * self.ri * self.fill_height) 
         gam_dot = (sp_rads * self.ri) / (self.ro - self.ri)
         
-        #holy moses, more filtering?
-        if False:
-            tau     = filter(st, tau, method="butter", A=2, B=0.001)
-            gam_dot = filter(st, gam_dot, method="butter", A=4, B=0.001)
+        mu      = tau / gam_dot
         
-        __, __, coeffs = fit_line(gam_dot, tau, 1)
-        
-        return coeffs[0]
+        return mu
             
     def set_strain_rate(self, value):
         desired_speed = value * (self.ro - self.ri) / self.ri  # in rads
