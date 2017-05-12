@@ -55,7 +55,7 @@ class rheometer(object):
     def get_rheometry(self, strain_rate, run_length):
         pass
     
-    def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", plot_title="Plot", plot_x_title="x", plot_y_title="y", plot_x=[1, 2, 3, 4, 5], plot_y=[2, 2, 2, 2, 2]):
+    def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", plot_title="Plot", plot_x_title="x", plot_y_title="y", plot_x=[1, 2, 3, 4, 5], plot_y=[2, 2, 2, 2, 2], input_type="enum"):
         global stdscr
         global plotwin
         global debug
@@ -63,7 +63,7 @@ class rheometer(object):
         stdscr.border(0)
         plotwin.clear()
         plotwin.border(0)
-        if options_help == "NONE": options_help = ["There is no help available for this option."] * len(options)
+        if options_help == "NONE": options_help = [""] * len(options)
 
         # TEST DATA #
         plot_x = np.linspace(1, 5)
@@ -126,19 +126,27 @@ class rheometer(object):
             
         # Show help
         if get_input:
-            stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 3, options_help[selected])
+            if input_type == "enum":
+                stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 3, options_help[selected])
+            elif input_type == "string":
+                stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 3, ":_")
 
         # Get Input
         stdscr.addstr(0,0, "")
         stdscr.refresh()
         plotwin.refresh()
-        if get_input:
+        if get_input and input_type == "enum":
             res = stdscr.getch()
+        elif get_input and input_type == "string":
+            curses.echo()
+            res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 5, 5)
         else:
             res = 10
 
         # Return
-        if res == curses.KEY_UP:
+        if input_type == "string":
+            curses.noecho()
+        elif res == curses.KEY_UP:
             # up arrow, reduce selection
             if selected == 0:
                 selected = len(options) - 1
@@ -159,6 +167,7 @@ class rheometer(object):
         return res
 
     def menutree(self, initsel=0):
+        os.system('mode con: cols=159 lines=34')
         global stdscr
         global debug
         blurb = ["This script will operate the RPi-R, testing a ", 
@@ -253,8 +262,50 @@ class rheometer(object):
                 pass
             return 0
         elif res == 1:
-            # recal stall torque (requires mass reading)
-            # do things
+            # recal stall torque
+
+            # step 1: set up hardware (attach arm to cylinder, set up balance)
+            blurb = [   "Motor Characteristic Calibration", 
+                        "", 
+                        "Step 1: Set up.", 
+                        "This script will operate the RPi-R, testing a ",
+                        "The arm must be attached to the inner cylinder ", 
+                        "and positioned such that when the motor rotates,",
+                        "the arm hits the balance",
+                        "Continue when ready."]
+            options = ["> Continue", "> Cancel"]
+            help = ["", ""]
+            res = self.display(blurb, options, options_help=help)
+            if res == 1: return 1
+
+            for i in range(0, 17):
+                # step 2a: set voltage, read sensor information (Ims, Vms)
+                # step 2b: read balance information (user input mass reading on balance)
+                # step 2c: repeat steps a,b for multiple supply voltages (17, from PV=0 to PV=128, every 8)
+
+                self.mot.set_pot(i * 8)
+                for j in range(0, 10):
+                    sensor_readings = [0, 0, 0, 0]
+                    if not debug: sensor_readings = self.mot.read_sensors()
+                    blurb = [   "Motor Characteristic Calibration",
+                                "",
+                                "Step 2: Reading Sensors",
+                                "",
+                                "Supply voltage set to: {}".format((8 * i) * 0.066 + 2.422),
+                                "Sensor\t\tReading\t\tValue",
+                                "30AHES\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[1], resx.cal_30AHES[0] * sensor_readings[1] + resx.cal_30AHES[1]),
+                                "5AHES1\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[2], resx.cal_5AHES[0] * sensor_readings[2] + resx.cal_5AHES[1]),
+                                "5AHES2\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[3], resx.cal_5AHES[0] * sensor_readings[3] + resx.cal_5AHES[1]),
+                                "",
+                                "Enter the balance reading, grams ({}/10):".format(j)]
+                    options = [""]
+                    help = [""]
+                    res = self.display(blurb, options, options_help=help, input_type="string")
+                    
+                    # plot results?
+                    # save information
+                    # update resx calibrations
+
             return 1
         elif res == 2:
             # test a sample (default settings - PV=48, for 5 minutes)
@@ -721,6 +772,7 @@ if __name__ == "__main__":
         mparams={'log_dir':'./','poll_logging':False}
     else:
         mparams={'log_dir':'./'}
+
     r = rheometer(motor_params=mparams)
     
     if debug:
@@ -743,7 +795,7 @@ if __name__ == "__main__":
             stdscr.keypad(0)
             curses.echo()
             curses.endwin()
-    print a
+
     # Get list of strains
     #strains = np.linspace(5, 250, 128)
     
