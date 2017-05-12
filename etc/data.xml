@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<data>
+    <geometry name="icor">
+        <size>0.01525</size>
+        <units>m</units>
+    </geometry>
+    <geometry name="ich">
+        <size>0.04</size>
+        <units>m</units>
+    </geometry>
+    <geometry name="ocor">
+        <size>0.0220755</size>
+        <units>m</units>
+    </geometry>
+    <geometry name="ocir">
+        <size>0.019556</size>
+        <units>m</units>
+    </geometry>
+    <geometry name="och">
+        <size>0.04</size>
+        <units>m</units>
+    </geometry>
+    <calibration name="dynamo">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+    <calibration name="30AHES">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+    <calibration name="5AHES">
+        <coeff1>312.806</coeff1>
+        <coeff2>-159.196</coeff2>
+    </calibration>
+</data>
