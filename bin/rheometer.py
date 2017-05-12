@@ -11,6 +11,7 @@ import resx
 import sys
 import curses
 import math
+import os
 
 from motor import motor
 from filter import filter
@@ -54,12 +55,48 @@ class rheometer(object):
     def get_rheometry(self, strain_rate, run_length):
         pass
     
-    def display(self, stdscr, blurb, options, selected=0, get_input=True, options_help="NONE"):
-        self.version
+    def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", plot_title="Plot", plot_x_title="x", plot_y_title="y", plot_x=[1, 2, 3, 4, 5], plot_y=[2, 2, 2, 2, 2]):
+        global stdscr
+        global plotwin
         global debug
         stdscr.clear()
         stdscr.border(0)
+        plotwin.clear()
+        plotwin.border(0)
         if options_help == "NONE": options_help = ["There is no help available for this option."] * len(options)
+
+        # TEST DATA #
+        plot_x = np.linspace(1, 5)
+        plot_y = (np.exp(-plot_x))
+
+        # Plot
+        # width = 50, height = 25
+        plotwin.addstr(2, 1, "{}{}{}".format(" " * ((48 - len(plot_title)) / 2), plot_title, " " * ((48 - len(plot_title)) / 2)))
+        
+        # draw axis
+        for i in range(4, 23):
+            plotwin.addstr(i, 4, "|")
+        for i in range(5, 45):
+            plotwin.addstr(22, i, "-")
+        plotwin.addstr(22, 4, "o")
+
+        # draw titles
+        plotwin.addstr(23, 1, "{}{}{}".format(" " * ((48 - len(plot_x_title)) / 2), plot_x_title, " " * ((48 - len(plot_x_title)) / 2)))
+        y_title_centred = "{}{}{}".format(" " * ((24 - len(plot_y_title)) / 2), plot_y_title, " " * ((24 - len(plot_y_title)) / 2))
+        for i in range(0, len(y_title_centred)):
+            plotwin.addstr(i + 1, 2, y_title_centred[i])
+
+        # get scale
+        deltax = max(plot_x)
+        deltay = max(plot_y)
+        plot_x = np.array(plot_x)
+        plot_x = plot_x * (29 / deltax)
+        plot_y = np.array(plot_y)
+        plot_y = plot_y * (17 / deltay)
+
+        # plot data
+        for i in range(0, len(plot_x)):
+            plotwin.addstr(21 - int(plot_y[i]), 4 + int(plot_x[i]), "X")
 
         # RPi-R header
         stdscr.addstr(3, 3, r"____________ _       ______ ")
@@ -94,6 +131,7 @@ class rheometer(object):
         # Get Input
         stdscr.addstr(0,0, "")
         stdscr.refresh()
+        plotwin.refresh()
         if get_input:
             res = stdscr.getch()
         else:
@@ -106,21 +144,22 @@ class rheometer(object):
                 selected = len(options) - 1
             else:
                 selected -= 1
-            res = self.display(stdscr, blurb, options, selected, True, options_help)
+            res = self.display(blurb, options, selected, True, options_help)
         elif res == curses.KEY_DOWN:
             # down arrow, increase selection
             if selected == len(options) - 1:
                 selected = 0
             else:
                 selected += 1
-            res = self.display(stdscr, blurb, options, selected, True, options_help)
+            res = self.display(blurb, options, selected, True, options_help)
         elif res == curses.KEY_ENTER or res == 10 or res == 13:
             res = selected
         else:
-            res = self.display(stdscr, blurb, options, selected, True, options_help)
+            res = self.display(blurb, options, selected, True, options_help)
         return res
 
-    def menutree(self, stdscr, initsel=0):
+    def menutree(self, initsel=0):
+        global stdscr
         global debug
         blurb = ["This script will operate the RPi-R, testing a ", 
                 "fluid and reporting the results. This program ", 
@@ -145,13 +184,13 @@ class rheometer(object):
                     "Test fluid using custom settings.",
                     ""]
         
-        res = self.display(stdscr, blurb, options, initsel, options_help=help)
+        res = self.display(blurb, options, initsel, options_help=help)
         
         if res == 0:
             blurb = ["Sensor recalibration.", "", "Run length:"]
             options = ["> Long (~10 minutes)", "> Medium (~5 minutes)", "> Short (~2 minutes)"]
             help = ["  ", "  ", "  "]
-            res = self.display(stdscr, blurb, options, options_help=help)
+            res = self.display(blurb, options, options_help=help)
 
             if res == 0:
                 step = 5
@@ -160,7 +199,7 @@ class rheometer(object):
             elif res == 2:
                 step = 0.25
                 
-            self.display(stdscr, ["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
+            self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
             
             if not debug: self.mot.start_poll(ln)
@@ -168,7 +207,7 @@ class rheometer(object):
             for i in range(0, 129):
                 self.mot.set_pot(i)
                 vms = 0.066 * i + 2.422
-                stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s".format(vms, (128 - i) * step))
+                stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (128 - i) * step))
                 width = 40
                 perc = int(math.ceil((i * float(step) / 128.0) * width))
                 neg_perc = int(math.floor(((128.0 - i) * step / 128.0) * width))
@@ -203,7 +242,7 @@ class rheometer(object):
             options = ["\t(1) Save",
                        "\t(2) Discard"]
             help = ["  ", "  "]
-            res = self.display(stdscr, blurb, options, options_help=help)
+            res = self.display(blurb, options, options_help=help)
             
             if res == 0:
                 resx.cal_dynamo = tdyncal
@@ -215,9 +254,42 @@ class rheometer(object):
             return 0
         elif res == 1:
             # recal stall torque (requires mass reading)
+            # do things
             return 1
         elif res == 2:
-            # test a sample (default settings - PV=10, for 5 minutes)
+            # test a sample (default settings - PV=48, for 5 minutes)
+            blurb = ["Rheometry quick run:", "\tRun length: \t5 minutes","\tStrain rate:\t96.9 (1/s)", ""]
+            options = ["> Continue", "> Cancel"]
+            help = [" ", " "]
+            res = self.display(blurb, options, options_help=help)
+
+            if res == 0:
+                # run test
+                self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
+                ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%H%M_%d%m%y", time.gmtime()))
+                
+                if not debug: self.mot.start_poll(ln)
+                
+                self.mot.set_pot(48)
+                vms = 0.066 * 48 + 2.422
+
+                for i in range(0, 300):
+                    stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (300 - i)))
+                    width = 40
+                    perc = int(math.ceil((i / 300.0) * width))
+                    neg_perc = int(math.floor(((300.0 - i) / 300.0) * width))
+                    stdscr.addstr(17, 3, "[{}{}]".format("#" * perc, " " * neg_perc))
+                    stdscr.refresh()
+                    time.sleep(1)
+                
+                self.mot.clean_exit()
+                visco_res = calc_visc(self, ln, 15)
+                blurb = ["Average Viscosity: {:.3f} Pa.s".format(visco_res)]
+                options = ["> Save results plot", "> Continue"]
+                options_help = ["Save resulting rheometry plot to file", "Discard results, return to menu"]
+            else:
+                # cancel
+                pass
             return 2
         elif res == 3:
             # test a sample (custom settings - load from xml or edit default)
@@ -637,30 +709,40 @@ class rheometer(object):
         
 if __name__ == "__main__":
     # init
+    rows, columns = os.popen('stty size', 'r').read().split()
     stdscr = curses.initscr()
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(1)
+    #plotwin = curses.newwin(int(0.2 * int(rows)), int(0.2 * int(rows)), 5, int(0.8 * int(rows)))
+    plotwin = curses.newwin(25, 50, 5, 100)
+    plotwin.border(0)
     if debug:
         mparams={'log_dir':'./','poll_logging':False}
     else:
         mparams={'log_dir':'./'}
     r = rheometer(motor_params=mparams)
-
-    a = r.menutree(stdscr)
-    try:
-        res = 0
-        while res != 4:
-            res = r.menutree(stdscr, initsel=res)
-    except:
-        pass
-    else:
-        pass
-    finally:
+    
+    if debug:
+        a = r.menutree()
         curses.nocbreak()
         stdscr.keypad(0)
         curses.echo()
         curses.endwin()
+    else:
+        try:
+            res = 0
+            while res != 4:
+                res = r.menutree(initsel=res)
+        except:
+            pass
+        else:
+            pass
+        finally:
+            curses.nocbreak()
+            stdscr.keypad(0)
+            curses.echo()
+            curses.endwin()
     print a
     # Get list of strains
     #strains = np.linspace(5, 250, 128)
