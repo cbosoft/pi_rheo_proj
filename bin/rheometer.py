@@ -57,46 +57,10 @@ class rheometer(object):
     
     def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", plot_title="Plot", plot_x_title="x", plot_y_title="y", plot_x=[1, 2, 3, 4, 5], plot_y=[2, 2, 2, 2, 2], input_type="enum"):
         global stdscr
-        global plotwin
         global debug
         stdscr.clear()
         stdscr.border(0)
-        plotwin.clear()
-        plotwin.border(0)
         if options_help == "NONE": options_help = [""] * len(options)
-
-        # TEST DATA #
-        plot_x = np.linspace(1, 5)
-        plot_y = (np.exp(-plot_x))
-
-        # Plot
-        # width = 50, height = 25
-        plotwin.addstr(2, 1, "{}{}{}".format(" " * ((48 - len(plot_title)) / 2), plot_title, " " * ((48 - len(plot_title)) / 2)))
-        
-        # draw axis
-        for i in range(4, 23):
-            plotwin.addstr(i, 4, "|")
-        for i in range(5, 45):
-            plotwin.addstr(22, i, "-")
-        plotwin.addstr(22, 4, "o")
-
-        # draw titles
-        plotwin.addstr(23, 1, "{}{}{}".format(" " * ((48 - len(plot_x_title)) / 2), plot_x_title, " " * ((48 - len(plot_x_title)) / 2)))
-        y_title_centred = "{}{}{}".format(" " * ((24 - len(plot_y_title)) / 2), plot_y_title, " " * ((24 - len(plot_y_title)) / 2))
-        for i in range(0, len(y_title_centred)):
-            plotwin.addstr(i + 1, 2, y_title_centred[i])
-
-        # get scale
-        deltax = max(plot_x)
-        deltay = max(plot_y)
-        plot_x = np.array(plot_x)
-        plot_x = plot_x * (29 / deltax)
-        plot_y = np.array(plot_y)
-        plot_y = plot_y * (17 / deltay)
-
-        # plot data
-        for i in range(0, len(plot_x)):
-            plotwin.addstr(21 - int(plot_y[i]), 4 + int(plot_x[i]), "X")
 
         # RPi-R header
         stdscr.addstr(3, 3, r"____________ _       ______ ")
@@ -120,10 +84,10 @@ class rheometer(object):
         # Show Options
         for i in range(0, len(options)):
             if selected == i:
-                stdscr.addstr(blurbheight + len(blurb) + i, 3, options[i], curses.A_STANDOUT)
+                stdscr.addstr(blurbheight + len(blurb) + i + 1, 3, options[i], curses.A_STANDOUT)
             else:
-                stdscr.addstr(blurbheight + len(blurb) + i, 3, options[i])
-            
+                stdscr.addstr(blurbheight + len(blurb) + i + 1, 3, options[i])
+        
         # Show help
         if get_input:
             if input_type == "enum":
@@ -134,7 +98,6 @@ class rheometer(object):
         # Get Input
         stdscr.addstr(0,0, "")
         stdscr.refresh()
-        plotwin.refresh()
         if get_input and input_type == "enum":
             res = stdscr.getch()
         elif get_input and input_type == "string":
@@ -187,11 +150,11 @@ class rheometer(object):
                     "> Custom test",
                     "> Quit"]
         
-        help = [    "Simple sweep of voltages used to recalibrate sensors.",
-                    "!! - Yet to be implemented.",
+        help = [    "Sweep supply voltage between ~ 2.422V to ~10.87V.",
+                    "Stall torque measurement and calibration.",
                     "5 minute test of fluid at constant strain (~96.9s^-1).",
                     "Test fluid using custom settings.",
-                    ""]
+                    "Quit"]
         
         res = self.display(blurb, options, initsel, options_help=help)
         
@@ -206,7 +169,7 @@ class rheometer(object):
             elif res == 1:
                 step = 2.5
             elif res == 2:
-                step = 0.25
+                step = 0.1
                 
             self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
@@ -230,6 +193,7 @@ class rheometer(object):
                 tdyncal = self.dynamo_cal
                 t30acal = self.hes30A_cal
                 t5acal = self.hes5A_cal
+                ticovms = resx.cal_IcoVms
             else:
                 # data contained in log file $ln can be used to calibrate dynamo and HES sensor data"
                 datf    = pd.read_csv(ln)
@@ -239,10 +203,13 @@ class rheometer(object):
                 dr      = np.array(datf['dr'], np.float64)
                 cra     = np.array(datf['cr2a'], np.float64)
                 crb     = np.array(datf['cr2b'], np.float64)
+                pv      = np.array(datf['pv'], np.float64)
+                vms     = 0.066 * pv + 2.422
 
                 tdyncal = self.cal_dynamo(st, dr, pv)
                 t30acal = self.cal_30ahes(st, cr, pv)
                 t5acal = self.cal_5ahes(st, cra, crb, pv)
+                ticovms = np.polyfit(vms, ((cr * t30acal[0] + t30acal[1]) + (cra * t5acal[0] + t5acal[1]) + (crb * t5acal[0] + t5acal[1])) / 3, 1)
             
             blurb = ["Calibration results:", "",
                      "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
@@ -257,6 +224,7 @@ class rheometer(object):
                 resx.cal_dynamo = tdyncal
                 resx.cal_30AHES = t30acal
                 resx.cal_5AHES = t5acal
+                resx.cal_IcoVms = ticovms
                 resx.writeout()
             elif res == 1:
                 pass
@@ -277,6 +245,10 @@ class rheometer(object):
             help = ["", ""]
             res = self.display(blurb, options, options_help=help)
             if res == 1: return 1
+            
+            currents = [0] * 0
+            supply_voltages = [0] * 0
+            masses = [0] * 0
 
             for i in range(0, 17):
                 # step 2a: set voltage, read sensor information (Ims, Vms)
@@ -285,8 +257,15 @@ class rheometer(object):
 
                 self.mot.set_pot(i * 8)
                 for j in range(0, 10):
-                    sensor_readings = [0, 0, 0, 0]
-                    if not debug: sensor_readings = self.mot.read_sensors()
+                    for k in range(0, 100):
+                        sensor_readings = [0, 0, 0, 0]
+                        if not debug: sensor_readings = self.mot.read_sensors()
+                        current = ((resx.cal_30AHES[0] * sensor_readings[1] + resx.cal_30AHES[1]) + 
+                                (resx.cal_5AHES[0] * sensor_readings[2] + resx.cal_5AHES[1]) + 
+                                (resx.cal_5AHES[0] * sensor_readings[3] + resx.cal_5AHES[1])) / 3
+                        supply_voltage = (8 * i) * 0.066 + 2.422
+                        currents.append(current)
+                        supply_voltages.append(supply_voltage)
                     blurb = [   "Motor Characteristic Calibration",
                                 "",
                                 "Step 2: Reading Sensors",
@@ -301,8 +280,18 @@ class rheometer(object):
                     options = [""]
                     help = [""]
                     res = self.display(blurb, options, options_help=help, input_type="string")
-                    
-                    # plot results?
+                    for k in range(0, 100):
+                        masses.append(float(res))
+
+                    Larm = 0.17 # length of arm attached to motor, in m
+                    g = 9.81 # acceleration due to gravity, m/(s^2)
+                    stall_torques = np.array(masses) * g * Larm
+
+                    TsFit = np.polyfit(supply_voltages, stall_torques, 1)
+                    IemFit = np.polyfit(supply_voltages, currents - (np.array(supply_voltages) * resx.cal_IcoVms[0] + resx.cal_IcoVms[1]), 1)
+                    resx.cal_TsVms = TsFit
+                    resx.cal_IemfVms = IemFit
+                    resx.writeout()
                     # save information
                     # update resx calibrations
 
@@ -761,13 +750,12 @@ class rheometer(object):
 if __name__ == "__main__":
     # init
     rows, columns = os.popen('stty size', 'r').read().split()
-    stdscr = curses.initscr()
+    bigscr = curses.initscr()
+    stdscr = curses.newwin(34, 75, 1, 1)
+    stdscr.border(0)
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(1)
-    #plotwin = curses.newwin(int(0.2 * int(rows)), int(0.2 * int(rows)), 5, int(0.8 * int(rows)))
-    plotwin = curses.newwin(25, 50, 5, 100)
-    plotwin.border(0)
     if debug:
         mparams={'log_dir':'./','poll_logging':False}
     else:
