@@ -96,15 +96,15 @@ class motor(object):
         if not os.path.isdir(self.log_dir):
             os.mkdir(self.log_dir)
 
-        # Get unique number for the log file
-        un = time.strftime("%H %M %S", time.gmtime())
-
         # Creat log
         if (self.poll_logging):
             if log_name == "DATETIME":
+                # Get unique number for the log file
+                un = time.strftime("%H %M %S", time.gmtime())
                 self.this_log_name = self.log_dir + "/log_" + un + ".csv"
             else:
-                self.this_log_name = self.log_dir + "/" + log_name
+                #self.this_log_name = self.log_dir + "/" + log_name
+                self.this_log_name = str(log_name)
             
             self.logf = open(self.this_log_name, "w")
             
@@ -119,7 +119,7 @@ class motor(object):
 
     def start_poll(self, name="DATETIME"):
         if self.poll_logging:
-            self.new_logs(self.new_logs(name))
+            self.new_logs(log_name=name)
         if (not self.poll_running):  # if not already running
             td.start_new_thread(self.poll, tuple())
     
@@ -148,10 +148,8 @@ class motor(object):
     def poll(self):
 
         self.poll_running = True
-
+	
         while (self.poll_running):
-            # self.get_power()  # get electrical power supplied to motor
-            
             # At the third tone, the time will be...
             t = time.time()
             
@@ -176,7 +174,7 @@ class motor(object):
             self.speed = self.fdr * self.svf[0] + self.svf[1]
             if self.log_paused:
                 self.log_add_note = True
-
+            
             if (self.poll_logging) and (not self.log_paused):
                 if self.log_add_note:
                     self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, volts[2], volts[3]))
@@ -186,8 +184,6 @@ class motor(object):
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
-
-        print("Motor polling has halted.")
 
     def update_filt_hist(self, srv, crv, tim):
         if (len(self.srvs) + 1) > self.filtlen:

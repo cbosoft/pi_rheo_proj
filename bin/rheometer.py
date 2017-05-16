@@ -27,7 +27,7 @@ else:
 
 class rheometer(object):
     # misc
-    version = "0.1"
+    version = "0.1.0"
     
     # geometry
     roo = resx.ocor                 # outer cell outer radius in m
@@ -69,7 +69,7 @@ class rheometer(object):
         stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
         stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
         stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
-        stdscr.addstr(10, 3, r"Raspberry Pi Rheometer {}".format(self.version))
+        stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
 
         blurbheight = 12        
         
@@ -165,11 +165,11 @@ class rheometer(object):
             res = self.display(blurb, options, options_help=help)
 
             if res == 0:
-                step = 5
+                step = 5  # 5s * 129 ~= 600s
             elif res == 1:
-                step = 2.5
+                step = 2.5  # 25s * 129 ~= 300s
             elif res == 2:
-                step = 0.1
+                step = 1  # 1s * 129 ~= 120s
                 
             self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
@@ -181,8 +181,8 @@ class rheometer(object):
                 vms = 0.066 * i + 2.422
                 stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (128 - i) * step))
                 width = 40
-                perc = int(math.ceil((i * float(step) / 128.0) * width))
-                neg_perc = int(math.floor(((128.0 - i) * step / 128.0) * width))
+                perc = int(math.ceil((i / 128.0) * width))
+                neg_perc = int(math.floor(((128.0 - i) / 128.0) * width))
                 stdscr.addstr(17, 3, "[{}{}]".format("#" * perc, " " * neg_perc))
                 stdscr.refresh()
                 time.sleep(step)
@@ -283,7 +283,7 @@ class rheometer(object):
                     for k in range(0, 100):
                         masses.append(float(res))
 
-                    Larm = 0.17 # length of arm attached to motor, in m
+                    Larm = 0.0656 # length of arm attached to motor, in m
                     g = 9.81 # acceleration due to gravity, m/(s^2)
                     stall_torques = np.array(masses) * g * Larm
 
@@ -392,8 +392,8 @@ class rheometer(object):
             self.mot.update_setpoint(desired_speed)
 
     def cal_30ahes(self, st, cr, pv):
-        crf = filter.filter(st, cr, method="butter", A=2, B=0.001)
-        crf = filter.filter(st, crf, method="gaussian", A=100, B=100)
+        crf = filter(st, cr, method="butter", A=2, B=0.001)
+        #crf = filter(st, crf, method="gaussian", A=100, B=100)
 
         cu = [0] * 0
         pv_s = [0] * 0
@@ -459,9 +459,9 @@ class rheometer(object):
         cul = coeffs[0] * pvlo + coeffs[1]
 
         # Remove unwanted outlying data
-        min_l = 10000
+        min_l = 0#10000
         max_l = -1
-        skip = 10000
+        skip = 1#0000
         cr = cr[min_l:max_l:skip]
         crf = crf[min_l:max_l:skip]
         cul = cul[min_l:max_l:skip]
@@ -469,18 +469,13 @@ class rheometer(object):
         crstd = np.std(cr)
         crfstd = np.std(crf)
 
-        # Set up figure
-        f = plt.figure(figsize=(8, 8))
-        ax = f.add_subplot(111)
-
         # Plot data and trendline: CRF vs CU
         __, __, coeffs = fit_line(crf, cul, 1)
         return coeffs
     
     def cal_5ahes(self, st, cra, crb, pv):
-        cra     = filter.filter(st, cra, method="butter", A=2, B=0.001)
-        crb     = filter.filter(st, crb, method="gaussian", A=100, B=100)
-        pv      = np.array(datf['pv'])
+        cra     = filter(st, cra, method="butter", A=2, B=0.001)
+        crb     = filter(st, crb, method="gaussian", A=100, B=100)
         crf     = 0.5 * (cra + crb)
         cu = [0] * 0
         pv_s = [0] * 0
@@ -547,19 +542,15 @@ class rheometer(object):
         cul = coeffs[0] * pvlo + coeffs[1]
 
         # Remove unwanted outlying data
-        min_l = 10000
+        min_l = 0#10000
         max_l = -1
-        skip = 10000
-        cr = cr[min_l:max_l:skip]
+        skip = 1#0000
+        #cr = cr[min_l:max_l:skip]
         crf = crf[min_l:max_l:skip]
         cul = cul[min_l:max_l:skip]
 
-        crstd = np.std(cr)
-        crfstd = np.std(crf)
-
-        # Set up figure
-        f = plt.figure(figsize=(8, 8))
-        ax = f.add_subplot(111)
+        #crstd = np.std(cr)
+        #crfstd = np.std(crf)
 
         # Plot data and trendline: CRF vs CU
         __, __, coeffs = fit_line(crf, cul, 1)
@@ -705,15 +696,11 @@ class rheometer(object):
         # pv = 128
         stdv.append(np.std(rv_t_128))
         av_rvs[16] = np.average(rv_t_128)
-            
+        
+        #THERE HAS GOT TO BE A BETTER WAY OF DOING THIS FOR FUCKS SAKE
         # 1st Trend: speed as a function of potval
         zavspdpv = np.polyfit(p2v[4:], av_spd[4:], 1)
         tlo = np.poly1d(zavspdpv)
-
-        # Speed v Val  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #  #
-        # Set up figure
-        f = plt.figure(figsize=(8, 8))
-        ax = f.add_subplot(111)
 
         # 2nd Trend: read voltage as a function of potval
         z = np.polyfit(pv, rv, 1)
@@ -733,13 +720,13 @@ if __name__ == "__main__":
     curses.cbreak()
     stdscr.keypad(1)
     if debug:
-        mparams={'log_dir':'./','poll_logging':False}
+        mparams={'log_dir':'.','poll_logging':False}
     else:
-        mparams={'log_dir':'./'}
+        mparams={'log_dir':'.','poll_logging':True}
 
     r = rheometer(motor_params=mparams)
     
-    if debug:
+    if True:
         a = r.menutree()
         curses.nocbreak()
         stdscr.keypad(0)
