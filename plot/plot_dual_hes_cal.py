@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("./../../bin/")
+sys.path.append("./../bin/")
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -11,7 +11,8 @@ import pandas as pd
 from plothelp import fit_line
 
 # Read csv
-datf = pd.read_csv("./../../logs/dual_hes_long1000.csv")
+#datf = pd.read_csv("./../logs/dual_hes_long1000.csv")
+datf = pd.read_csv("./../logs/sensor_calibration_100417.csv")
 st      = np.array(datf['t'])
 st      = st - st[0]
 cr      = np.array(datf['cr'])
@@ -88,9 +89,9 @@ pvlo = np.array(pvlo)
 cul = coeffs[0] * pvlo + coeffs[1]
 
 # Remove unwanted outlying data
-min_l = 10000
+min_l = 0  #10000
 max_l = -1
-skip = 10000
+skip = 1  #0000
 cr = cr[min_l:max_l:skip]
 crf = crf[min_l:max_l:skip]
 cul = cul[min_l:max_l:skip]
