@@ -18,7 +18,7 @@ TO DO:
 * Analogue filtering?
 * Dead-time compensation?
 * Speed control
-~~* Temperature control (monitoring)~~
+* ~~Temperature control (monitoring)~~
 
 
 ```
