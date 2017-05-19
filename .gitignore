@@ -1,26 +1,2 @@
-lib/img_recog/frames/*
-lib/img_recog/old_frames
-lib/img_recog/outp/*
-lib/img_recog/videos/*
-lib/img_recog/working_frames/*
 **/*.pyc
-write_up/*.BACKUP
-write_up/*.NOAPPENDIX
-write_up/*.log
-write_up/*.pdf
-write_up/*.gz
-write_up/*.bak
-write_up/*.aux
-write_up/*.sav
-write_up/*.toc
-write_up/*.out
-write_up/*.bbl
-write_up/*.blg
-write_up/*.nls
-write_up/*.nlo
-write_up/*.ilg
-write_up/report_template.tex
-write_up/figures/*.png
-lib/*.png
-write_up/images/hall_sensor_waveform.png
-lib/test scripts/dat+plot/*.csv
+plot/*.png
