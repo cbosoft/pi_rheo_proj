@@ -16,6 +16,7 @@ import filter
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
 from control import tf_pi_controller as pitf
+from tempsens import ds18b20 as ts
 
 
 class motor(object):
@@ -51,13 +52,14 @@ class motor(object):
     control_stopped = True
     
     # Classes
+    therm = ts("blank")
     pot = dp()  # potentiometer to control voltage
     pic = pitf((0.2, 0.15))
     aconv = ac()  # adc to read current/voltage
     adc_chan = [0, 1, 2, 3]  # voltage channel, current channel, current channel, current channel
 
     def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
-                 poll_logging=True, log_dir="./logs",
+                 poll_logging=True, log_dir="./logs", therm_sn="blank"
                  log_name="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15),
                  filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
@@ -74,8 +76,9 @@ class motor(object):
         if not filt_param_B == 0.314: self.filtB = filt_param_B
 
         # Set sensor variables
-        #self.pot = dp()
-        #self.aconv = ac(cs_pin=1, vref=adc_vref)
+        self.pot = dp()
+        self.aconv = ac(cs_pin=1, vref=adc_vref)
+        self.therm = ts(therm_sn)
         self.i_poll_rate=i_poll_rate
         
         # Set up logs
@@ -108,7 +111,7 @@ class motor(object):
             
             self.logf = open(self.this_log_name, "w")
             
-            self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr\n")
+            self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr,T\n")
 
     def log_pause(self):
         self.log_paused = True
@@ -172,15 +175,23 @@ class motor(object):
             #print fvolts
             self.fdr = fvolts[0]
             self.speed = self.fdr * self.svf[0] + self.svf[1]
+            
+            temperature_c = 0.0
+            # if thermosensor was set up properly...
+            if self.therm.check_sn(): 
+                temperature_c = self.therm.read_temp()
+            else:
+                warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
+            
             if self.log_paused:
                 self.log_add_note = True
             
             if (self.poll_logging) and (not self.log_paused):
                 if self.log_add_note:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, volts[2], volts[3]))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {9:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, volts[2], volts[3], temperature_c))
                     self.log_add_note = False
                 else:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], volts[2], volts[3]))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f}, {8:.3f} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], volts[2], volts[3], temperature_c))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
