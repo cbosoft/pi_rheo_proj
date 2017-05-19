@@ -20,16 +20,16 @@
         <units>m</units>
     </geometry>
     <calibration name="dynamo">
-        <coeff1>312.806</coeff1>
-        <coeff2>-159.196</coeff2>
+        <coeff1>356.362846288</coeff1>
+        <coeff2>-169.821264835</coeff2>
     </calibration>
     <calibration name="30AHES">
-        <coeff1>312.806</coeff1>
-        <coeff2>-159.196</coeff2>
+        <coeff1>0.442981098333</coeff1>
+        <coeff2>-0.122739850109</coeff2>
     </calibration>
     <calibration name="5AHES">
-        <coeff1>312.806</coeff1>
-        <coeff2>-159.196</coeff2>
+        <coeff1>0.495851573781</coeff1>
+        <coeff2>-0.62604582254</coeff2>
     </calibration>
     <calibration name="IemfVms">
         <coeff1>312.806</coeff1>
