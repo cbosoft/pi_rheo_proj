@@ -55,7 +55,7 @@ class rheometer(object):
     def get_rheometry(self, strain_rate, run_length):
         pass
     
-    def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", plot_title="Plot", plot_x_title="x", plot_y_title="y", plot_x=[1, 2, 3, 4, 5], plot_y=[2, 2, 2, 2, 2], input_type="enum"):
+    def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", input_type="enum"):
         global stdscr
         global debug
         stdscr.clear()
@@ -169,7 +169,7 @@ class rheometer(object):
             elif res == 1:
                 step = 2.5  # 25s * 129 ~= 300s
             elif res == 2:
-                step = 1  # 1s * 129 ~= 120s
+                step = 0.1  # 1s * 129 ~= 120s
                 
             self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
@@ -205,11 +205,15 @@ class rheometer(object):
                 crb     = np.array(datf['cr2b'], np.float64)
                 pv      = np.array(datf['pv'], np.float64)
                 vms     = 0.066 * pv + 2.422
+                
+                cu1     = (cr * t30acal[0] + t30acal[1])
+                cu2     = (cra * t5acal[0] + t5acal[1])
+                cu3     = (crb * t5acal[0] + t5acal[1])
 
                 tdyncal = self.cal_dynamo(st, dr, pv)
                 t30acal = self.cal_30ahes(st, cr, pv)
                 t5acal = self.cal_5ahes(st, cra, crb, pv)
-                ticovms = np.polyfit(vms, ((cr * t30acal[0] + t30acal[1]) + (cra * t5acal[0] + t5acal[1]) + (crb * t5acal[0] + t5acal[1])) / 3, 1)
+                ticovms = np.polyfit(vms, (cu1 + cu2 + cu3) / 3, 1)
             
             blurb = ["Calibration results:", "",
                      "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
@@ -554,6 +558,7 @@ class rheometer(object):
 
         # Plot data and trendline: CRF vs CU
         __, __, coeffs = fit_line(crf, cul, 1)
+        return coeffs
     
     def cal_dynamo(self, st, rv, pv):
         # Read csv
@@ -697,7 +702,7 @@ class rheometer(object):
         stdv.append(np.std(rv_t_128))
         av_rvs[16] = np.average(rv_t_128)
         
-        #THERE HAS GOT TO BE A BETTER WAY OF DOING THIS FOR FUCKS SAKE
+        #THERE HAS GOT TO BE A BETTER WAY OF DOING THIS
         # 1st Trend: speed as a function of potval
         zavspdpv = np.polyfit(p2v[4:], av_spd[4:], 1)
         tlo = np.poly1d(zavspdpv)
@@ -708,7 +713,7 @@ class rheometer(object):
 
         # 3rd Trend: speed as a function of read voltage
         z3z = np.polyfit(tl(pv), tlo(pv), 1)
-        return z3z[0], z3z[1]
+        return z3z
         
 if __name__ == "__main__":
     # init
