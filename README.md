@@ -18,21 +18,15 @@ TO DO:
 * Analogue filtering?
 * Dead-time compensation?
 * Speed control
-* Temperature control (monitoring)
+~~* Temperature control (monitoring)~~
 
 
 ```
-overall_loop.py                 uses the other libs to achieve the main task
-
-/datasheets                     contains the datasheets for the hardware used
-
-/write_up                       where my report lives!
-
-/lib                            where the class libraries live
-
-/lib/test scripts               folder containing scripts that test the hardware (gather information etc)
-
-/lib/img_recog                  contains scripts and files used and output by the crack detection script
+/bin                            code lives here
+/etc                            meta data lives here (calibrations, rheometer geometry)
+/logs                           data logged from experimental runs lives here (temporary)
+/misc/datasheets                hardware datasheets live here
+/plot                           scripts for plotting results live here
 ```
 *Distributed under GNU General Public License (GPL).*
 
