@@ -13,7 +13,7 @@ More Learn Python:
 
 TO DO:
 * Calibration scripts
-* Central calibration storage (not as var in each class!)
+*~~ Central calibration storage (not as var in each class!)~~
 * Redo cals (TS vs. Vms & Iemf vs.  Vms)
 * Analogue filtering?
 * Dead-time compensation?
