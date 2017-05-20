@@ -7,8 +7,7 @@
 
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # TODO:
-# Motor "cycling"
-# wait after change in sensor recal
+# 
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 packages_missing = [""]
@@ -40,6 +39,10 @@ try:
     import math
 except ImportError as ex:
     packages_missing.append("crtmath")
+try:
+    import copy
+except ImportError as ex:
+    packages_missing.append("crtcopy")
 try:
     import os
 except ImportError as ex:
@@ -91,7 +94,14 @@ else:
 
 class rheometer(object):
     # misc
-    version = "0.1.0"
+    version = "0.1.1"               # maj.typ.min
+                                    # MAJOR: Indicates release version
+                                    # TYPE: What type of release? 
+                                    #   0: LTS
+                                    #   1: pre-alpha development
+                                    #   2: alpha
+                                    #   3: beta
+                                    # MINOR: Indicates progress through release (towards next version)
     
     # geometry
     roo = resx.ocor                 # outer cell outer radius in m
@@ -130,30 +140,26 @@ class rheometer(object):
         if options_help == "NONE": options_help = [""] * len(options)
 
         # RPi-R header
-        if self.motor_running:
-            stdscr.addstr(3, 3, r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==")
-            stdscr.addstr(3, 3, r"____________ _       ______ ")
-            stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
-            stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
-            stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
-            stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
-            stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
-            stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
-        else:
-            stdscr.addstr(3, 3, r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==")
-            stdscr.addstr(3, 3, r"____________ _       ______ ")
-            stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
-            stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
-            stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
-            stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
-            stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
-            stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
+        mode_string = " " #6
+        motor_string = "   MOTOR OFF" #10
+        if self.motor_running: motor_string = "!! MOTOR ON !!" #13
+        if debug: 
+            mode_string = "  !! DEBUG !!" #11
+            motor_string = " " #3
+        #stdscr.addstr(3, 3,  r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--=")
+        stdscr.addstr(3, 3,  r"____________ _       ______        ")
+        stdscr.addstr(4, 3,  r"| ___ \ ___ (_)      | ___ \                {}".format(mode_string))
+        stdscr.addstr(5, 3,  r"| |_/ / |_/ /_ ______| |_/ /       ")
+        stdscr.addstr(6, 3,  r"|    /|  __/| |______|    /                 {}".format(motor_string))
+        stdscr.addstr(7, 3,  r"| |\ \| |   | |      | |\ \        ")
+        stdscr.addstr(8, 3,  r"\_| \_\_|   |_|      \_| \_|       Raspberry Pi Rheometer    v{}".format(self.version))
+        stdscr.addstr(10, 3, r"_____________________________________________________________________".format(self.version))
 
         blurbheight = 12        
         
-        if debug: 
-            stdscr.addstr(blurbheight, 3, r" !! -->> DEBUG MODE <<-- !!")
-            blurbheight += 2
+        #if debug: 
+        #    stdscr.addstr(blurbheight, 3, r" !! -->> DEBUG MODE <<-- !!")
+        #    blurbheight += 2
 
         # Display Blurb
         for i in range(0, len(blurb)):
@@ -222,13 +228,13 @@ class rheometer(object):
                 "\t(30A HES)\tIms(Vhes) = {:.3f} * Vhes + {:.3f}".format(self.hes30A_cal[0], self.hes30A_cal[1]),
                 "\t(5A HES)\tIms(Vhes) = {:.3f} * Vhes + {:.3f}".format(self.hes5A_cal[0], self.hes5A_cal[1])]
         
-        options = [ "> Recalibrate sensors",
-                    "> Recalibrate torque",
+        options = [ "> Calibrate sensors",
+                    "> Calibrate torque",
                     "> Quick test",
                     "> Custom test",
                     "> Quit"]
         
-        help = [    "Sweep supply voltage between ~ 2.422V to ~10.87V.",
+        help = [    "Calibrate dyamo and all 3 HES current sensors.",
                     "Stall torque measurement and calibration.",
                     "5 minute test of fluid at constant strain (~96.9s^-1).",
                     "Test fluid using custom settings.",
@@ -237,17 +243,24 @@ class rheometer(object):
         res = self.display(blurb, options, initsel, options_help=help)
         
         if res == 0:
-            #blurb = ["Sensor recalibration.", "", "Run length:"]
-            #options = ["> Long (~10 minutes)", "> Medium (~5 minutes)", "> Short (~2 minutes)"]
-            #help = ["  ", "  ", "  "]
-            #res = self.display(blurb, options, options_help=help)
-                
-            self.display(["Running calibration (standard sweep, 2.422V to 10.87V).", "Note:", "\to Allow motor to freely rotate.", "\to Attach ammeter in series with motor."], ["> Continue"], get_input=True)
+            res = self.display([
+                              "Sensor Calibration", 
+                              "Step 1: Set up", 
+                              " ",
+                              "\t1. Allow motor to freely rotate.", 
+                              "\t2. Attach ammeter in series with motor.",
+                              "\t3. Ensure circuit is powered."], 
+                              [
+                              "\t> Continue",
+                              "\t> Cancel"], get_input=True)
+                          
+            if res == 1: return 0
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
             
             if not debug: self.mot.start_poll(ln)
+            self.set_relay(True)
             
-            # Dictionary inits
+            # variable inits
             cua      = dict()
 
             dr       = list()
@@ -276,7 +289,12 @@ class rheometer(object):
                 crb.append(0.0)
 
                 for j in range(0, repetitions):
-                    blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions)]
+                    blurb = ["Sensor Calibration",
+                             "Step 2: Read Ammeter",
+                             " ",
+                             "Supply voltage set to: {:.3f}V ({}/17)  ".format(vms, (i + 1)), 
+                             " ", 
+                             "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions)]
                     options = [""]
                     amr = self.display(blurb, options, input_type="string")
                     input_fine = True
@@ -285,7 +303,13 @@ class rheometer(object):
                         cua[(i * 8)] += float(amr)
                     except:
                         input_fine = False
-                        blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
+                        blurb = ["Sensor Calibration",
+                                 "Step 2: Read Ammeter",
+                                 " ",
+                                 "Supply voltage set to: {:.3f}V ({}/17)  ".format(vms, (i + 1)), 
+                                 " ", 
+                                 "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions),
+                                 "Input needs to be a number!"]
 
                     while not input_fine:
                         amr = self.display(blurb, options, input_type="string")
@@ -294,7 +318,13 @@ class rheometer(object):
                             cua[(i * 8)] += float(amr)
                         except:
                             input_fine = False
-                            blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
+                            blurb = ["Sensor Calibration",
+                                     "Step 2: Read Ammeter",
+                                     " ",
+                                     "Supply voltage set to: {:.3f}V ({}/17)  ".format(vms, (i + 1)), 
+                                     " ", 
+                                     "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions),
+                                     "Input needs to be a number!"]
 
                     for rep in range(0, readings):
                         dr[len(dr) - 1]   += self.mot.volts[0]
@@ -303,6 +333,8 @@ class rheometer(object):
                         crb[len(crb) - 1] += self.mot.volts[3]
                     
                         time.sleep(0.001)
+                    
+                    self.motor_cycle()
 
                 vms_hist.append(vms)
                 pv_hist.append(i * 8)
@@ -315,6 +347,7 @@ class rheometer(object):
                 cua[(i * 8)] = cua[(i * 8)] / repetitions
             
             if not debug: self.mot.clean_exit()
+            self.set_relay(False)
             
             if debug: 
                 tdyncal = self.dynamo_cal
@@ -322,9 +355,6 @@ class rheometer(object):
                 t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
-
-#                for k in vms_hist:
-#                    print k
 
                 cr      = np.array(cr, np.float64)
                 cra     = np.array(cra, np.float64)
@@ -344,8 +374,8 @@ class rheometer(object):
                      "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
                      "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(t30acal[0], t30acal[1]),
                      "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(t5acal[0], t5acal[1]), ""]
-            options = ["\t(1) Save",
-                       "\t(2) Discard"]
+            options = ["\t> Save",
+                       "\t> Discard"]
             help = ["  ", "  "]
             res = self.display(blurb, options, options_help=help)
             
@@ -363,14 +393,14 @@ class rheometer(object):
 
             # step 1: set up hardware (attach arm to cylinder, set up balance)
             blurb = [   "Motor Characteristic Calibration", 
-                        " ", 
-                        "Step 1: Set up.", 
+                        "Step 1: Set up", 
                         " ",
-                        "The arm must be attached to the inner cylinder ", 
-                        "and positioned such that when the motor rotates,",
-                        "the arm hits the balance.",
-                        "Turn the motor on and continue when ready."]
-            options = ["> Continue", "> Cancel"]
+                        "\t1. Attach arm to cylinder", 
+                        "\t2. Set so arm hits balance",
+                        "\t3. Ensure circuit is powered"
+                    ]
+            options = ["\t> Continue", 
+                       "\t> Cancel"]
             help = ["", ""]
             res = self.display(blurb, options, options_help=help)
             if res == 1: return 1
@@ -378,7 +408,9 @@ class rheometer(object):
             currents = [0] * 0
             supply_voltages = [0] * 0
             masses = [0] * 0
-
+            
+            self.set_relay(True)
+            
             for i in range(0, 17):
                 # step 2a: set voltage, read sensor information (Ims, Vms)
                 # step 2b: read balance information (user input mass reading on balance)
@@ -388,13 +420,11 @@ class rheometer(object):
                 for j in range(0, readings):
                     # Get mass reading
                     blurb = [   "Motor Characteristic Calibration",
-                                " ",
                                 "Step 2: Reading Sensors",
                                 " ",
                                 "Supply voltage set to: {}V ({}/{})".format((8 * i) * 0.066 + 2.422, i, 17),
                                 " ",
-                                "Leave motor on!",
-                                "Enter the balance reading, grams ({}/{}):".format(j + 1, readings)]
+                                "Enter the balance reading, grams ({}/{}): ".format(j + 1, readings)]
                     options = [""]
                     help = [""]
                     res = self.display(blurb, options, options_help=help, input_type="string")
@@ -414,28 +444,51 @@ class rheometer(object):
                     
                     # Cycle motor
                     self.motor_cycle()
-
-            Larm          = 0.0656   # length of arm attached to motor, in m
-            g             = 9.81     # acceleration due to gravity, m/(s^2)
+                    self.set_relay(False)
+                    time.sleep(3)
+                    self.set_relay(True)
+                    
+            self.motor.clean_exit()
+            self.set_relay(False)
+            
+            Larm = 0.0656   # length of arm attached to motor, in m
+            g    = 9.81     # acceleration due to gravity, m/(s^2)
+            
             stall_torques = np.array(masses, np.float64) * g * Larm
-
-            TsFit = np.polyfit(supply_voltages, stall_torques, 1)
-            IemFit = np.polyfit(supply_voltages, currents - (np.array(supply_voltages) * resx.cal_IcoVms[0] + resx.cal_IcoVms[1]), 1)
-            resx.cal_TsVms = TsFit
-            resx.cal_IemfVms = IemFit
-            resx.writeout()
-
+            TsFit         = np.polyfit(supply_voltages, stall_torques, 1)
+            IemFit        = np.polyfit(supply_voltages, currents - (np.array(supply_voltages) * resx.cal_IcoVms[0] + resx.cal_IcoVms[1]), 1)
+            
+            blurb = ["Calibration results:", 
+                     " ",
+                     "\t(Stall Torque)\tTs(Vms) = {} * Vms + {}".format(TsFit[0], TsFit[1]),
+                     "\t(EMF Current)\tIem(Vms) = {} * Vms + {}".format(IemFit[0], IemFit[1])]
+            options = ["\t> Save",
+                       "\t> Discard"]
+            help = ["  ", "  "]
+            res = self.display(blurb, options, options_help=help)
+            
+            if res == 0:
+                resx.cal_TsVms = TsFit
+                resx.cal_IemfVms = IemFit
+                resx.writeout()
+            elif res == 1:
+                pass
             return 1
         elif res == 2:
             # test a sample (default settings - PV=48, for 5 minutes)
-            blurb = ["Rheometry quick run:", "\tRun length: \t5 minutes","\tStrain rate:\t96.9 (1/s)", " "]
-            options = ["> Continue", "> Cancel"]
+            blurb = ["Rheometry Test (Quick)", 
+                     "Settings:",
+                     "\tRun length: \t5 minutes",
+                     "\tStrain rate:\t96.9 (1/s)", 
+                     " "]
+            options = ["> Continue", 
+                       "> Cancel"]
             help = [" ", " "]
             res = self.display(blurb, options, options_help=help)
 
             if res == 0:
                 # run test
-                self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
+                self.display(["Rheometry Test (Quick)", "", ""],[""], get_input=False)
                 ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%H%M_%d%m%y", time.gmtime()))
                 
                 if not debug: self.mot.start_poll(ln)
@@ -580,10 +633,10 @@ class rheometer(object):
     def motor_cycle(self):
         prev_pv = copy.copy(self.mot.pot.lav)
         for i in range(0, 128):
-            self.mot.set_resistance(i)
+            self.mot.set_pot(i)
             time.sleep(0.01)
         for i in range(0, 128):
-            self.mot.set_resistance(127 - i)
+            self.mot.set_pot(127 - i)
             time.sleep(0.01)
             
     def set_relay(self, value):
