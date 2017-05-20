@@ -41,6 +41,7 @@ class motor(object):
     dr = 0.0
     fdr = 0.0
     svf = [300, -150]  # 1st order linear fit equation; SPEED = svf[0] * VOLTAGE + svf[1]; VOLTAGE in volts, SPEED in RPM
+    volts = [0.0] * 4
     
     # Filtering
     filtlen = 1000    # number of samples to "remember" for filtering purposes
