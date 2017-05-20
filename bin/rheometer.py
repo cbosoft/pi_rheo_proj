@@ -45,6 +45,10 @@ try:
 except ImportError as ex:
     packages_missing.append("crtos")
 try:
+    import copy
+except ImportError as ex:
+    packages_missing.append("crtcopy")
+try:
     import matplotlib
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
@@ -235,8 +239,6 @@ class rheometer(object):
             
             # Dictionary inits
             cua      = dict()
-<<<<<<< HEAD
-
             dr       = list()
             cr       = list()
             cra      = list()
@@ -257,22 +259,6 @@ class rheometer(object):
                 vms = 0.066 * (i * 8) + 2.422
 
                 cua[(i * 8)] = 0.0
-=======
-
-            dr       = list()
-            cr       = list()
-            cra      = list()
-            crb      = list()
-            vms_hist = list()
-
-            repetitions = 1
-
-            for i in range(0, 17):
-                if not debug: self.mot.set_pot(i*8)
-                vms = 0.066 * (i * 8) + 2.422
-
-                cua[vms] = 0.0
->>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
                 dr.append(0.0)
                 cr.append(0.0)
                 cra.append(0.0)
@@ -310,23 +296,12 @@ class rheometer(object):
                 vms_hist.append(vms)
                 pv_hist.append(i * 8)
 
-<<<<<<< HEAD
                 dr[len(dr) - 1]     = dr[len(dr) - 1] / (repetitions * readings)
                 cr[len(cr) - 1]     = cr[len(cr) - 1] / (repetitions * readings)
                 cra[len(cra) - 1]   = cra[len(cra) - 1] / (repetitions * readings)
                 crb[len(crb) - 1]   = crb[len(crb) - 1] / (repetitions * readings)
 
                 cua[(i * 8)] = cua[(i * 8)] / repetitions
-=======
-                vms_hist.append(vms)
-
-                dr[len(dr) - 1]     = dr[len(dr) - 1] / repetitions
-                cr[len(cr) - 1]     = cr[len(cr) - 1] / repetitions
-                cra[len(cra) - 1]   = cra[len(cra) - 1] / repetitions
-                crb[len(crb) - 1]   = crb[len(crb) - 1] / repetitions
-
-                cua[vms] = cua[vms] / repetitions
->>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
             
             if not debug: self.mot.clean_exit()
             
@@ -336,11 +311,6 @@ class rheometer(object):
                 t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
-<<<<<<< HEAD
-
-#                for k in vms_hist:
-#                    print k
-
                 cr      = np.array(cr, np.float64)
                 cra     = np.array(cra, np.float64)
                 crb     = np.array(crb, np.float64)
@@ -354,12 +324,6 @@ class rheometer(object):
                 cu3     = t5acal[0] * crb + t5acal[1]
 
                 ticovms = np.polyfit(vms_hist, (cu1 + cu2 + cu3) / 3, 1)
-=======
-                tdyncal = self.cal_dynamo(dr, vms_hist)
-                t30acal = self.cal_30ahes(cr, vms_hist, cua)
-                t5acal  = self.cal_5ahes(cra, crb, vms_hist, cua)
-                ticovms = np.polyfit(vms, (cu1 + cu2 + cu3) / 3, 1)
->>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
             
             blurb = ["Calibration results:", "",
                      "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
@@ -592,15 +556,19 @@ class rheometer(object):
 
         spd_long = np.array(range(0, len(vmsm)), np.float64)
         for i in range(0, len(vms)):
-<<<<<<< HEAD
             spd_long[i] = vdict[str(vms[i])]
- 
-=======
-            spd_long = vdict[vms[i]]
-        
->>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
         coeffs = np.polyfit(dr, spd_long, 1)
         return coeffs
+        
+    def motor_cycle(self):
+        prev_pv = copy.copy(self.mot.pot.lav)
+        for i in range(0, 128):
+            self.mot.set_resistance(i)
+            time.sleep(0.01)
+        for i in range(0, 128):
+            self.mot.set_resistance(127 - i)
+            time.sleep(0.01)
+        
         
 if __name__ == "__main__" and True:
     # setup curses window
