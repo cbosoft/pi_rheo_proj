@@ -59,7 +59,7 @@ class motor(object):
     adc_chan = [0, 1, 2, 3]  # voltage channel, current channel, current channel, current channel
 
     def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
-                 poll_logging=True, log_dir="./logs", therm_sn="blank"
+                 poll_logging=True, log_dir="./logs", therm_sn="blank",
                  log_name="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15),
                  filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
@@ -157,13 +157,13 @@ class motor(object):
             t = time.time()
             
             # Get speed
-            volts = self.read_sensors()
-            self.dr = volts[0]
-            fvolts = volts
+            self.volts = self.read_sensors()
+            self.dr = self.volts[0]
+            fvolts = self.volts
 
             # if desired, apply filtering to input
             if not (self.filtering == "NONE"):
-                self.update_filt_hist(volts[0], volts[1], t)
+                self.update_filt_hist(self.volts[0], self.volts[1], t)
                 start_delay = 20
 
                 #if self.filter_delay >= 100: start_delay = self.filter_delay + 1
@@ -188,10 +188,10 @@ class motor(object):
             
             if (self.poll_logging) and (not self.log_paused):
                 if self.log_add_note:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {9:.3f}, {6} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, volts[2], volts[3], temperature_c))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {9:.3f}, {6} \n").format(t, self.volts[0], self.volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, self.volts[2], self.volts[3], temperature_c))
                     self.log_add_note = False
                 else:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f}, {8:.3f} \n").format(t, volts[0], volts[1], self.pot.lav, fvolts[0], fvolts[1], volts[2], volts[3], temperature_c))
+                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f}, {8:.3f} \n").format(t, self.volts[0], self.volts[1], self.pot.lav, fvolts[0], fvolts[1], self.volts[2], self.volts[3], temperature_c))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
