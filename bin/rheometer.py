@@ -159,60 +159,80 @@ class rheometer(object):
         res = self.display(blurb, options, initsel, options_help=help)
         
         if res == 0:
-            blurb = ["Sensor recalibration.", "", "Run length:"]
-            options = ["> Long (~10 minutes)", "> Medium (~5 minutes)", "> Short (~2 minutes)"]
-            help = ["  ", "  ", "  "]
-            res = self.display(blurb, options, options_help=help)
-
-            if res == 0:
-                step = 5  # 5s * 129 ~= 600s
-            elif res == 1:
-                step = 2.5  # 25s * 129 ~= 300s
-            elif res == 2:
-                step = 0.1  # 1s * 129 ~= 120s
+            #blurb = ["Sensor recalibration.", "", "Run length:"]
+            #options = ["> Long (~10 minutes)", "> Medium (~5 minutes)", "> Short (~2 minutes)"]
+            #help = ["  ", "  ", "  "]
+            #res = self.display(blurb, options, options_help=help)
                 
-            self.display(["Running calibration (standard sweep, 2.422V to 10.87V)."],[""], get_input=False)
+            self.display(["Running calibration (standard sweep, 2.422V to 10.87V).", "", "The motor should be left to run free, nothing to hamper movement.", "Attach an ammeter in series with the motor."], ["> Continue"], get_input=True)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
             
             if not debug: self.mot.start_poll(ln)
             
-            for i in range(0, 129):
-                self.mot.set_pot(i)
-                vms = 0.066 * i + 2.422
-                stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (128 - i) * step))
-                width = 40
-                perc = int(math.ceil((i / 128.0) * width))
-                neg_perc = int(math.floor(((128.0 - i) / 128.0) * width))
-                stdscr.addstr(17, 3, "[{}{}]".format("#" * perc, " " * neg_perc))
-                stdscr.refresh()
-                time.sleep(step)
+            # Dictionary inits
+            cua = {100:0}
+
+            dr  = [0] * [0]
+            cr  = [0] * [0]
+            cra = [0] * [0]
+            crb = [0] * [0]
+
+            for i in range(0, 17):
+                if not debug: self.mot.set_pot(i)
+                vms = 0.066 * (i * 8) + 2.422
+
+                cua.append(0.0)
+                dr.append(0.0)
+                cr.append(0.0)
+                cra.append(0.0)
+                crb.append(0.0)
+
+                for j in range(0, 5):
+                    blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1)]
+                    options = [""]
+                    amr = self.display(blurb, options, input_type="string")
+                    input_fine = True
+
+                    try:
+                        cua[vms] += float(amr)
+                    except:
+                        input_fine = False
+                        blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1), "Input was not recognised!"]
+
+                    while not input_fine:
+                        amr = self.display(blurb, options, input_type="string")
+                        input_fine = True
+                        try:
+                            cua[vms] += float(amr)
+                        except:
+                            input_fine = False
+                            blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1), "Input was not recognised!"]
+
+                    dr[len(dr) - 1]   += self.mot.volts[0]
+                    cr[len(cr) - 1]   += self.mot.volts[1]
+                    cra[len(cra) - 1] += self.mot.volts[2]
+                    crb[len(crb) - 1] += self.mot.volts[3]
+
+                    time.sleep(1)
+
+                dr[len(dr) - 1]     = dr[len(dr) - 1] / 5
+                cr[len(cr) - 1]     = cr[len(cr) - 1] / 5
+                cra[len(cra) - 1]   = cra[len(cra) - 1] / 5
+                crb[len(crb) - 1]   = crb[len(crb) - 1]] / 5
+
+                cua[vms] = cua[vms] / 5
             
-            self.mot.clean_exit()
+            if not debug: self.mot.clean_exit()
             
             if debug: 
                 tdyncal = self.dynamo_cal
                 t30acal = self.hes30A_cal
-                t5acal = self.hes5A_cal
+                t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
-                # data contained in log file $ln can be used to calibrate dynamo and HES sensor data"
-                datf    = pd.read_csv(ln)
-                st      = np.array(datf['t'], np.float64)
-                st      = st - st[0]
-                cr      = np.array(datf['cr'], np.float64)
-                dr      = np.array(datf['dr'], np.float64)
-                cra     = np.array(datf['cr2a'], np.float64)
-                crb     = np.array(datf['cr2b'], np.float64)
-                pv      = np.array(datf['pv'], np.float64)
-                vms     = 0.066 * pv + 2.422
-                
-                cu1     = (cr * t30acal[0] + t30acal[1])
-                cu2     = (cra * t5acal[0] + t5acal[1])
-                cu3     = (crb * t5acal[0] + t5acal[1])
-
-                tdyncal = self.cal_dynamo(st, dr, pv)
-                t30acal = self.cal_30ahes(st, cr, pv)
-                t5acal = self.cal_5ahes(st, cra, crb, pv)
+                tdyncal = self.cal_dynamo(dr, vms)
+                t30acal = self.cal_30ahes(cr, vms, cua)
+                t5acal  = self.cal_5ahes(cra, crb, vms, cua)
                 ticovms = np.polyfit(vms, (cu1 + cu2 + cu3) / 3, 1)
             
             blurb = ["Calibration results:", "",
@@ -395,328 +415,61 @@ class rheometer(object):
         else:
             self.mot.update_setpoint(desired_speed)
 
-    def cal_30ahes(self, st, cr, pv):
+    def cal_30ahes(self, cr, vms, cua):
+        st  = range(0, len(cr))
         crf = filter(st, cr, method="butter", A=2, B=0.001)
-        #crf = filter(st, crf, method="gaussian", A=100, B=100)
+        cu  = [0] * 0
 
-        cu = [0] * 0
-        pv_s = [0] * 0
+        # From ammeter
+        for v in vms:
+            cu.append(cua[v])
 
-        for p in pv:
-            if p == 0:
-                cu.append(0.48)
-                pv_s.append(0)
-            elif p == 8:
-                cu.append(0.51)
-                pv_s.append(8)
-            elif p == 16:
-                cu.append(0.53)
-                pv_s.append(16)
-            elif p == 24:
-                cu.append(0.55)
-                pv_s.append(24)
-            elif p == 32:
-                cu.append(0.57)
-                pv_s.append(32)
-            elif p == 40:
-                cu.append(0.59)
-                pv_s.append(40)
-            elif p == 48:
-                cu.append(0.6)
-                pv_s.append(48)
-            elif p == 56:
-                cu.append(0.62)
-                pv_s.append(56)
-            elif p == 64:
-                cu.append(0.63)
-                pv_s.append(64)
-            elif p == 72:
-                cu.append(0.65)
-                pv_s.append(72)
-            elif p == 80:
-                cu.append(0.67)
-                pv_s.append(80)
-            elif p == 88:
-                cu.append(0.69)
-                pv_s.append(88)
-            elif p == 96:
-                cu.append(0.7)
-                pv_s.append(96)
-            elif p == 104:
-                cu.append(0.73)
-                pv_s.append(104)
-            elif p == 112:
-                cu.append(0.73)
-                pv_s.append(112)
-            elif p == 120:
-                cu.append(0.75)
-                pv_s.append(120)
-            elif p == 128:
-                cu.append(0.82)
-                pv_s.append(128)
-
-        # CU AS A FUNC OF PV
-        coeffs = np.polyfit(pv_s, cu, 1)  # fit linear equation to data read manually
-        pvlo = np.arange(0, 128, (128.0 / len(pv)))
-        pvlo = [math.floor(p) for p in pvlo]
-        pvlo = np.array(pvlo)
-        cul = coeffs[0] * pvlo + coeffs[1]
-
-        # Remove unwanted outlying data
-        min_l = 0#10000
-        max_l = -1
-        skip = 1#0000
-        cr = cr[min_l:max_l:skip]
-        crf = crf[min_l:max_l:skip]
-        cul = cul[min_l:max_l:skip]
-
-        crstd = np.std(cr)
-        crfstd = np.std(crf)
-
-        # Plot data and trendline: CRF vs CU
-        __, __, coeffs = fit_line(crf, cul, 1)
+        # Form trendline: CRF vs CU
+        coeffs = np.polyfit(crf, cu, 1)
         return coeffs
     
-    def cal_5ahes(self, st, cra, crb, pv):
+    def cal_5ahes(self, st, cra, crb, vms, cua):
+        st      = range(0, len(cra))
         cra     = filter(st, cra, method="butter", A=2, B=0.001)
-        crb     = filter(st, crb, method="gaussian", A=100, B=100)
+
+        st      = range(0, len(crb))
+        crb     = filter(st, crb, method="butter", A=2, B=0.001)
+
         crf     = 0.5 * (cra + crb)
-        cu = [0] * 0
-        pv_s = [0] * 0
+        cu      = [0] * 0
 
-        # From manual ammeter read
-        for p in pv:
-            if p == 0:
-                cu.append(0.48)
-                pv_s.append(0)
-            elif p == 8:
-                cu.append(0.51)
-                pv_s.append(8)
-            elif p == 16:
-                cu.append(0.53)
-                pv_s.append(16)
-            elif p == 24:
-                cu.append(0.55)
-                pv_s.append(24)
-            elif p == 32:
-                cu.append(0.57)
-                pv_s.append(32)
-            elif p == 40:
-                cu.append(0.59)
-                pv_s.append(40)
-            elif p == 48:
-                cu.append(0.6)
-                pv_s.append(48)
-            elif p == 56:
-                cu.append(0.62)
-                pv_s.append(56)
-            elif p == 64:
-                cu.append(0.63)
-                pv_s.append(64)
-            elif p == 72:
-                cu.append(0.65)
-                pv_s.append(72)
-            elif p == 80:
-                cu.append(0.67)
-                pv_s.append(80)
-            elif p == 88:
-                cu.append(0.69)
-                pv_s.append(88)
-            elif p == 96:
-                cu.append(0.7)
-                pv_s.append(96)
-            elif p == 104:
-                cu.append(0.73)
-                pv_s.append(104)
-            elif p == 112:
-                cu.append(0.73)
-                pv_s.append(112)
-            elif p == 120:
-                cu.append(0.75)
-                pv_s.append(120)
-            elif p == 128:
-                cu.append(0.82)
-                pv_s.append(128)
+        # From ammeter
+        for v in vms:
+            cu.append(cua[v])
 
-        # CU AS A FUNC OF PV
-        coeffs = np.polyfit(pv_s, cu, 1)  # fit linear equation to data read manually
-        pvlo = np.arange(0, 128, (128.0 / len(pv)))
-        pvlo = [math.floor(p) for p in pvlo]
-        pvlo = np.array(pvlo)
-        cul = coeffs[0] * pvlo + coeffs[1]
-
-        # Remove unwanted outlying data
-        min_l = 0#10000
-        max_l = -1
-        skip = 1#0000
-        #cr = cr[min_l:max_l:skip]
-        crf = crf[min_l:max_l:skip]
-        cul = cul[min_l:max_l:skip]
-
-        #crstd = np.std(cr)
-        #crfstd = np.std(crf)
-
-        # Plot data and trendline: CRF vs CU
-        __, __, coeffs = fit_line(crf, cul, 1)
+        # Form trendline: CRF vs CU
+        coeffs = np.polyfit((crf, cu, 1)
         return coeffs
     
-    def cal_dynamo(self, st, rv, pv):
+    def cal_dynamo(self, dr, vms):
         # Read csv
-        datf = open("./../logs/voltvval.csv", "r")
-        datl = datf.readlines()
-        datf.close()
+        datf    = pandas.read_csv("./../logs/main_speed_v_vms.csv")
 
-        # Create lists for sorting
-        av_volt = [0] * 0
-        av_spd = [0] * 0
-        p2v = [0] * 0
-        std = [0] * 0
+        vmsm    = np.array(datf['vms'], np.float64)
+        spd1    = np.array(datf['spd1'], np.float64)
+        spd2    = np.array(datf['spd2'], np.float64)
+        spd3    = np.array(datf['spd3'], np.float64)
 
-        for i in range(2, len(datl)):
-            splt = datl[i].split(",", 13)
-            av_volt.append(float(splt[6]))
-            av_spd.append(float(splt[12]))
-            p2v.append(float(splt[0]))
-            std.append(np.std(np.array([float(splt[7]), float(splt[8]), float(splt[9]), float(splt[10]), float(splt[11])])))
+        av_spd  = (spd1 + spd2 + spd3) / 3
 
-        av_speed_long = [0] * 0
+        vdict = {100:0}
+        for i in range(0, len(vmsm)):
+            vdict[vmsm[i]] = av_spd[i]
 
-
-        cur_pv = pv[0]
-        pv_indx = 0
-        for i in range(0, len(pv)):
-            for j in range(0, len(p2v)):
-                if (pv[i] - p2v[j]) < 8 and (pv[i] - p2v[j]) >= 0:
-
-                    pv_indx = j
-            av_speed_long.append(av_spd[pv_indx])
-
-        rv_t_0 = [0] * 0
-        rv_t_8 = [0] * 0
-        rv_t_16 = [0] * 0
-        rv_t_24 = [0] * 0
-        rv_t_32 = [0] * 0
-        rv_t_40 = [0] * 0
-        rv_t_48 = [0] * 0
-        rv_t_56 = [0] * 0
-        rv_t_64 = [0] * 0
-        rv_t_72 = [0] * 0
-        rv_t_80 = [0] * 0
-        rv_t_88 = [0] * 0
-        rv_t_96 = [0] * 0
-        rv_t_104 = [0] * 0
-        rv_t_112 = [0] * 0
-        rv_t_120 = [0] * 0
-        rv_t_128 = [0] * 0
-
-        av_rvs = np.array([0.0] * len(p2v))
-        for i in range(0, len(pv)):
-            for j in range(0, len(p2v)):
-                if pv[i] == p2v[j]:
-                    if j == 0 : rv_t_0.append(rv[i])
-                    if j == 1 : rv_t_8.append(rv[i])
-                    if j == 2 : rv_t_16.append(rv[i])
-                    if j == 3 : rv_t_24.append(rv[i])
-                    if j == 4 : rv_t_32.append(rv[i])
-                    if j == 5 : rv_t_40.append(rv[i])
-                    if j == 6 : rv_t_48.append(rv[i])
-                    if j == 7 : rv_t_56.append(rv[i])
-                    if j == 8 : rv_t_64.append(rv[i])
-                    if j == 9 : rv_t_72.append(rv[i])
-                    if j == 10 : rv_t_80.append(rv[i])
-                    if j == 11 : rv_t_88.append(rv[i])
-                    if j == 12 : rv_t_96.append(rv[i])
-                    if j == 13 : rv_t_104.append(rv[i])
-                    if j == 14 : rv_t_112.append(rv[i])
-                    if j == 15 : rv_t_120.append(rv[i])
-                    if j == 16 : rv_t_128.append(rv[i])
-
-        # 2d list not working as expected, using manual (long hand) method :@
-        stdv = [0] * 0
-
-        # pv = 0
-        stdv.append(np.std(rv_t_0))
-        av_rvs[0] = np.average(rv_t_0)
-
-        # pv = 8
-        stdv.append(np.std(rv_t_8))
-        av_rvs[1] = np.average(rv_t_8)
-
-        # pv = 16
-        stdv.append(np.std(rv_t_16))
-        av_rvs[2] = np.average(rv_t_16)
-
-        # pv = 24
-        stdv.append(np.std(rv_t_24))
-        av_rvs[3] = np.average(rv_t_24)
-
-        # pv = 32
-        stdv.append(np.std(rv_t_32))
-        av_rvs[4] = np.average(rv_t_32)
-
-        # pv = 40
-        stdv.append(np.std(rv_t_40))
-        av_rvs[5] = np.average(rv_t_40)
-
-        # pv = 48
-        stdv.append(np.std(rv_t_48))
-        av_rvs[6] = np.average(rv_t_48)
-
-        # pv = 56
-        stdv.append(np.std(rv_t_56))
-        av_rvs[7] = np.average(rv_t_56)
-
-        # pv = 64
-        stdv.append(np.std(rv_t_64))
-        av_rvs[8] = np.average(rv_t_64)
-
-        # pv = 72
-        stdv.append(np.std(rv_t_72))
-        av_rvs[9] = np.average(rv_t_72)
-
-        # pv = 80
-        stdv.append(np.std(rv_t_80))
-        av_rvs[10] = np.average(rv_t_80)
-
-        # pv = 88
-        stdv.append(np.std(rv_t_88))
-        av_rvs[11] = np.average(rv_t_88)
-
-        # pv = 96
-        stdv.append(np.std(rv_t_96))
-        av_rvs[12] = np.average(rv_t_96)
-
-        # pv = 104
-        stdv.append(np.std(rv_t_104))
-        av_rvs[13] = np.average(rv_t_104)
-
-        # pv = 112
-        stdv.append(np.std(rv_t_112))
-        av_rvs[14] = np.average(rv_t_112)
-
-        # pv = 120
-        stdv.append(np.std(rv_t_120))
-        av_rvs[15] = np.average(rv_t_120)
-
-        # pv = 128
-        stdv.append(np.std(rv_t_128))
-        av_rvs[16] = np.average(rv_t_128)
+        spd_long = np.array(range(0, len(vms)), np.float64)
+        for i in range(0, len(vms)):
+            spd_long = vdict[vms[i]]
         
-        #THERE HAS GOT TO BE A BETTER WAY OF DOING THIS
-        # 1st Trend: speed as a function of potval
-        zavspdpv = np.polyfit(p2v[4:], av_spd[4:], 1)
-        tlo = np.poly1d(zavspdpv)
-
-        # 2nd Trend: read voltage as a function of potval
-        z = np.polyfit(pv, rv, 1)
-        tl = np.poly1d(z)
-
-        # 3rd Trend: speed as a function of read voltage
-        z3z = np.polyfit(tl(pv), tlo(pv), 1)
-        return z3z
+        coeffs = np.polyfit(dr, spd, 1)
+        return coeffs
         
 if __name__ == "__main__":
-    # init
+    # setup curses window
     rows, columns = os.popen('stty size', 'r').read().split()
     bigscr = curses.initscr()
     stdscr = curses.newwin(34, 75, 1, 1)
@@ -724,11 +477,14 @@ if __name__ == "__main__":
     curses.noecho()
     curses.cbreak()
     stdscr.keypad(1)
+    
+    # if debug: no logging
     if debug:
         mparams={'log_dir':'.','poll_logging':False}
     else:
         mparams={'log_dir':'.','poll_logging':True}
 
+    # start up rheometer
     r = rheometer(motor_params=mparams)
     
     if True:
@@ -751,10 +507,4 @@ if __name__ == "__main__":
             stdscr.keypad(0)
             curses.echo()
             curses.endwin()
-
-    # Get list of strains
-    #strains = np.linspace(5, 250, 128)
-    
-    # Get viscosity and show it to the user
-    #print "Viscosity reading: {} Pa.s".format(r.get_viscosity(strains, 180))
     
