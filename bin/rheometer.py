@@ -3,16 +3,72 @@
 #
 # class object controlling the rheometer from the rasbperry pi
 #
+packages_missing = [""]
+try:
+    import time
+except ImportError as ex:
+    packages_missing.append("crttime")
+try:
+    import numpy as np
+except ImportError as ex:
+    packages_missing.append("pipnumpy")
+try:
+    import pandas as pd
+except ImportError as ex:
+    packages_missing.append("pippandas")
+try:
+    import resx
+except ImportError as ex:
+    packages_missing.append("crtresx.py")
+try:
+    import syst
+except ImportError as ex:
+    packages_missing.append("crtsys")
+try:
+    import curses
+except ImportError as ex:
+    packages_missing.append("pipcurses")
+try:
+    import math
+except ImportError as ex:
+    packages_missing.append("crtmath")
+try:
+    import os
+except ImportError as ex:
+    packages_missing.append("crtos")
+try:
+    import matplotlib
+except ImportError as ex:
+    packages_missing.append("pipmatplotlib")
+try:
+    import _tkinter
+except ImportError as ex:
+    packages_missing.append("aptpython-tk")
+    
+if len(packages_missing) > 1: 
+    print "!! -- Packages missing -- !!"
+    for i in range(1, len(packages_missing)): 
+        print "\t" + packages_missing[i][3:]
+    print "Automatically trying to obtain missing packages...\n"
+    for i in range(1, len(packages_missing)):
+        if packages_missing[i][:3] == "apt":
+            os.system("sudo apt-get install {}".format(packages_missing[i][3:]))
+        elif packages_missing[i][:3] == "pip":
+            os.system("sudo -H pip install {}".format(packages_missing[i][3:]))
 
-import time
-import numpy as np
-import pandas as pd
-import resx
-import sys
-import curses
-import math
-import os
+crit_fail = False
+for p in packages_missing:
+    if p[:3] == "crt":
+        crit_fail = True
 
+if crit_fail:
+    print "Some packages could not be automatically installed:\n"
+    for p in packages_missing:
+        print "\t{}".format(p[3:])
+    print "\nIs there a typo in the rheometer script? Broken python install?"
+    print "Press any key to continue"
+    raw_input()
+    exit()
 from motor import motor
 from filter import filter
 from plothelp import fit_line
@@ -140,9 +196,9 @@ class rheometer(object):
                 "", 
                 "Current calibrations are:", 
                 "",
-                "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(self.dynamo_cal[0], self.dynamo_cal[1]),
-                "\t(30A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes30A_cal[0], self.hes30A_cal[1]),
-                "\t(5A HES)\tIms(Vhes) = {} * Vhes + {}".format(self.hes5A_cal[0], self.hes5A_cal[1])]
+                "\t(Dynamo)\tSpeed(Vd) = {:.3f} * Vd + {:.3f}".format(self.dynamo_cal[0], self.dynamo_cal[1]),
+                "\t(30A HES)\tIms(Vhes) = {:.3f} * Vhes + {:.3f}".format(self.hes30A_cal[0], self.hes30A_cal[1]),
+                "\t(5A HES)\tIms(Vhes) = {:.3f} * Vhes + {:.3f}".format(self.hes5A_cal[0], self.hes5A_cal[1])]
         
         options = [ "> Recalibrate sensors",
                     "> Recalibrate torque",
@@ -164,7 +220,7 @@ class rheometer(object):
             #help = ["  ", "  ", "  "]
             #res = self.display(blurb, options, options_help=help)
                 
-            self.display(["Running calibration (standard sweep, 2.422V to 10.87V).", "", "The motor should be left to run free, nothing to hamper movement.", "Attach an ammeter in series with the motor."], ["> Continue"], get_input=True)
+            self.display(["Running calibration (standard sweep, 2.422V to 10.87V).", "Note:", "\to Allow motor to freely rotate.", "\to Attach ammeter in series with motor."], ["> Continue"], get_input=True)
             ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y", time.gmtime()))
             
             if not debug: self.mot.start_poll(ln)
@@ -218,7 +274,7 @@ class rheometer(object):
                 dr[len(dr) - 1]     = dr[len(dr) - 1] / 5
                 cr[len(cr) - 1]     = cr[len(cr) - 1] / 5
                 cra[len(cra) - 1]   = cra[len(cra) - 1] / 5
-                crb[len(crb) - 1]   = crb[len(crb) - 1]] / 5
+                crb[len(crb) - 1]   = crb[len(crb) - 1] / 5
 
                 cua[vms] = cua[vms] / 5
             
@@ -443,7 +499,7 @@ class rheometer(object):
             cu.append(cua[v])
 
         # Form trendline: CRF vs CU
-        coeffs = np.polyfit((crf, cu, 1)
+        coeffs = np.polyfit(crf, cu, 1)
         return coeffs
     
     def cal_dynamo(self, dr, vms):
