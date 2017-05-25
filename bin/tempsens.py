@@ -3,10 +3,12 @@
 #
 # class controlling the DS18B20 1-wire temperature sensor from a Raspberry Pi
 # 
-# Made following:
+# Taken (almost verbatim) from:
 # https://www.modmypi.com/blog/ds18b20-one-wire-digital-temperature-sensor-and-the-raspberry-pi
 #
 # Feels a bit silly, I'd rather directly control the sensor but w/e
+#
+# Requires root
 
 import os
 import sys
@@ -16,8 +18,8 @@ class ds18b20(object):
 
     def __init__(self, serno):
         # loads 1 wire drivers
-        os.system('modprobe w1-gpio')
-        os.system('modprobe w1-therm')
+        os.system('sudo -H modprobe w1-gpio')
+        os.system('sudo -H modprobe w1-therm')
         self.sens_file = 'sys/bus/w1/devices/{}/w1_slave'.format(serno)
 
     def temp_raw():
