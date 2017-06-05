@@ -11,6 +11,7 @@ import os
 import thread as td
 #import RPi.GPIO as gpio # Not necessary?
 import filter
+from warnings import warn
 
 #from glob import glob # Not necessary?
 from dig_pot import MCP4131 as dp

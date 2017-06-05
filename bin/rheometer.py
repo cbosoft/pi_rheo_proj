@@ -21,7 +21,7 @@ try:
 except ImportError as ex:
     packages_missing.append("crtresx.py")
 try:
-    import syst
+    import sys
 except ImportError as ex:
     packages_missing.append("crtsys")
 try:
@@ -226,25 +226,28 @@ class rheometer(object):
             if not debug: self.mot.start_poll(ln)
             
             # Dictionary inits
-            cua = {100:0}
+            cua      = dict()
 
-            dr  = [0] * [0]
-            cr  = [0] * [0]
-            cra = [0] * [0]
-            crb = [0] * [0]
+            dr       = list()
+            cr       = list()
+            cra      = list()
+            crb      = list()
+            vms_hist = list()
+
+            repetitions = 1
 
             for i in range(0, 17):
-                if not debug: self.mot.set_pot(i)
+                if not debug: self.mot.set_pot(i*8)
                 vms = 0.066 * (i * 8) + 2.422
 
-                cua.append(0.0)
+                cua[vms] = 0.0
                 dr.append(0.0)
                 cr.append(0.0)
                 cra.append(0.0)
                 crb.append(0.0)
 
-                for j in range(0, 5):
-                    blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1)]
+                for j in range(0, repetitions):
+                    blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions)]
                     options = [""]
                     amr = self.display(blurb, options, input_type="string")
                     input_fine = True
@@ -253,7 +256,7 @@ class rheometer(object):
                         cua[vms] += float(amr)
                     except:
                         input_fine = False
-                        blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1), "Input was not recognised!"]
+                        blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
 
                     while not input_fine:
                         amr = self.display(blurb, options, input_type="string")
@@ -262,7 +265,7 @@ class rheometer(object):
                             cua[vms] += float(amr)
                         except:
                             input_fine = False
-                            blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), "", "Ammeter reading (A) ({}/5): ".format(j + 1), "Input was not recognised!"]
+                            blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
 
                     dr[len(dr) - 1]   += self.mot.volts[0]
                     cr[len(cr) - 1]   += self.mot.volts[1]
@@ -271,12 +274,14 @@ class rheometer(object):
 
                     time.sleep(1)
 
-                dr[len(dr) - 1]     = dr[len(dr) - 1] / 5
-                cr[len(cr) - 1]     = cr[len(cr) - 1] / 5
-                cra[len(cra) - 1]   = cra[len(cra) - 1] / 5
-                crb[len(crb) - 1]   = crb[len(crb) - 1] / 5
+                vms_hist.append(vms)
 
-                cua[vms] = cua[vms] / 5
+                dr[len(dr) - 1]     = dr[len(dr) - 1] / repetitions
+                cr[len(cr) - 1]     = cr[len(cr) - 1] / repetitions
+                cra[len(cra) - 1]   = cra[len(cra) - 1] / repetitions
+                crb[len(crb) - 1]   = crb[len(crb) - 1] / repetitions
+
+                cua[vms] = cua[vms] / repetitions
             
             if not debug: self.mot.clean_exit()
             
@@ -286,9 +291,9 @@ class rheometer(object):
                 t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
-                tdyncal = self.cal_dynamo(dr, vms)
-                t30acal = self.cal_30ahes(cr, vms, cua)
-                t5acal  = self.cal_5ahes(cra, crb, vms, cua)
+                tdyncal = self.cal_dynamo(dr, vms_hist)
+                t30acal = self.cal_30ahes(cr, vms_hist, cua)
+                t5acal  = self.cal_5ahes(cra, crb, vms_hist, cua)
                 ticovms = np.polyfit(vms, (cu1 + cu2 + cu3) / 3, 1)
             
             blurb = ["Calibration results:", "",
@@ -504,7 +509,7 @@ class rheometer(object):
     
     def cal_dynamo(self, dr, vms):
         # Read csv
-        datf    = pandas.read_csv("./../logs/main_speed_v_vms.csv")
+        datf    = pd.read_csv("./../logs/main_speed_v_vms.csv")
 
         vmsm    = np.array(datf['vms'], np.float64)
         spd1    = np.array(datf['spd1'], np.float64)
@@ -513,15 +518,15 @@ class rheometer(object):
 
         av_spd  = (spd1 + spd2 + spd3) / 3
 
-        vdict = {100:0}
+        vdict = dict()
         for i in range(0, len(vmsm)):
             vdict[vmsm[i]] = av_spd[i]
 
-        spd_long = np.array(range(0, len(vms)), np.float64)
+        spd_long = np.array(range(0, len(vmsm)), np.float64)
         for i in range(0, len(vms)):
             spd_long = vdict[vms[i]]
         
-        coeffs = np.polyfit(dr, spd, 1)
+        coeffs = np.polyfit(dr, spd_long, 1)
         return coeffs
         
 if __name__ == "__main__":
