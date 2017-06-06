@@ -3,6 +3,14 @@
 #
 # class object controlling the rheometer from the rasbperry pi
 #
+
+
+# =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+# TODO:
+# Motor "cycling"
+# wait after change in sensor recal
+# =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 packages_missing = [""]
 try:
     import time
@@ -227,6 +235,29 @@ class rheometer(object):
             
             # Dictionary inits
             cua      = dict()
+<<<<<<< HEAD
+
+            dr       = list()
+            cr       = list()
+            cra      = list()
+            crb      = list()
+            vms_hist = list()
+            pv_hist  = list()
+
+            # settings
+            repetitions = 1 # default: 3
+            readings = 1000   # default: 10
+
+            for i in range(0, 17):
+
+                if not debug: self.mot.set_pot(i*8)
+
+                time.sleep(0.3)
+
+                vms = 0.066 * (i * 8) + 2.422
+
+                cua[(i * 8)] = 0.0
+=======
 
             dr       = list()
             cr       = list()
@@ -241,6 +272,7 @@ class rheometer(object):
                 vms = 0.066 * (i * 8) + 2.422
 
                 cua[vms] = 0.0
+>>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
                 dr.append(0.0)
                 cr.append(0.0)
                 cra.append(0.0)
@@ -253,7 +285,7 @@ class rheometer(object):
                     input_fine = True
 
                     try:
-                        cua[vms] += float(amr)
+                        cua[(i * 8)] += float(amr)
                     except:
                         input_fine = False
                         blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
@@ -262,18 +294,30 @@ class rheometer(object):
                         amr = self.display(blurb, options, input_type="string")
                         input_fine = True
                         try:
-                            cua[vms] += float(amr)
+                            cua[(i * 8)] += float(amr)
                         except:
                             input_fine = False
                             blurb = ["Supply voltage set to: {:.3f}V   ".format(vms), " ", "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions), "Input was not recognised!"]
 
-                    dr[len(dr) - 1]   += self.mot.volts[0]
-                    cr[len(cr) - 1]   += self.mot.volts[1]
-                    cra[len(cra) - 1] += self.mot.volts[2]
-                    crb[len(crb) - 1] += self.mot.volts[3]
+                    for rep in range(0, readings):
+                        dr[len(dr) - 1]   += self.mot.volts[0]
+                        cr[len(cr) - 1]   += self.mot.volts[1]
+                        cra[len(cra) - 1] += self.mot.volts[2]
+                        crb[len(crb) - 1] += self.mot.volts[3]
+                    
+                        time.sleep(0.001)
 
-                    time.sleep(1)
+                vms_hist.append(vms)
+                pv_hist.append(i * 8)
 
+<<<<<<< HEAD
+                dr[len(dr) - 1]     = dr[len(dr) - 1] / (repetitions * readings)
+                cr[len(cr) - 1]     = cr[len(cr) - 1] / (repetitions * readings)
+                cra[len(cra) - 1]   = cra[len(cra) - 1] / (repetitions * readings)
+                crb[len(crb) - 1]   = crb[len(crb) - 1] / (repetitions * readings)
+
+                cua[(i * 8)] = cua[(i * 8)] / repetitions
+=======
                 vms_hist.append(vms)
 
                 dr[len(dr) - 1]     = dr[len(dr) - 1] / repetitions
@@ -282,6 +326,7 @@ class rheometer(object):
                 crb[len(crb) - 1]   = crb[len(crb) - 1] / repetitions
 
                 cua[vms] = cua[vms] / repetitions
+>>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
             
             if not debug: self.mot.clean_exit()
             
@@ -291,10 +336,30 @@ class rheometer(object):
                 t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
+<<<<<<< HEAD
+
+#                for k in vms_hist:
+#                    print k
+
+                cr      = np.array(cr, np.float64)
+                cra     = np.array(cra, np.float64)
+                crb     = np.array(crb, np.float64)
+
+                tdyncal = self.cal_dynamo(dr, vms_hist)
+                t30acal = self.cal_30ahes(cr, pv_hist, cua)
+                t5acal  = self.cal_5ahes(cra, crb, pv_hist, cua)
+
+                cu1     = t30acal[0] * cr + t30acal[1]
+                cu2     = t5acal[0] * cra + t5acal[1]
+                cu3     = t5acal[0] * crb + t5acal[1]
+
+                ticovms = np.polyfit(vms_hist, (cu1 + cu2 + cu3) / 3, 1)
+=======
                 tdyncal = self.cal_dynamo(dr, vms_hist)
                 t30acal = self.cal_30ahes(cr, vms_hist, cua)
                 t5acal  = self.cal_5ahes(cra, crb, vms_hist, cua)
                 ticovms = np.polyfit(vms, (cu1 + cu2 + cu3) / 3, 1)
+>>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
             
             blurb = ["Calibration results:", "",
                      "\t(Dynamo)\tSpeed(Vd) = {} * Vd + {}".format(tdyncal[0], tdyncal[1]),
@@ -319,7 +384,7 @@ class rheometer(object):
 
             # step 1: set up hardware (attach arm to cylinder, set up balance)
             blurb = [   "Motor Characteristic Calibration", 
-                        "", 
+                        " ", 
                         "Step 1: Set up.", 
                         "This script will operate the RPi-R, testing a ",
                         "The arm must be attached to the inner cylinder ", 
@@ -383,7 +448,7 @@ class rheometer(object):
             return 1
         elif res == 2:
             # test a sample (default settings - PV=48, for 5 minutes)
-            blurb = ["Rheometry quick run:", "\tRun length: \t5 minutes","\tStrain rate:\t96.9 (1/s)", ""]
+            blurb = ["Rheometry quick run:", "\tRun length: \t5 minutes","\tStrain rate:\t96.9 (1/s)", " "]
             options = ["> Continue", "> Cancel"]
             help = [" ", " "]
             res = self.display(blurb, options, options_help=help)
@@ -410,7 +475,7 @@ class rheometer(object):
                 self.mot.clean_exit()
                 visco_res = self.calc_visc(self, ln, 15)
                 average_viscosity = np.average(visco_res)
-                blurb = ["Finished!","","Results saved in {}".format(ln), "Average Viscosity: {:.3f} Pa.s".format(average_viscosity)]
+                blurb = ["Finished!"," ","Results saved in {}".format(ln), "Average Viscosity: {:.3f} Pa.s".format(average_viscosity)]
                 options = ["> Continue"]
                 options_help = ["Return to menu"]
             else:
@@ -476,9 +541,12 @@ class rheometer(object):
         else:
             self.mot.update_setpoint(desired_speed)
 
-    def cal_30ahes(self, cr, vms, cua):
+    def cal_30ahes(self, cr, vms, cua, filteron=False):
         st  = range(0, len(cr))
-        crf = filter(st, cr, method="butter", A=2, B=0.001)
+        if filteron: 
+            crf = filter(st, cr, method="butter", A=2, B=0.001)
+        else:
+            crf = cr
         cu  = [0] * 0
 
         # From ammeter
@@ -489,12 +557,12 @@ class rheometer(object):
         coeffs = np.polyfit(crf, cu, 1)
         return coeffs
     
-    def cal_5ahes(self, st, cra, crb, vms, cua):
+    def cal_5ahes(self, cra, crb, vms, cua, filteron=False):
         st      = range(0, len(cra))
-        cra     = filter(st, cra, method="butter", A=2, B=0.001)
+        if filteron: cra     = filter(st, cra, method="butter", A=2, B=0.001)
 
         st      = range(0, len(crb))
-        crb     = filter(st, crb, method="butter", A=2, B=0.001)
+        if filteron: crb     = filter(st, crb, method="butter", A=2, B=0.001)
 
         crf     = 0.5 * (cra + crb)
         cu      = [0] * 0
@@ -520,16 +588,21 @@ class rheometer(object):
 
         vdict = dict()
         for i in range(0, len(vmsm)):
-            vdict[vmsm[i]] = av_spd[i]
+            vdict[str(vmsm[i])] = av_spd[i]
 
         spd_long = np.array(range(0, len(vmsm)), np.float64)
         for i in range(0, len(vms)):
+<<<<<<< HEAD
+            spd_long[i] = vdict[str(vms[i])]
+ 
+=======
             spd_long = vdict[vms[i]]
         
+>>>>>>> bf7f66bd4dd2715bbde9b04edb7fd957e7b68e1d
         coeffs = np.polyfit(dr, spd_long, 1)
         return coeffs
         
-if __name__ == "__main__":
+if __name__ == "__main__" and True:
     # setup curses window
     rows, columns = os.popen('stty size', 'r').read().split()
     bigscr = curses.initscr()
@@ -568,4 +641,32 @@ if __name__ == "__main__":
             stdscr.keypad(0)
             curses.echo()
             curses.endwin()
-    
+elif __name__ == "__main__" and False:
+    datf = pd.read_csv("./../logs/sensor_calibration_100417.csv")
+    r = rheometer()
+    cr = np.array(datf['cr'], np.float64)
+    cra = np.array(datf['cr2a'], np.float64)
+    crb = np.array(datf['cr2b'], np.float64)
+
+    vms = np.array(datf['pv'], np.float64)
+
+    cua = {0   : 0.51, 
+           8   : 0.53, 
+           16  : 0.54, 
+           24  : 0.56, 
+           32  : 0.57, 
+           40  : 0.59, 
+           48  : 0.61, 
+           56  : 0.62, 
+           64  : 0.64, 
+           72  : 0.65, 
+           80  : 0.67, 
+           88  : 0.68, 
+           96  : 0.7, 
+           104 : 0.71, 
+           112 : 0.73, 
+           120 : 0.74, 
+           128 : 0.76}
+
+    cal5 = r.cal_5ahes(cra, crb, vms, cua)
+    print cal5

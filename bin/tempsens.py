@@ -20,10 +20,10 @@ class ds18b20(object):
         # loads 1 wire drivers
         os.system('sudo -H modprobe w1-gpio')
         os.system('sudo -H modprobe w1-therm')
-        self.sens_file = 'sys/bus/w1/devices/{}/w1_slave'.format(serno)
+        self.sens_file = '/sys/bus/w1/devices/{}/w1_slave'.format(serno)
 
-    def temp_raw():
-        f = open(self.temp_sensor, 'r')
+    def temp_raw(self):
+        f = open(self.sens_file, 'r')
         lines = f.readlines()
         f.close()
         return lines
@@ -42,7 +42,7 @@ class ds18b20(object):
             return temp_c
     
     def set_sn(self, serno):
-        self.sens_file = 'sys/bus/w1/devices/{}/w1_slave'.format(serno)
+        self.sens_file = '/sys/bus/w1/devices/{}/w1_slave'.format(serno)
     
     def check_sn(self):
-        return os.path.isdir(self.sens_file)
+        return os.path.isfile(self.sens_file)

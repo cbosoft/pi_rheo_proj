@@ -60,7 +60,7 @@ class motor(object):
     adc_chan = [0, 1, 2, 3]  # voltage channel, current channel, current channel, current channel
 
     def __init__(self, startnow=False, adc_channels=[0, 1], adc_vref=3.3,
-                 poll_logging=True, log_dir="./logs", therm_sn="blank",
+                 poll_logging=True, log_dir="./logs", therm_sn="28-0316875e09ff",
                  log_name="DATETIME", svf=[312.806, -159.196], i_poll_rate=0.1, pic_tuning=(0.2, 0.15),
                  filtering="NONE", filter_samples=100, filt_param_A=0.314, filt_param_B=0.314):
 
