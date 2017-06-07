@@ -45,10 +45,6 @@ try:
 except ImportError as ex:
     packages_missing.append("crtos")
 try:
-    import copy
-except ImportError as ex:
-    packages_missing.append("crtcopy")
-try:
     import matplotlib
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
@@ -116,6 +112,9 @@ class rheometer(object):
     # classes
     mot = motor()
     
+    # vars
+    motor_running = False
+    
     def __init__(self, motor_params={'log_dir':'./logs'}):
         print motor_params
         self.mot = motor(**motor_params)
@@ -131,13 +130,24 @@ class rheometer(object):
         if options_help == "NONE": options_help = [""] * len(options)
 
         # RPi-R header
-        stdscr.addstr(3, 3, r"____________ _       ______ ")
-        stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
-        stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
-        stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
-        stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
-        stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
-        stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
+        if self.motor_running:
+            stdscr.addstr(3, 3, r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==")
+            stdscr.addstr(3, 3, r"____________ _       ______ ")
+            stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
+            stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
+            stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
+            stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
+            stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
+            stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
+        else:
+            stdscr.addstr(3, 3, r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==")
+            stdscr.addstr(3, 3, r"____________ _       ______ ")
+            stdscr.addstr(4, 3, r"| ___ \ ___ (_)      | ___ \ ")
+            stdscr.addstr(5, 3, r"| |_/ / |_/ /_ ______| |_/ /")
+            stdscr.addstr(6, 3, r"|    /|  __/| |______|    / ")
+            stdscr.addstr(7, 3, r"| |\ \| |   | |      | |\ \ ")
+            stdscr.addstr(8, 3, r"\_| \_\_|   |_|      \_| \_|")
+            stdscr.addstr(10, 3, r"RaspberryPi-Rheometer v{}".format(self.version))
 
         blurbheight = 12        
         
@@ -239,6 +249,7 @@ class rheometer(object):
             
             # Dictionary inits
             cua      = dict()
+
             dr       = list()
             cr       = list()
             cra      = list()
@@ -247,7 +258,7 @@ class rheometer(object):
             pv_hist  = list()
 
             # settings
-            repetitions = 1 # default: 3
+            repetitions = 3 # default: 3
             readings = 1000   # default: 10
 
             for i in range(0, 17):
@@ -311,6 +322,10 @@ class rheometer(object):
                 t5acal  = self.hes5A_cal
                 ticovms = resx.cal_IcoVms
             else:
+
+#                for k in vms_hist:
+#                    print k
+
                 cr      = np.array(cr, np.float64)
                 cra     = np.array(cra, np.float64)
                 crb     = np.array(crb, np.float64)
@@ -350,11 +365,11 @@ class rheometer(object):
             blurb = [   "Motor Characteristic Calibration", 
                         " ", 
                         "Step 1: Set up.", 
-                        "This script will operate the RPi-R, testing a ",
+                        " ",
                         "The arm must be attached to the inner cylinder ", 
                         "and positioned such that when the motor rotates,",
-                        "the arm hits the balance",
-                        "Continue when ready."]
+                        "the arm hits the balance.",
+                        "Turn the motor on and continue when ready."]
             options = ["> Continue", "> Cancel"]
             help = ["", ""]
             res = self.display(blurb, options, options_help=help)
@@ -368,10 +383,25 @@ class rheometer(object):
                 # step 2a: set voltage, read sensor information (Ims, Vms)
                 # step 2b: read balance information (user input mass reading on balance)
                 # step 2c: repeat steps a,b for multiple supply voltages (17, from PV=0 to PV=128, every 8)
-
+                readings = 3
                 self.mot.set_pot(i * 8)
-                for j in range(0, 10):
+                for j in range(0, readings):
+                    # Get mass reading
+                    blurb = [   "Motor Characteristic Calibration",
+                                " ",
+                                "Step 2: Reading Sensors",
+                                " ",
+                                "Supply voltage set to: {}V ({}/{})".format((8 * i) * 0.066 + 2.422, i, 17),
+                                " ",
+                                "Leave motor on!",
+                                "Enter the balance reading, grams ({}/{}):".format(j + 1, readings)]
+                    options = [""]
+                    help = [""]
+                    res = self.display(blurb, options, options_help=help, input_type="string")
+                    
+                    # Get sensor data
                     for k in range(0, 100):
+                        masses.append(float(res))
                         sensor_readings = [0, 0, 0, 0]
                         if not debug: sensor_readings = self.mot.read_sensors()
                         current = ((resx.cal_30AHES[0] * sensor_readings[1] + resx.cal_30AHES[1]) + 
@@ -380,34 +410,20 @@ class rheometer(object):
                         supply_voltage = (8 * i) * 0.066 + 2.422
                         currents.append(current)
                         supply_voltages.append(supply_voltage)
-                    blurb = [   "Motor Characteristic Calibration",
-                                "",
-                                "Step 2: Reading Sensors",
-                                "",
-                                "Supply voltage set to: {}".format((8 * i) * 0.066 + 2.422),
-                                "Sensor\t\tReading\t\tValue",
-                                "30AHES\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[1], resx.cal_30AHES[0] * sensor_readings[1] + resx.cal_30AHES[1]),
-                                "5AHES1\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[2], resx.cal_5AHES[0] * sensor_readings[2] + resx.cal_5AHES[1]),
-                                "5AHES2\t\t{:.3f}\t\t{:.3f}".format(sensor_readings[3], resx.cal_5AHES[0] * sensor_readings[3] + resx.cal_5AHES[1]),
-                                "",
-                                "Enter the balance reading, grams ({}/10):".format(j)]
-                    options = [""]
-                    help = [""]
-                    res = self.display(blurb, options, options_help=help, input_type="string")
-                    for k in range(0, 100):
-                        masses.append(float(res))
+                        time.sleep(0.01)
+                    
+                    # Cycle motor
+                    self.motor_cycle()
 
-                    Larm = 0.0656 # length of arm attached to motor, in m
-                    g = 9.81 # acceleration due to gravity, m/(s^2)
-                    stall_torques = np.array(masses) * g * Larm
+            Larm          = 0.0656   # length of arm attached to motor, in m
+            g             = 9.81     # acceleration due to gravity, m/(s^2)
+            stall_torques = np.array(masses, np.float64) * g * Larm
 
-                    TsFit = np.polyfit(supply_voltages, stall_torques, 1)
-                    IemFit = np.polyfit(supply_voltages, currents - (np.array(supply_voltages) * resx.cal_IcoVms[0] + resx.cal_IcoVms[1]), 1)
-                    resx.cal_TsVms = TsFit
-                    resx.cal_IemfVms = IemFit
-                    resx.writeout()
-                    # save information
-                    # update resx calibrations
+            TsFit = np.polyfit(supply_voltages, stall_torques, 1)
+            IemFit = np.polyfit(supply_voltages, currents - (np.array(supply_voltages) * resx.cal_IcoVms[0] + resx.cal_IcoVms[1]), 1)
+            resx.cal_TsVms = TsFit
+            resx.cal_IemfVms = IemFit
+            resx.writeout()
 
             return 1
         elif res == 2:
@@ -557,6 +573,7 @@ class rheometer(object):
         spd_long = np.array(range(0, len(vmsm)), np.float64)
         for i in range(0, len(vms)):
             spd_long[i] = vdict[str(vms[i])]
+ 
         coeffs = np.polyfit(dr, spd_long, 1)
         return coeffs
         
@@ -568,7 +585,13 @@ class rheometer(object):
         for i in range(0, 128):
             self.mot.set_resistance(127 - i)
             time.sleep(0.01)
-        
+            
+    def set_relay(self, value):
+        self.motor_running = value
+        if value:
+            self.mot.actuate()
+        else:
+            self.mot.deactuate()
         
 if __name__ == "__main__" and True:
     # setup curses window
