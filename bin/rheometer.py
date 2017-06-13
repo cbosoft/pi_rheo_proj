@@ -11,47 +11,64 @@
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 packages_missing = [""]
+print "Loading packages.."
 try:
+    print "\ttime"
     import time
 except ImportError as ex:
     packages_missing.append("crttime")
 try:
+    print "\tnumpy"
     import numpy as np
 except ImportError as ex:
     packages_missing.append("pipnumpy")
 try:
+    print "\tpandas"
     import pandas as pd
 except ImportError as ex:
     packages_missing.append("pippandas")
 try:
+    print "\tresources"
     import resx
 except ImportError as ex:
     packages_missing.append("crtresx.py")
 try:
+    print "\tsys"
     import sys
 except ImportError as ex:
     packages_missing.append("crtsys")
 try:
+    print "\tcurses"
     import curses
 except ImportError as ex:
     packages_missing.append("pipcurses")
 try:
+    print "\tmath"
     import math
 except ImportError as ex:
     packages_missing.append("crtmath")
 try:
+    print "\tcopy"
     import copy
 except ImportError as ex:
     packages_missing.append("crtcopy")
 try:
+    print "\tos"
     import os
 except ImportError as ex:
     packages_missing.append("crtos")
 try:
+    print "\trandom"
+    import random
+except ImportError as ex:
+    packages_missing.append("crtrandom")
+try:
+    print "\tmatplotlib"
     import matplotlib
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
 try:
+    print "\tpython-tk"
     import _tkinter
 except ImportError as ex:
     packages_missing.append("aptpython-tk")
@@ -80,8 +97,14 @@ if crit_fail:
     print "Press any key to continue"
     raw_input()
     exit()
+
+print "\tmotor.py"
 from motor import motor
+
+print "\tfilter.py"
 from filter import filter
+
+print "\tplot_help.py"
 from plothelp import fit_line
 
 try:
@@ -126,13 +149,26 @@ class rheometer(object):
     motor_running = False
     
     def __init__(self, motor_params={'log_dir':'./logs'}):
-        print motor_params
+        print "Initialising motor..."
         self.mot = motor(**motor_params)
             
     def get_rheometry(self, strain_rate, run_length):
         pass
     
     def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", input_type="enum"):
+        
+        summ_str = "Update screen:\n\t"
+        summ_str += "{}...\n\t".format(blurb[0])
+        if get_input:
+            summ_str += "Input: "
+            if input_type == "enum":
+                summ_str += "listed choice"
+            else:
+                summ_str += "input data"
+        else:
+            summ_str += "No input taken"
+        print summ_str
+        
         global stdscr
         global debug
         stdscr.clear()
@@ -140,13 +176,13 @@ class rheometer(object):
         if options_help == "NONE": options_help = [""] * len(options)
 
         # RPi-R header
-        mode_string = " " #6
-        motor_string = "   MOTOR OFF" #10
-        if self.motor_running: motor_string = "!! MOTOR ON !!" #13
+        mode_string = " "
+        motor_string = "   MOTOR OFF"
+        if self.motor_running: motor_string = "!! MOTOR ON !!"
         if debug: 
-            mode_string = "  !! DEBUG !!" #11
-            motor_string = " " #3
-        #stdscr.addstr(3, 3,  r"--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--==--=")
+            mode_string = "  !! DEBUG !!"
+            motor_string = " "
+            
         stdscr.addstr(3, 3,  r"____________ _       ______        ")
         stdscr.addstr(4, 3,  r"| ___ \ ___ (_)      | ___ \                {}".format(mode_string))
         stdscr.addstr(5, 3,  r"| |_/ / |_/ /_ ______| |_/ /       ")
@@ -155,11 +191,7 @@ class rheometer(object):
         stdscr.addstr(8, 3,  r"\_| \_\_|   |_|      \_| \_|       Raspberry Pi Rheometer    v{}".format(self.version))
         stdscr.addstr(10, 3, r"_____________________________________________________________________".format(self.version))
 
-        blurbheight = 12        
-        
-        #if debug: 
-        #    stdscr.addstr(blurbheight, 3, r" !! -->> DEBUG MODE <<-- !!")
-        #    blurbheight += 2
+        blurbheight = 12
 
         # Display Blurb
         for i in range(0, len(blurb)):
@@ -212,7 +244,8 @@ class rheometer(object):
         else:
             res = self.display(blurb, options, selected, True, options_help)
         return res
-
+        
+    #################################################################################################################################################
     def menutree(self, initsel=0):
         os.system('mode con: cols=159 lines=34')
         global stdscr
@@ -325,14 +358,20 @@ class rheometer(object):
                                      " ", 
                                      "Ammeter reading (A) ({}/{}): ".format((j + 1), repetitions),
                                      "Input needs to be a number!"]
-
+                    
+                    # get sensor readings
+                    
+                    blurb = [" ", " Getting sensor data... "]
+                    options = [" "]
+                    self.display(blurb, options, get_input=False)
+                    
                     for rep in range(0, readings):
                         dr[len(dr) - 1]   += self.mot.volts[0]
                         cr[len(cr) - 1]   += self.mot.volts[1]
                         cra[len(cra) - 1] += self.mot.volts[2]
                         crb[len(crb) - 1] += self.mot.volts[3]
                     
-                        time.sleep(0.001)
+                        time.sleep(1.0 / readings)
                     
                     self.motor_cycle()
 
@@ -522,6 +561,7 @@ class rheometer(object):
             # quit
             return 4
 
+    #################################################################################################################################################
     def calc_visc(self, filename, fill_vol):
         self.fill_height = fill_vol / self.dxsa
         datf = pd.read_csv(filename)
@@ -564,7 +604,8 @@ class rheometer(object):
         mu      = tau / gam_dot
         
         return mu
-            
+       
+    #################################################################################################################################################     
     def set_strain_rate(self, value):
         desired_speed = value * (self.ro - self.ri) / self.ri  # in rads
         desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
@@ -574,6 +615,7 @@ class rheometer(object):
         else:
             self.mot.update_setpoint(desired_speed)
 
+    #################################################################################################################################################
     def cal_30ahes(self, cr, vms, cua, filteron=False):
         st  = range(0, len(cr))
         if filteron: 
@@ -590,6 +632,7 @@ class rheometer(object):
         coeffs = np.polyfit(crf, cu, 1)
         return coeffs
     
+    #################################################################################################################################################
     def cal_5ahes(self, cra, crb, vms, cua, filteron=False):
         st      = range(0, len(cra))
         if filteron: cra     = filter(st, cra, method="butter", A=2, B=0.001)
@@ -608,6 +651,7 @@ class rheometer(object):
         coeffs = np.polyfit(crf, cu, 1)
         return coeffs
     
+    #################################################################################################################################################
     def cal_dynamo(self, dr, vms):
         # Read csv
         datf    = pd.read_csv("./../logs/main_speed_v_vms.csv")
@@ -630,15 +674,53 @@ class rheometer(object):
         coeffs = np.polyfit(dr, spd_long, 1)
         return coeffs
         
-    def motor_cycle(self):
+    #################################################################################################################################################
+    def motor_cycle(self, show_screen=True):
+        
+        # display wait screen
+        blurb = [" ", " Cycling motor..."]
+        options = [" "]
+        if show_screen: self.display(blurb, options, get_input=False)
+        
+        # save PV
         prev_pv = copy.copy(self.mot.pot.lav)
-        for i in range(0, 128):
-            self.mot.set_pot(i)
-            time.sleep(0.01)
-        for i in range(0, 128):
-            self.mot.set_pot(127 - i)
-            time.sleep(0.01)
+
+        # get random number
+        r = random.randint(1, 2)
+        highfirst = True
+        # use random to randomise order
+        if r == 1: highfirst = False
+        
+        # set to 4 random PVs
+        for i in range(0, 4):
+            self.mot.set_pot(random.randint(0, 128))
+            time.sleep(0.1)
             
+        # set either to highest or lowest
+        if highfirst:
+            self.mot.set_pot(128)
+            time.sleep(0.1)
+        else:
+            self.mot.set_pot(0)
+            time.sleep(0.1)
+            
+        # another 4 random PVs
+        for i in range(0, 4):
+            self.mot.set_pot(random.randint(0, 128))
+            time.sleep(0.1)
+        
+        # set to either lowest, or highest
+        if not highfirst:
+            self.mot.set_pot(128)
+            time.sleep(0.1)
+        else:
+            self.mot.set_pot(0)
+            time.sleep(0.1)
+        
+        # return to original PV
+        self.mot.set_pot(prev_pv)
+            
+    #################################################################################################################################################
     def set_relay(self, value):
         self.motor_running = value
         if value:
@@ -648,7 +730,7 @@ class rheometer(object):
         
 if __name__ == "__main__" and True:
     # setup curses window
-    rows, columns = os.popen('stty size', 'r').read().split()
+    #rows, columns = os.popen('stty size', 'r').read().split()
     bigscr = curses.initscr()
     stdscr = curses.newwin(34, 75, 1, 1)
     stdscr.border(0)
