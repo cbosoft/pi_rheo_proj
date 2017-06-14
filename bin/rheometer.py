@@ -535,7 +535,7 @@ class rheometer(object):
                 self.mot.set_pot(48)
                 vms = 0.066 * 48 + 2.422
 
-                for i in range(0, 300):
+                for i in range(0, 150):
                     stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (300 - i)))
                     width = 40
                     perc = int(math.ceil((i / 300.0) * width))
@@ -545,11 +545,16 @@ class rheometer(object):
                     time.sleep(1)
                 
                 self.mot.clean_exit()
-                visco_res = self.calc_visc(self, ln, 15)
+                
+                # calculate viscosity
+                visco_res = self.calc_visc(ln, 15)
                 average_viscosity = np.average(visco_res)
+
+                # display result
                 blurb = ["Finished!"," ","Results saved in {}".format(ln), "Average Viscosity: {:.3f} Pa.s".format(average_viscosity)]
                 options = ["> Continue"]
-                options_help = ["Return to menu"]
+                
+                res = self.display(blurb, options)
             else:
                 # cancel
                 pass
