@@ -1,21 +1,26 @@
-I'm using a Raspberry Pi to control a custom built rheometer.
+### RPi-R ###
 
-Useful links:
+Raspberry Pi Rheometer. A rheometer using a Taylor-Couette cell along with 
+a plethora of sensors to record a bunch of data like temperature, revolution
+speed, motor supply current etc etc.
 
-Learn Python:
-    https://en.wikibooks.org/wiki/Non-Programmer%27s_Tutorial_for_Python_2.6/Intro
+Due to time constraints and difficulty of getting the rheometer to work properly 
+(i.e. it doesn't accurately report viscosity vs time and I can't be bothered to
+fix it), The rheometer will now be used simply as a rough guide. The power into 
+the motor is directly related to the torque output, and therefore (at constant
+strain rate) the viscosity. The rheometer will normalise the power draw with 
+respect to the empty rheometer.
 
-More Learn Python:
-    http://www.pyschools.com/
-
-(I will update with more links as I go)
-
+The important part here is how the piezo-sensor output and the normal rheometer 
+output match up.
 
 TO DO:
-* Calibration scripts
+* Attach piezo sensors in such a way as to minimise noise (i.e. from motor)
+* Re-write software to reflect new simplified method of indication
+* ~~Calibration scripts~~
 * ~~Central calibration storage (not as var in each class!)~~
-* Redo cals (TS vs. Vms & Iemf vs.  Vms)
-* Analogue filtering?
+* ~~Redo cals (TS vs. Vms & Iemf vs.  Vms)~~
+* ~~Analogue filtering?~~ Not necessary, might implement later
 * Dead-time compensation?
 * Speed control
 * ~~Temperature control (monitoring)~~
