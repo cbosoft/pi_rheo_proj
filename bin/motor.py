@@ -61,7 +61,7 @@ class motor(object):
     pot = dp()  # potentiometer to control voltage
     pic = pitf((0.2, 0.15))
     aconv = ac()  # adc to read current/voltage
-    adc_chan = [0, 1, 2, 3, 4, 5]  # voltage channel, current channel, current channel, current channel, piezo, piezo
+    adc_chan = [0, 1, 2, 3, 4, 5, 6, 7]  # voltage channel, current channel, current channel, current channel, piezo, piezo, bg_piezo, adcnoise
     
     # GPIO Pins
     relay_pin = 0
@@ -131,7 +131,7 @@ class motor(object):
             
             self.logf = open(self.this_log_name, "w")
             
-            self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr,T,Vpz1,Vpz2\n")
+            self.logf.write("t,dr,cr,cr2a,cr2b,pv,fdr,fcr,T,Vpz1,Vpz2,Vpzbg,Vadcbg\n")
 
     def log_pause(self):
         self.log_paused = True
@@ -166,7 +166,11 @@ class motor(object):
         self.control_stopped = True
 
     def read_sensors(self):
-        return [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1]), self.aconv.read_volts(self.adc_chan[2]), self.aconv.read_volts(self.adc_chan[3]), self.aconv.read_volts(self.adc_chan[4]), self.aconv.read_volts(self.adc_chan[5])]
+        out = list()
+        for a in self.adc_chan:
+            out.append(self.aconv.read_volts(a))
+        return out
+        #return [self.aconv.read_volts(self.adc_chan[0]), self.aconv.read_volts(self.adc_chan[1]), self.aconv.read_volts(self.adc_chan[2]), self.aconv.read_volts(self.adc_chan[3]), self.aconv.read_volts(self.adc_chan[4]), self.aconv.read_volts(self.adc_chan[5])]
         
     def poll(self):
 
@@ -203,17 +207,11 @@ class motor(object):
             else:
                 warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
             
-            if self.log_paused:
-                self.log_add_note = True
-            
             if (self.poll_logging) and (not self.log_paused):
-                if self.log_add_note:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {7:.3f}, {8:.3f}, {3}, {4:.3f}, {5:.3f}, {9:.3f}, {6}, {10}, {11} \n").format(
-                                    t, self.volts[0], self.volts[1], self.pot.lav, fvolts[0], fvolts[1], self.log_note, self.volts[2], self.volts[3], temperature_c, self.volts[4], self.volts[5]))
-                    self.log_add_note = False
-                else:
-                    self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {6:.3f}, {7:.3f}, {3}, {4:.3f}, {5:.3f}, {8:.3f}, {9}, {10} \n").format(
-                    t, self.volts[0], self.volts[1], self.pot.lav, fvolts[0], fvolts[1], self.volts[2], self.volts[3], temperature_c, self.volts[4], self.volts[5]))
+                #"t,dr,cr,cr2a,cr2b,pv,fdr,fcr,T,Vpz1,Vpz2,Vpzbg,Vadcbg
+                #                   t         dr      cr      cr2a      cr2b   pv     fdr      fcr      T     Vpz1  Vpz2  Vpzbg Vadcbg
+                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7:.3f}, {8:.3f}, {9}, {10}, {11}, {12} \n").format(
+                    t, self.volts[0], self.volts[1], self.volts[2], self.volts[3], self.pot.lav, fvolts[0], fvolts[1], temperature_c, self.volts[4], self.volts[5], self.volts[6], self.volts[7]))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)

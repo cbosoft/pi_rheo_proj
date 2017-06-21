@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
+import matplotlib.pyplot as plt
+from filter import filter
 import resx
 
 def fitf(x, a):
@@ -69,19 +71,25 @@ def get_error(variable):
 def read_logf(log_n):
     datf = pd.read_csv(log_n)
     
-    t    =   np.array(datf['t'], np.float64)
-    dr   =   np.array(datf['dr'], np.float64)
-    cr   =   np.array(datf['cr'], np.float64)
-    cr2a =   np.array(datf['cr2a'], np.float64)
-    cr2b =   np.array(datf['cr2b'], np.float64)
-    pv   =   np.array(datf['pv'], np.float64)
-    fdr  =   np.array(datf['fdr'], np.float64)
-    fcr  =   np.array(datf['fcr'], np.float64)
-    T    =   np.array(datf['T'], np.float64)
-    Vpz1 =   np.array(datf['Vpz1'], np.float64)
-    Vpz2 =   np.array(datf['Vpz2'], np.float64)
+    t       =   np.array(datf['t'], np.float64)
+    dr      =   np.array(datf['dr'], np.float64)
+    cr      =   np.array(datf['cr'], np.float64)
+    cr2a    =   np.array(datf['cr2a'], np.float64)
+    cr2b    =   np.array(datf['cr2b'], np.float64)
+    pv      =   np.array(datf['pv'], np.float64)
+    fdr     =   np.array(datf['fdr'], np.float64)
+    fcr     =   np.array(datf['fcr'], np.float64)
+    T       =   np.array(datf['T'], np.float64)
+    Vpz1    =   np.array(datf['Vpz1'], np.float64)
+    Vpz2    =   np.array(datf['Vpz2'], np.float64)
+    Vpzbg   =   [0.0] * len(t)
+    Vadcbg  =   [0.0] * len(t)
+    #Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
+    #Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
     
-    return t, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2
+    st = t - t[0]
+    
+    return t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg
 
 def simple_get_results(log_n):    
     t, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2 = plothelp.read_logf(log_n)
@@ -101,3 +109,29 @@ def simple_get_results(log_n):
     normal_visc  = power / power_base
     
     return normal_visc
+    
+def simple_plot(x, y, outp, xlab="", ylab="", leg=None):
+    if leg == None: leg = [""]
+    f = plt.figure()
+    ax = f.add_subplot(111)
+    ax.plot(x, y)
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    plt.legend(leg)
+    plt.savefig(outp)
+    
+def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
+    if leg == None: leg = [""] * len(ys)
+    f = plt.figure()
+    ax = f.add_subplot(111)
+    
+    for y in ys:
+        yp = y
+        if filtering: yp = filter(x, y, method="butter", A=2, B=0.001)
+        ax.plot(x, yp)
+        
+    ax.set_xlabel(xlab)
+    ax.set_ylabel(ylab)
+    
+    plt.legend(leg)
+    plt.savefig(outp)
