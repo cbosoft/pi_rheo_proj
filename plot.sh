@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "Plotting figures"
-cd ./figures
+cd ./plot
 arr=(*.py)
 count=${#arr[@]}
 
