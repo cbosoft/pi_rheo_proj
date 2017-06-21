@@ -1,7 +1,9 @@
 # plot helper
 # useful defs for plotting
 import numpy as np
+import pandas as pd
 from scipy.optimize import curve_fit
+import resx
 
 def fitf(x, a):
     return a * x
@@ -64,19 +66,38 @@ def get_error(variable):
     return get_abs_sol_comp_unc(29.62, 0.38, err_glyc_vol_9887_abs / 29.62, err_wat_vol_9887_abs / 0.38)
 
 
-svf_raw = [308.768, -167.080]
-cvf1_raw = [15.93, -28.59]
-cvf2_raw = [11.07, -28.44]
-vsvf_raw = [0.066, 2.278]
+def read_logf(log_n):
+    datf = pd.read_csv(log_n)
+    
+    t    =   np.array(datf['t'], np.float64)
+    dr   =   np.array(datf['dr'], np.float64)
+    cr   =   np.array(datf['cr'], np.float64)
+    cr2a =   np.array(datf['cr2a'], np.float64)
+    cr2b =   np.array(datf['cr2b'], np.float64)
+    pv   =   np.array(datf['pv'], np.float64)
+    fdr  =   np.array(datf['fdr'], np.float64)
+    fcr  =   np.array(datf['fcr'], np.float64)
+    T    =   np.array(datf['T'], np.float64)
+    Vpz1 =   np.array(datf['Vpz1'], np.float64)
+    Vpz2 =   np.array(datf['Vpz2'], np.float64)
+    
+    return t, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2
 
-def svf(val):
-    return svf_raw[0] * val + svf_raw[1]
-
-def cvf1(val):
-    return cvf1_raw[0] * val + cvf1_raw[1]
-
-def cvf2(val):
-    return cvf2_raw[0] * val + cvf2_raw[1]
-
-def vsvf(val):
-    return vsvf_raw[0] * val + vsvf_raw[1]
+def simple_get_results(log_n):    
+    t, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2 = plothelp.read_logf(log_n)
+    
+    voltage = 0.066 * pv + 2.422
+    
+    cu1     = resx.cal30AHES[0] * cr + resx.cal30AHES[1]
+    cu2     = resx.cal5AHES[0] * cr2a + resx.cal5AHES[1]
+    cu3     = resx.cal5AHES[0] * cr2b + resx.cal5AHES[1]
+    current = (cu1 + cu2 + cu3) / 3
+    
+    power   = current * voltage
+    
+    current_base = resx.IcoVms[0] * voltage + resx.IcoVms[1]
+    power_base   = voltage * current_base
+    
+    normal_visc  = power / power_base
+    
+    return normal_visc
