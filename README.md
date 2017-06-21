@@ -17,6 +17,7 @@ output match up.
 TO DO:
 * Attach piezo sensors in such a way as to minimise noise (i.e. from motor)
 * Re-write software to reflect new simplified method of indication
+* Figure out best method for plotting results
 * ~~Calibration scripts~~
 * ~~Central calibration storage (not as var in each class!)~~
 * ~~Redo cals (TS vs. Vms & Iemf vs.  Vms)~~
