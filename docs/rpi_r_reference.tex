@@ -1,0 +1,70 @@
+\documentclass{report}
+
+\usepackage{geometry}
+
+\geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
+
+\begin{document}
+	
+	{
+		\pagenumbering{gobble}
+		\centering
+		\Huge \noindent
+		\texttt{RPi-R}
+		\vskip2cm
+		\normalsize Using the Taylor-Couette Cell Rotational Rheometer with the Raspberry Pi
+		\vfill
+		\small Christopher Boyle \hfill \today
+		\newpage
+	}
+	
+	\tableofcontents
+	
+	\chapter{Overview}
+	
+		\section{Hardware}
+			This section describes the main hardware that comprises the rheometer; the Taylor-couette cell, the bench, the scissor lift, etc. Most (i.e. all) of this was not of my design or choosing, it was set up by the department for a previous set of students, therefore I don't know the exact reasoning behind the choices, but I'll give it a go.
+			
+			The Taylor-Couette cell is composed of a hollow glass cylinder and a perspex inner cylinder. The inner cylinder is attached to the rotor of a DC motor. The outer cylinder is attached to a scissor lift. Fluid can be placed into the gap between the cylinders and sheared - this is roughly the whole rheometer. In addition, there are sensors and other electronics which allow the hardware to be controlled by a Raspberry Pi computer, discussed in the next section.
+			
+			The cell is based upon a heavy metal base, of unsure exact function. It is a nice way to organise the rheometer, it provides a stable base, and it protects the worktop, but a bare worktop would have been fine too. On this bench sits the scissor lift holding the fixed outer cylinder, as well as a clamp stand which holds the motor (and the inner cylinder).
+			
+			The motor is a 15V DC electric motor with a 1/16th reduction gear system attached. This motor can operate nominally with a voltage supply between 4.5V and 15V.
+			
+			There are some important geometries used in the rheometry calculation; the diameters of the inner and outer cylinders. These are summarised in Table \ref{tablegeoms}.
+			
+			\begin{table}
+				\centering
+				\caption{Summary of Hardware Geometries}
+				\label{tablegeoms}
+				\begin{tabular}{| c | c | c |}
+					\hline
+					\textbf{Dimension} & \textbf{Symbol} & \textbf{Value} \\ \hline
+					Inner cylinder diameter & $\rm D_{IC}$ & m \\ \hline
+					Outer cylinder diameter (outer) & $\rm D_{OCo}$ & m \\ \hline
+					Outer cylinder diameter (inner) & $\rm D_{OCi}$ & m \\ \hline
+				\end{tabular}
+			\end{table}
+			
+			\subsection*{Known Issues}
+				\textbf{Assumption:} Couette flow in between the cylinders. \textbf{Strengths:} the cylinders have a small gap, and can be easily adjusted to minimise errors in centring. \textbf{Weaknesses:} both the inner and outer cylinders have small imperfections which could affect the flow in the cell. The glass outer cylinder is non uniform --- to be expected with glass objects. Also, the inner cylinder is slightly off centre --- slightly.
+				
+				\textbf{Assumption:} motor gear system will not greatly affect the system, or it will but in a way that can be accounted for in calibrations. \textbf{Strengths:} this should be true for any well maintained gear system. Gears only transfer movement and should not present any resistance that is not easily accounted for. \textbf{Weaknesses:} the gear system/motor sometimes acts oddle --- making strange sounds and appearing to slow despite no changes to load or to power supply. This was remedied (hopefully) by applying WD40 to the gear system.
+			
+		\section{Electronics}
+		
+		\section{Software}
+	
+	\chapter{Usage}
+	
+		\section{Using the rheometer script}
+		
+		\section{Custom usage scripts}
+	
+	\chapter{}
+	
+	\chapter{Why?}
+
+	
+
+\end{document}
