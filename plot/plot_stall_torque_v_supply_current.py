@@ -1,5 +1,5 @@
 import sys
-sys.path.append("./../../bin")
+sys.path.append("./../bin")
 from plothelp import fit_line
 
 import matplotlib.pyplot as plt

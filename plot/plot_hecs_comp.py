@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append("./../../bin")
+sys.path.append("./../bin")
 
 from filter import filter
 
