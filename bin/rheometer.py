@@ -7,6 +7,8 @@
 
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 # ☺ << This appeared here one day. I don't have the heart to delete it.
+#
+# TODO: plot results
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 packages_missing = [""]
@@ -62,6 +64,11 @@ try:
 except ImportError as ex:
     packages_missing.append("crtrandom")
 try:
+    print "\tglob.glob"
+    from glob import glob
+except ImportError as ex:
+    packages_missing.append("crtglob")
+try:
     print "\tmatplotlib"
     import matplotlib
 except ImportError as ex:
@@ -105,6 +112,8 @@ from filter import filter
 
 print "\tplot_help.py"
 from plothelp import fit_line
+from plothelp import read_logf
+from plothelp import simple_get_results
 
 try:
     import spidev
@@ -526,24 +535,7 @@ class rheometer(object):
 
             if res == 0:
                 # run test
-                self.display(["Rheometry Test (Quick)", "", ""],[""], get_input=False)
-                ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%H%M_%d%m%y", time.gmtime()))
-                
-                if not debug: self.mot.start_poll(ln)
-                
-                self.mot.set_pot(48)
-                vms = 0.066 * 48 + 2.422
-
-                for i in range(0, 150):
-                    stdscr.addstr(16, 3, "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (300 - i)))
-                    width = 40
-                    perc = int(math.ceil((i / 300.0) * width))
-                    neg_perc = int(math.floor(((300.0 - i) / 300.0) * width))
-                    stdscr.addstr(17, 3, "[{}{}]".format("#" * perc, " " * neg_perc))
-                    stdscr.refresh()
-                    time.sleep(1)
-                
-                self.mot.clean_exit()
+                ln = self.run_test()
                 
                 # calculate viscosity
                 visco_res = self.calc_visc(ln, 15)
@@ -565,6 +557,156 @@ class rheometer(object):
             # quit
             return 4
 
+    #################################################################################################################################################
+    def simple_mode(self):
+        os.system('mode con: cols=159 lines=34')
+        global stdscr
+        global debug
+        
+        blurb =     [
+                    "Welcome to RPi-R: Simple rheometry recording with a Raspberry Pi",
+                    ]
+        options =   [
+                    "> Run sample (quick)",
+                    "> Run sample (custom)",
+                    "> View results",
+                    "> Re-calibrate sensors",
+                    "> View Readme"
+                    ]
+        res = self.display(blurb, options)
+        
+        if res == 0 or res == 1:
+            # Run sample
+            
+            length = 300  # run length, in seconds
+            str_rt = 97   # strain rate, in inverse seconds
+            
+            if res == 1:
+                # Get custom settings
+                
+                # Run length
+                inp_k = False
+                extra_info = " "
+                
+                while not inp_k:
+                    blurb = ["Run sample - setup",
+                             extra_info,
+                             "Enter run length (seconds)"]
+                    options = [""]
+                    
+                    length = self.display(blurb, options, get_input=True, input_type="string")
+                    
+                    inp_k = True
+                    
+                    try:
+                        length = int(length)
+                    except:
+                        inp_k = False
+                        extra_info = "Input not recognised (must be an integer)"
+                
+                # Strain rate
+                inp_k = False
+                extra_info = " "
+                
+                while not inp_k:
+                    blurb = ["Run sample - setup",
+                             extra_info,
+                             "Enter strain rate setpoint (inverse seconds)"]
+                    options = [""]
+                    
+                    str_rt = self.display(blurb, options, get_input=True, input_type="string")
+                    
+                    inp_k = True
+                    
+                    try:
+                        str_rt = float(str_rt)
+                    except:
+                        inp_k = False
+                        extra_info = "Input not recognised (must be number)"
+                
+            ln = self.run_test(length, str_rt)
+            
+            blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
+            options = ["> Continue"]
+            res = self.display(blurbs, options)
+        
+        elif res == 2:
+            # View results
+            blurb = ["View Results - Latest"]
+            recent_logs = sorted(glob("./../logs/rheometry_test_*.csv"))
+            
+            ## Display most recent log results
+            # "| log name ... | average viscosity result ... |"
+            blurb.append("Log:      {}".format(recent_logs[-1]))
+            
+            norm_visc = simple_get_results(recent_logs[-1])
+            
+            av_norm_visc = np.average(norm_visc)
+            
+            blurb.append("Av. Visc: {}".format(av_norm_visc))
+            
+            blurb.append(" ")
+            
+            blurb.append(" More files in logs folder")
+            
+            blurb.append(" ")
+            
+            options = ["> Continue", "> Plot"]
+            
+            res = self.display(blurb, options)
+            
+            ## List older files...
+            # "> June 12"
+            # "> June 10"
+            pass
+        elif res == 3:
+            # Recalibrate
+            pass
+        elif res == 4:
+            # View readme/manual
+            blurb = ["RPi-R: Simple rheometry indicator",
+                     " ",
+                     "Power into the motor to maintain a set strain rate",
+                     "is related to the viscosity of the fluid in the cell.",
+                     "",
+                     "The zero-load power. An unknown fluid can be",
+                     "characterised by comparison."]
+            options = ["> Continue"]
+            
+            self.display(blurb, options)
+            
+    #################################################################################################################################################
+    def run_test(self, length=300, strain=48):
+        self.display(["Rheometry Test", "", ""],[""], get_input=False)
+        ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%d%m%y_%H%M", time.gmtime()))
+        
+        if not debug: self.mot.start_poll(ln)
+        
+        ## !! NOT FINAL METHOD !!
+        # Only done like this because I'm lazy 
+        # and control system has not been finished yet
+        
+        pv = strain
+        
+        self.mot.set_pot(pv)
+        vms = 0.066 * pv + 2.422
+        
+        for i in range(0, length):
+            width = 40
+            perc = int(math.ceil((i / float(length)) * width))
+            neg_perc = int(math.floor(((float(length) - i) / length) * width))
+            blurb = [
+                    "Rheometry Test", 
+                    "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (length - i)),
+                    "[{}{}]".format("#" * perc, " " * neg_perc)
+                    ]
+            options = [" "]
+            self.display(blurb, options, get_input=False)
+            time.sleep(1)
+        
+        self.mot.clean_exit()
+        return ln
+        
     #################################################################################################################################################
     def calc_visc(self, filename, fill_vol):
         self.fill_height = fill_vol / self.dxsa
@@ -752,7 +894,8 @@ if __name__ == "__main__" and True:
     r = rheometer(motor_params=mparams)
     
     if True:
-        a = r.menutree()
+        #a = r.menutree()
+        a = r.simple_mode()
         curses.nocbreak()
         stdscr.keypad(0)
         curses.echo()
