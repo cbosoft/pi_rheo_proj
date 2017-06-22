@@ -19,6 +19,9 @@
         <size>0.04</size>
         <units>m</units>
     </geometry>
+    <misc name="version">
+        <ver>0.1.2</ver>
+    </misc>
     <calibration name="dynamo">
         <coeff1>360.245152725</coeff1>
         <coeff2>-57.5772351922</coeff2>
