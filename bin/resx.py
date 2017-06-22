@@ -18,6 +18,9 @@ def parse_root(name, type):
         elif child.tag == type and type == "calibration":
             if child.attrib["name"] == name:
                 return [float(child[0].text), float(child[1].text)]
+        elif child.tag == type and type == "misc":
+            if child.attrib["name"] == name:
+                return child[0].text
 
 icor = parse_root("icor", "geometry")
 ich = parse_root("ich", "geometry")
@@ -32,6 +35,8 @@ cal_5AHES = parse_root("5AHES", "calibration")
 cal_IemfVms = parse_root("IemfVms", "calibration")
 cal_IcoVms = parse_root("IcoVms", "calibration")
 cal_TsVms = parse_root("TsVms", "calibration")
+
+version = parse_root("version", "misc")
 
 def writeout(path="./../etc/data.xml"):
     global root

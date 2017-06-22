@@ -92,18 +92,18 @@ def read_logf(log_n):
     return t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg
 
 def simple_get_results(log_n):    
-    t, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2 = plothelp.read_logf(log_n)
+    t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg = read_logf(log_n)
     
     voltage = 0.066 * pv + 2.422
     
-    cu1     = resx.cal30AHES[0] * cr + resx.cal30AHES[1]
-    cu2     = resx.cal5AHES[0] * cr2a + resx.cal5AHES[1]
-    cu3     = resx.cal5AHES[0] * cr2b + resx.cal5AHES[1]
+    cu1     = resx.cal_30AHES[0] * cr + resx.cal_30AHES[1]
+    cu2     = resx.cal_5AHES[0] * cr2a + resx.cal_5AHES[1]
+    cu3     = resx.cal_5AHES[0] * cr2b + resx.cal_5AHES[1]
     current = (cu1 + cu2 + cu3) / 3
     
     power   = current * voltage
     
-    current_base = resx.IcoVms[0] * voltage + resx.IcoVms[1]
+    current_base = resx.cal_IcoVms[0] * voltage + resx.cal_IcoVms[1]
     power_base   = voltage * current_base
     
     normal_visc  = power / power_base
