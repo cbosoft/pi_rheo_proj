@@ -6,8 +6,6 @@
 
 
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-# ☺ << This appeared here one day. I don't have the heart to delete it.
-#
 # TODO: plot results
 # =============================================== <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
@@ -125,7 +123,7 @@ else:
 
 class rheometer(object):
     # misc
-    version = "0.1.1"               # maj.typ.min
+    version = "0.1.2"               # maj.typ.min
                                     # MAJOR: Indicates release version
                                     # TYPE: What type of release? 
                                     #   0: LTS
@@ -194,7 +192,7 @@ class rheometer(object):
         stdscr.addstr(3, 3,  r"____________ _       ______        ")
         stdscr.addstr(4, 3,  r"| ___ \ ___ (_)      | ___ \                {}".format(mode_string))
         stdscr.addstr(5, 3,  r"| |_/ / |_/ /_ ______| |_/ /       ")
-        stdscr.addstr(6, 3,  r"|    /|  __/| |______|    /                 {}".format(motor_string))
+        stdscr.addstr(6, 3,  r"|    /|  __/| |______|    /                 ")
         stdscr.addstr(7, 3,  r"| |\ \| |   | |      | |\ \        ")
         stdscr.addstr(8, 3,  r"\_| \_\_|   |_|      \_| \_|       Raspberry Pi Rheometer    v{}".format(self.version))
         stdscr.addstr(10, 3, r"_____________________________________________________________________".format(self.version))
@@ -628,7 +626,7 @@ class rheometer(object):
             
             blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
             options = ["> Continue"]
-            res = self.display(blurbs, options)
+            res = self.display(blurb, options)
         
         elif res == 2:
             # View results
