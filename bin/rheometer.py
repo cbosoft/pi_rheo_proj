@@ -570,7 +570,8 @@ class rheometer(object):
                     "> Run sample (custom)",
                     "> View results",
                     "> Re-calibrate sensors",
-                    "> View Readme"
+                    "> View Readme",
+                    "> Quit"
                     ]
         res = self.display(blurb, options)
         
@@ -622,8 +623,11 @@ class rheometer(object):
                     except:
                         inp_k = False
                         extra_info = "Input not recognised (must be number)"
-                
-            ln = self.run_test(length, str_rt)
+            
+            if str_rt == 9000:
+                ln = self.run_test(length, 128, "hill")
+            else:
+                ln = self.run_test(length, str_rt)
             
             blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
             options = ["> Continue"]
@@ -673,9 +677,12 @@ class rheometer(object):
             options = ["> Continue"]
             
             self.display(blurb, options)
+        else:
+            return 4
+        return 1
             
     #################################################################################################################################################
-    def run_test(self, length=300, strain=48):
+    def run_test(self, length=300, strain=48, shape="flat"):
         self.display(["Rheometry Test", "", ""],[""], get_input=False)
         ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%d%m%y_%H%M", time.gmtime()))
         
@@ -687,10 +694,15 @@ class rheometer(object):
         
         pv = strain
         
-        self.mot.set_pot(pv)
-        vms = 0.066 * pv + 2.422
+        if shape == "flat":
+            self.mot.set_pot(pv)
+        elif shape == "hill":
+            self.mot.set_pot(0)
+            gradient = 1  # math.ceil(128/length)
+
         
         for i in range(0, length):
+            vms = 0.066 * self.mot.pot.lav + 2.422
             width = 40
             perc = int(math.ceil((i / float(length)) * width))
             neg_perc = int(math.floor(((float(length) - i) / length) * width))
@@ -702,6 +714,11 @@ class rheometer(object):
             options = [" "]
             self.display(blurb, options, get_input=False)
             time.sleep(1)
+            if shape == "hill":
+                if self.mot.pot.lav >= 128 or self.mot.pot.lav < 0:
+                    gradient = -gradient
+                
+                self.mot.set_pot(self.mot.pot.lav + gradient)
         
         self.mot.clean_exit()
         return ln

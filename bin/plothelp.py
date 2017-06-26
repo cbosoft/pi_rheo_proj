@@ -82,10 +82,8 @@ def read_logf(log_n):
     T       =   np.array(datf['T'], np.float64)
     Vpz1    =   np.array(datf['Vpz1'], np.float64)
     Vpz2    =   np.array(datf['Vpz2'], np.float64)
-    Vpzbg   =   [0.0] * len(t)
-    Vadcbg  =   [0.0] * len(t)
-    #Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
-    #Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
+    Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
+    Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
     
     st = t - t[0]
     
@@ -108,20 +106,21 @@ def simple_get_results(log_n):
     
     normal_visc  = power / power_base
     
-    return normal_visc
+    return power / dr  # normal_visc
     
 def simple_plot(x, y, outp, xlab="", ylab="", leg=None):
-    if leg == None: leg = [""]
     f = plt.figure()
     ax = f.add_subplot(111)
+    
     ax.plot(x, y)
+    
     ax.set_xlabel(xlab)
     ax.set_ylabel(ylab)
-    plt.legend(leg)
+    
+    if not leg == None: plt.legend(leg)
     plt.savefig(outp)
     
 def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
-    if leg == None: leg = [""] * len(ys)
     f = plt.figure()
     ax = f.add_subplot(111)
     
@@ -133,5 +132,21 @@ def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
     ax.set_xlabel(xlab)
     ax.set_ylabel(ylab)
     
-    plt.legend(leg)
+    if not leg == None: plt.legend(leg)
     plt.savefig(outp)
+    
+def multi_multi_plot(x, ys, outp, xlab="", ylab=None, leg=None, filtering=False):
+    f = plt.figure(figsize=(10,(5*len(ys))))
+    sbp = (len(ys) * 100) + 10
+    
+    for i in range(0, len(ys)):
+        ax = f.add_subplot(sbp + i + 1)
+        yp = ys[i]
+        if filtering: yp = filter(x, ys[i], method="butter", A=2, B=0.001)
+        ax.plot(x, yp)
+        ax.set_xlabel(xlab)
+        ax.set_ylabel(ylab[i])
+        if not leg == None: plt.legend([leg[i]])
+        
+    plt.savefig(outp)
+    
