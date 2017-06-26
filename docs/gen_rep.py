@@ -10,7 +10,7 @@ import resx
 ## plot figures
 
 # get log file to plot
-log_file = sorted(glob("./../logs/rheometry*.csv"))[0]
+log_file = sorted(glob("./../logs/rheometry*.csv"))[-3]
 dt_ind = log_file[-15:-4]
 
 short_date = dt_ind[0:6]
@@ -37,14 +37,15 @@ ph.multi_plot(st, [norm_visc, norm_visc_filt], "viscometry.png".format(dt_ind), 
 # 3rd plot - piezo check
 vraw = Vpz1
 vcorr = vraw - Vpzbg - Vadcbg
-vcorr = vraw - Vpz2 # temp
+#vcorr = vraw - Vpz2 # temp
 vfilc = ft(t, vcorr, method="gaussian")
 
 ph.multi_plot(st, [vraw, vcorr, vfilc], "./general_piezo.png".format(dt_ind), xlab="Time, s", ylab="Piezo (1) signal, V", leg=["Raw signal", "Corrected signal", "Corrected and filtered signal"])
 
 # 4th plot - overall check
-ph.multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_visc_filt[-1], vfilc / vfilc[-1]], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab="Normalised signals, unitless", leg=["Speeds", "Viscosity", "Piezo"])
+ph.multi_multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_visc_filt[-1], vfilc / vfilc[-1], pv], "norm_signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed (Norm'd)", "Viscosity (Norm'd)", "Piezo Voltage (Norm'd)", "Strain (Norm'd)"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 
+ph.multi_multi_plot(st, [filt_speeds, norm_visc_filt, vfilc, pv], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed, RPM", "Viscosity Ref", "Piezo Voltage, V", "Strain Ref"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 ## create report tex
 
 templ_f = open("./auto_rep_template.tex", "r")
