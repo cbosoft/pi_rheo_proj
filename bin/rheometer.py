@@ -11,6 +11,12 @@
 
 packages_missing = [""]
 print "Loading packages.."
+
+print "\tplot_help.py"
+from plothelp import fit_line
+from plothelp import read_logf
+from plothelp import simple_get_results
+
 try:
     print "\ttime"
     import time
@@ -44,6 +50,8 @@ except ImportError as ex:
 try:
     print "\tmath"
     import math
+    from math import sin
+    from math import cos
 except ImportError as ex:
     packages_missing.append("crtmath")
 try:
@@ -624,11 +632,12 @@ class rheometer(object):
                     inp_k = True
                     
                     try:
-                        t = sp.Symbol('t')
+                        t = 2
                         gd = sp.Symbol('gd')
                         expr = pe(gd_expr) - gd
                         val = sp.solve(expr, gd)
                         if len(val) > 1: raise Exception("you dun entered it rong lol")
+                        a = eval(str(sp.solve(expr, gd)[0]))
                     except:
                         inp_k = False
                         extra_info = "Input not recognised (ensure it is a function of 't', or a constant)"
@@ -734,7 +743,7 @@ class rheometer(object):
         gd = sp.Symbol('gd')
         
         for i in range(0, length):
-            t = copy.copy(i)
+            t = float(copy.copy(i))
             
             expr = pe(gd_expr) - gd
             
@@ -749,10 +758,10 @@ class rheometer(object):
             neg_perc = int(math.floor(((float(length) - i) / length) * width))
             blurb = [
                     "Rheometry Test", 
-                    "Supply voltage set to: _ _ _ {:.3f}V".format(vms),
-                    "Target strain rate: _ _ _ _ _{}".format(gd_val),
-                    "Value sent to potentiometer: {}".format(self.mot.pot.lav),
-                    "Time remaining: _ _ _ _ _ _ _{}s   ".format(length - i),
+                    "Supply voltage set to:_ _ _ _ _ _ _ _ {:.3f} V".format(vms),
+                    "Target strain rate: _ _ _ _ _ _ _ _ _ {:.3f} (s^-1)".format(gd_val),
+                    "Value sent to potentiometer:_ _ _ _ _ {}".format(self.mot.pot.lav),
+                    "Time remaining: _ _ _ _ _ _ _ _ _ _ _ {}s   ".format(length - i),
                     "[{}{}]".format("#" * perc, " " * neg_perc)
                     ]
             options = [" "]
@@ -811,7 +820,7 @@ class rheometer(object):
         desired_speed = value * (self.ro - self.ri) / self.ri  # in rads
         desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
         if self.mot.control_stopped:
-            set_pv = int((desired_speed - self.spf[1]) / self.spf[0])
+            set_pv = int((desired_speed - resx.cal_Vnl[1]) / resx.cal_Vnl[0])
             self.mot.set_pot(set_pv)
         else:
             self.mot.update_setpoint(desired_speed)
@@ -968,9 +977,9 @@ if __name__ == "__main__":
             res = 0
             while res != 4:
                 if menu_mode_simple:
-                    a = r.simple_mode(initsel=res)
+                    res = r.simple_mode(initsel=res)
                 else:
-                    a = r.complex_mode(initsel=res)
+                    res = r.complex_mode(initsel=res)
         except:
             pass
         else:
