@@ -226,6 +226,8 @@ class motor(object):
         self.tims.append(tim)
 
     def set_pot(self, value):
+        if value < 0: value = 0
+        if value > 128: value = 128
         self.pot.set_resistance(int(value))
                    
     def clean_exit(self):
