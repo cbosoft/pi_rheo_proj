@@ -72,6 +72,12 @@ try:
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
 try:
+    print "\tSymPy"
+    from sympy.parsing.sympy_parser import parse_expr as pe
+    import sympy as sp
+except ImportError as ex:
+    packages_missing.append("pipsympy")
+try:
     print "\tpython-tk"
     import _tkinter
 except ImportError as ex:
@@ -225,7 +231,7 @@ class rheometer(object):
             res = stdscr.getch()
         elif get_input and input_type == "string":
             curses.echo()
-            res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 5, 5)
+            res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 5, 15)
         else:
             res = 10
 
@@ -579,7 +585,7 @@ class rheometer(object):
             # Run sample
             
             length = 300  # run length, in seconds
-            str_rt = 97   # strain rate, in inverse seconds
+            gd_expr = "48"  # strain rate, in inverse seconds
             
             if res == 1:
                 # Get custom settings
@@ -590,6 +596,10 @@ class rheometer(object):
                 
                 while not inp_k:
                     blurb = ["Run sample - setup",
+                             "",
+                             "Length:     --",
+                             "Function:   --",
+                             "",
                              extra_info,
                              "Enter run length (seconds)"]
                     options = [""]
@@ -603,31 +613,48 @@ class rheometer(object):
                     except:
                         inp_k = False
                         extra_info = "Input not recognised (must be an integer)"
-                
-                # Strain rate
+                        
+                # strain rate function
                 inp_k = False
                 extra_info = " "
                 
                 while not inp_k:
                     blurb = ["Run sample - setup",
+                             "",
+                             "Length:     {}s".format(length),
+                             "Function:   --",
+                             "",
                              extra_info,
-                             "Enter strain rate setpoint (inverse seconds)"]
+                             "Enter strain rate function (inverse seconds)",
+                             "",
+                             "Input in form of an expression (gamma dot = ...)"]
                     options = [""]
                     
-                    str_rt = self.display(blurb, options, get_input=True, input_type="string")
+                    gd_expr = self.display(blurb, options, get_input=True, input_type="string")
                     
                     inp_k = True
                     
                     try:
-                        str_rt = float(str_rt)
+                        t = sp.Symbol('t')
+                        gd = sp.Symbol('gd')
+                        expr = pe(gd_expr) - gd
+                        val = sp.solve(expr, gd)
+                        if len(val) > 1: raise Exception("you dun entered it rong lol")
                     except:
                         inp_k = False
-                        extra_info = "Input not recognised (must be number)"
+                        extra_info = "Input not recognised (ensure it is a function of 't', or a constant)"
             
-            if str_rt == 9000:
-                ln = self.run_test(length, 128, "hill")
-            else:
-                ln = self.run_test(length, str_rt)
+            blurb = ["Run sample - setup",
+                     "",
+                     "Length:    {}s".format(length),
+                     "Function:  gd = {}".format(gd_expr),
+                     ""]
+            options = ["> Continue", "> Quit"]
+            res = self.display(blurb, options)
+            
+            if res == 1: return 1
+            
+            ln = self.run_test(length, gd_expr)
             
             blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
             options = ["> Continue"]
@@ -646,7 +673,7 @@ class rheometer(object):
             
             av_norm_visc = np.average(norm_visc)
             
-            blurb.append("Av. Visc: {}".format(av_norm_visc))
+            #blurb.append("Av. Visc: {}".format(av_norm_visc))
             
             blurb.append(" ")
             
@@ -672,8 +699,9 @@ class rheometer(object):
                      "Power into the motor to maintain a set strain rate",
                      "is related to the viscosity of the fluid in the cell.",
                      "",
-                     "The zero-load power. An unknown fluid can be",
-                     "characterised by comparison."]
+                     "An unknown fluid can be characterised by comparing",
+                     "the power draw of the loadless cell to the draw of the",
+                     "loaded cell."]
             options = ["> Continue"]
             
             self.display(blurb, options)
@@ -682,26 +710,23 @@ class rheometer(object):
         return 1
             
     #################################################################################################################################################
-    def run_test(self, length=300, strain=48, shape="flat"):
+    def run_test(self, length=300, gd_expr="48"):
         self.display(["Rheometry Test", "", ""],[""], get_input=False)
         ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%d%m%y_%H%M", time.gmtime()))
         
         if not debug: self.mot.start_poll(ln)
         
-        ## !! NOT FINAL METHOD !!
-        # Only done like this because I'm lazy 
-        # and control system has not been finished yet
-        
-        pv = strain
-        
-        if shape == "flat":
-            self.mot.set_pot(pv)
-        elif shape == "hill":
-            self.mot.set_pot(0)
-            gradient = 1  # math.ceil(128/length)
-
+        gd = sp.Symbol('gd')
         
         for i in range(0, length):
+            t = copy.copy(i)
+            
+            expr = pe(gd_expr) - gd
+            
+            gd_val = eval(str(sp.solve(expr, gd)[0]))
+            
+            self.mot.set_pot(gd_val)
+            
             vms = 0.066 * self.mot.pot.lav + 2.422
             width = 40
             perc = int(math.ceil((i / float(length)) * width))
@@ -714,11 +739,6 @@ class rheometer(object):
             options = [" "]
             self.display(blurb, options, get_input=False)
             time.sleep(1)
-            if shape == "hill":
-                if self.mot.pot.lav >= 128 or self.mot.pot.lav < 0:
-                    gradient = -gradient
-                
-                self.mot.set_pot(self.mot.pot.lav + gradient)
         
         self.mot.clean_exit()
         return ln
