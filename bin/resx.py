@@ -36,6 +36,8 @@ cal_IemfVms = parse_root("IemfVms", "calibration")
 cal_IcoVms = parse_root("IcoVms", "calibration")
 cal_TsVms = parse_root("TsVms", "calibration")
 
+cal_Vnl = [5.130, 15.275]
+
 version = parse_root("version", "misc")
 
 def writeout(path="./../etc/data.xml"):
