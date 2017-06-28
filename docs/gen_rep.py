@@ -10,7 +10,7 @@ import resx
 ## plot figures
 
 # get log file to plot
-log_file = sorted(glob("./../logs/rheometry*.csv"))[-3]
+log_file = sorted(glob("./../logs/rheometry*.csv"))[-1]
 dt_ind = log_file[-15:-4]
 
 short_date = dt_ind[0:6]
