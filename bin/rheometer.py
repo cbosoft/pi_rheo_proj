@@ -180,7 +180,7 @@ class rheometer(object):
                 summ_str += "input data"
         else:
             summ_str += "No input taken"
-        print summ_str
+        #print summ_str
         
         global stdscr
         global debug
@@ -928,7 +928,7 @@ if __name__ == "__main__" and True:
 
     # start up rheometer
     r = rheometer(motor_params=mparams)
-    
+       
     if True:
         #a = r.menutree()
         a = r.simple_mode()
