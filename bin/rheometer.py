@@ -162,26 +162,10 @@ class rheometer(object):
     motor_running = False
     
     def __init__(self, motor_params={'log_dir':'./logs'}):
-        print "Initialising motor..."
+        #print "Initialising motor..."
         self.mot = motor(**motor_params)
-            
-    def get_rheometry(self, strain_rate, run_length):
-        pass
     
     def display(self, blurb, options, selected=0, get_input=True, options_help="NONE", input_type="enum"):
-        
-        summ_str = "Update screen:\n\t"
-        summ_str += "{}...\n\t".format(blurb[0])
-        if get_input:
-            summ_str += "Input: "
-            if input_type == "enum":
-                summ_str += "listed choice"
-            else:
-                summ_str += "input data"
-        else:
-            summ_str += "No input taken"
-        #print summ_str
-        
         global stdscr
         global debug
         stdscr.clear()
@@ -259,7 +243,7 @@ class rheometer(object):
         return res
         
     #################################################################################################################################################
-    def menutree(self, initsel=0):
+    def complex_mode(self, initsel=0):
         os.system('mode con: cols=159 lines=34')
         global stdscr
         global debug
@@ -563,7 +547,7 @@ class rheometer(object):
             return 4
 
     #################################################################################################################################################
-    def simple_mode(self):
+    def simple_mode(self, initsel=0):
         os.system('mode con: cols=159 lines=34')
         global stdscr
         global debug
@@ -579,7 +563,7 @@ class rheometer(object):
                     "> View Readme",
                     "> Quit"
                     ]
-        res = self.display(blurb, options)
+        res = self.display(blurb, options, selected=initsel)
         
         if res == 0 or res == 1:
             # Run sample
@@ -599,6 +583,7 @@ class rheometer(object):
                              "",
                              "Length:     --",
                              "Function:   --",
+                             "Log tag:    --",
                              "",
                              extra_info,
                              "Enter run length (seconds)"]
@@ -623,11 +608,15 @@ class rheometer(object):
                              "",
                              "Length:     {}s".format(length),
                              "Function:   --",
+                             "Log tag:    --",
                              "",
                              extra_info,
                              "Enter strain rate function (inverse seconds)",
                              "",
-                             "Input in form of an expression (gamma dot = ...)"]
+                             "Input in form of an expression (gamma dot = ...)",
+                             "NOTE:",
+                             "\tMinimum value =   5 (s^-1)",
+                             "\tMaximum value = 250 (s^-1)"]
                     options = [""]
                     
                     gd_expr = self.display(blurb, options, get_input=True, input_type="string")
@@ -644,17 +633,43 @@ class rheometer(object):
                         inp_k = False
                         extra_info = "Input not recognised (ensure it is a function of 't', or a constant)"
             
+            # Run tag
+            inp_k = False
+            extra_info = " "
+            
+            while not inp_k:
+                blurb = ["Run sample - setup",
+                         "",
+                         "Length:     {}s".format(length),
+                         "Function:   gd = {} (s^-1)".format(gd_expr),
+                         "Log tag:    --",
+                         "",
+                         extra_info,
+                         "Enter identifier for the run: (test material composition etc)"]
+                options = [""]
+                
+                tag = self.display(blurb, options, get_input=True, input_type="string")
+                
+                inp_k = True
+                
+                try:
+                    tag = str(tag)
+                except:
+                    inp_k = False
+                    extra_info = "Input not recognised (how on earth did you input a non-string?!)"
+            
             blurb = ["Run sample - setup",
                      "",
                      "Length:    {}s".format(length),
-                     "Function:  gd = {}".format(gd_expr),
+                     "Function:  gd = {} (s^-1)".format(gd_expr),
+                     "Log tag:    \"{}\"".format(tag),
                      ""]
             options = ["> Continue", "> Quit"]
             res = self.display(blurb, options)
             
             if res == 1: return 1
             
-            ln = self.run_test(length, gd_expr)
+            ln = self.run_test(tag, length, gd_expr)
             
             blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
             options = ["> Continue"]
@@ -710,9 +725,9 @@ class rheometer(object):
         return 1
             
     #################################################################################################################################################
-    def run_test(self, length=300, gd_expr="48"):
+    def run_test(self, tag, length, gd_expr):
         self.display(["Rheometry Test", "", ""],[""], get_input=False)
-        ln = "./../logs/rheometry_test_{}.csv".format(time.strftime("%d%m%y_%H%M", time.gmtime()))
+        ln = "./../logs/rheometry_test_{}_{}.csv".format(tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
         
         if not debug: self.mot.start_poll(ln)
         
@@ -725,7 +740,8 @@ class rheometer(object):
             
             gd_val = eval(str(sp.solve(expr, gd)[0]))
             
-            self.mot.set_pot(gd_val)
+            #self.mot.set_pot(gd_val)
+            self.set_strain_rate(gd_val)
             
             vms = 0.066 * self.mot.pot.lav + 2.422
             width = 40
@@ -733,7 +749,10 @@ class rheometer(object):
             neg_perc = int(math.floor(((float(length) - i) / length) * width))
             blurb = [
                     "Rheometry Test", 
-                    "Supply voltage set to: {:.3f}V\tTime remaining: {}s   ".format(vms, (length - i)),
+                    "Supply voltage set to: _ _ _ {:.3f}V".format(vms),
+                    "Target strain rate: _ _ _ _ _{}".format(gd_val),
+                    "Value sent to potentiometer: {}".format(self.mot.pot.lav),
+                    "Time remaining: _ _ _ _ _ _ _{}s   ".format(length - i),
                     "[{}{}]".format("#" * perc, " " * neg_perc)
                     ]
             options = [" "]
@@ -910,7 +929,7 @@ class rheometer(object):
         else:
             self.mot.deactuate()
         
-if __name__ == "__main__" and True:
+if __name__ == "__main__":
     # setup curses window
     #rows, columns = os.popen('stty size', 'r').read().split()
     bigscr = curses.initscr()
@@ -928,10 +947,18 @@ if __name__ == "__main__" and True:
 
     # start up rheometer
     r = rheometer(motor_params=mparams)
-       
-    if True:
-        #a = r.menutree()
-        a = r.simple_mode()
+    
+    menu_mode_simple = True
+    catch_mode_on = True
+    
+    if "-c" in sys.argv: menu_mode_simple = False # complex calculation mode
+    if "-r" in sys.argv: catch_mode_on = False # raw operation, errors are not caught.
+    
+    if not catch_mode_on:
+        if menu_mode_simple:
+            a = r.simple_mode()
+        else:
+            a = r.complex_mode()
         curses.nocbreak()
         stdscr.keypad(0)
         curses.echo()
@@ -940,7 +967,10 @@ if __name__ == "__main__" and True:
         try:
             res = 0
             while res != 4:
-                res = r.menutree(initsel=res)
+                if menu_mode_simple:
+                    a = r.simple_mode(initsel=res)
+                else:
+                    a = r.complex_mode(initsel=res)
         except:
             pass
         else:
@@ -950,32 +980,3 @@ if __name__ == "__main__" and True:
             stdscr.keypad(0)
             curses.echo()
             curses.endwin()
-elif __name__ == "__main__" and False:
-    datf = pd.read_csv("./../logs/sensor_calibration_100417.csv")
-    r = rheometer()
-    cr = np.array(datf['cr'], np.float64)
-    cra = np.array(datf['cr2a'], np.float64)
-    crb = np.array(datf['cr2b'], np.float64)
-
-    vms = np.array(datf['pv'], np.float64)
-
-    cua = {0   : 0.51, 
-           8   : 0.53, 
-           16  : 0.54, 
-           24  : 0.56, 
-           32  : 0.57, 
-           40  : 0.59, 
-           48  : 0.61, 
-           56  : 0.62, 
-           64  : 0.64, 
-           72  : 0.65, 
-           80  : 0.67, 
-           88  : 0.68, 
-           96  : 0.7, 
-           104 : 0.71, 
-           112 : 0.73, 
-           120 : 0.74, 
-           128 : 0.76}
-
-    cal5 = r.cal_5ahes(cra, crb, vms, cua)
-    print cal5
