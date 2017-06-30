@@ -20,7 +20,7 @@
         <units>m</units>
     </geometry>
     <misc name="version">
-        <ver>0.1.2</ver>
+        <ver>0.1.3</ver>
     </misc>
     <calibration name="dynamo">
         <coeff1>360.245152725</coeff1>
