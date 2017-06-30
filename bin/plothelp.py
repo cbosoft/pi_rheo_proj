@@ -82,17 +82,40 @@ def read_logf(log_n):
     fdr     =   np.array(datf['fdr'], np.float64)
     fcr     =   np.array(datf['fcr'], np.float64)
     T       =   np.array(datf['T'], np.float64)
-    Vpz1    =   np.array(datf['Vpz1'], np.float64)
-    Vpz2    =   np.array(datf['Vpz2'], np.float64)
-    Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
-    Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
+    
+    Vpz1    =   [0.0] * len(t)
+    try:
+        Vpz1    =   np.array(datf['Vpz1'], np.float64)
+    except:
+        pass
+    
+    Vpz2    =   [0.0] * len(t)
+    try:
+        Vpz2    =   np.array(datf['Vpz2'], np.float64)
+    except:
+        pass
+    
+    Vpzbg    =   [0.0] * len(t)
+    try:
+        Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
+    except:
+        pass
+    
+    Vadcbg    =   [0.0] * len(t)
+    try:
+        Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
+    except:
+        pass
     
     st = t - t[0]
     
-    return t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg
+    #rheometry_test_TAG_DATE_TIME.csv
+    parts = log_n.split("_")
+    
+    return t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, parts[2]
 
 def simple_get_results(log_n):    
-    t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg = read_logf(log_n)
+    t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, tag = read_logf(log_n)
     
     voltage = 0.066 * pv + 2.422
     
