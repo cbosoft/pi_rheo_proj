@@ -58,7 +58,7 @@ ph.multi_multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_vi
 ph.multi_multi_plot(st, [filt_speeds, norm_visc_filt, vfilc, pv], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed, RPM", "Viscosity Ref", "Piezo Voltage, V", "Strain Ref"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 
 ############################################################################################################################
-l = 10 # number of logs to try to compare
+l = 5 # number of logs to try to compare
 if len(log_files) < l: l = len(logs)
 print "comparing last {} logs".format(l)
 
