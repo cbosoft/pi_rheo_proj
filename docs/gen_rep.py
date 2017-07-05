@@ -58,29 +58,58 @@ ph.multi_multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_vi
 ph.multi_multi_plot(st, [filt_speeds, norm_visc_filt, vfilc, pv], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed, RPM", "Viscosity Ref", "Piezo Voltage, V", "Strain Ref"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 
 ############################################################################################################################
-l = 5 # number of logs to try to compare
+l = 6 # number of logs to try to compare
 if len(log_files) < l: l = len(logs)
 print "comparing last {} logs".format(l)
+
+import random
+from copy import copy
+import numpy as np
+
+colours = list()
+colours.append([0, 0, 1, 1]) # blue
+colours.append([0, 1, 0, 1]) # green
+colours.append([0, 0.5, 0.5, 1]) # cyan
+colours.append([1, 0, 0, 1])
+colours.append([1, 0, 1, 1])
+colours.append([1, 1, 0, 1])
+colours.append([1, 0.5, 0, 1])
+colours.append([0, 0.5, 0.5, 1])
+colours.append([1, 0, 0, 1])
+colours.append([1, 0, 0, 1])
+
+symbols = "ovs*xD^+8.hovs*xD^+8.hovs*xD^+8.h"
 
 f = plt.figure(figsize=(8,8))
 ax = f.add_subplot(111)
 
 leg = list()
-for f in log_files[-(l + 1):-1]:
+idx = 0
+for f in log_files[-(l):]:
     print "  plotting {}".format(f)
     t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, tag = ph.read_logf(f)
     leg.append(tag)
     vraw = Vpz1
-    vcorr = vraw - Vpzbg - Vadcbg
-    vfilc = ft(t, vcorr, method="gaussian")
+    vcorr = vraw # - Vpzbg - Vadcbg
+    vfilc = ft(t, vcorr, method="butter", A=2, B=0.01)
     
     #ax.plot(st, vraw, color=(0, 0, 1, 0.75))
     #ax.plot(st, vcorr, color=(0, 0, 1, 0.5))
-    ax.plot(st, vfilc)
-
+    full = colours[idx]
+    trans = copy(full)
+    trans[3] = 0.25
+    #ax.plot(st, vcorr, color=trans)
+    av = np.average(vfilc[-100:])
+    ax.plot(st[0:-1:10], vfilc[0:-1:10], color=full, marker=symbols[idx], linestyle='None', label="{}: {:.3f}".format(leg[idx], av))
+    av = [av] * 2
+    ax.plot([st[0], st[-1]], av, color=full)
+    
+    idx += 1
+plt.ylim(ymin=1.65)
+#ax.set_ylim((1.5, 2))
 ax.set_xlabel("Time, s")
 ax.set_ylabel("Piezo signal, V")
-plt.legend(leg)
+plt.legend()
 plt.savefig("./logs_piezo_compare.png")
 
 
