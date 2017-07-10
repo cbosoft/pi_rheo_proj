@@ -117,7 +117,7 @@ if len(packages_missing) > 1:
         for p in packages_missing:
             print "\t{}".format(p[3:])
         print "\nIs there a typo in the rheometer script? Broken python install?"
-    print "Press any key to continue"
+    print "Press enter to continue"
     raw_input()
     exit()
 
@@ -747,7 +747,8 @@ class rheometer(object):
         self.display(["Rheometry Test", "", ""],[""], get_input=False)
         ln = "./../logs/rheometry_test_{}_{}.csv".format(tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
         
-        rec.start_recording(ln[:-3] + "wav")
+        recrdr = rec.recorder()
+        recrdr.start_recording(ln[:-3] + "wav")
         
         if not debug: self.mot.start_poll(ln)
         
@@ -779,7 +780,7 @@ class rheometer(object):
             self.display(blurb, options, get_input=False)
             time.sleep(1)
         
-        rec.stop_recording()
+        recrdr.stop_recording()
         self.mot.clean_exit()
         return ln
     #################################################################################################################################################

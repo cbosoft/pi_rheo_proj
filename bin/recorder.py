@@ -16,7 +16,7 @@ class recorder(object):
         self.recording = True
         self.outname = output_name
         td.start_new_thread(self.rec_str, tuple())
-        self.stream = audio.open(format=pyaudio.paInt16, channels=self.channels,
+        self.stream = self.audio.open(format=pyaudio.paInt16, channels=self.channels,
                 rate=self.rate, input=True,
                 frames_per_buffer=self.chunk)
         self.frames = []
@@ -34,8 +34,8 @@ class recorder(object):
         self.audio.terminate()
         
         waveFile = wave.open(self.outname, 'wb')
-        waveFile.setnchannels(CHANNELS)
-        waveFile.setsampwidth(audio.get_sample_size(FORMAT))
-        waveFile.setframerate(RATE)
-        waveFile.writeframes(b''.join(frames))
+        waveFile.setnchannels(self.channels)
+        waveFile.setsampwidth(self.audio.get_sample_size(pyaudio.paInt16))
+        waveFile.setframerate(self.rate)
+        waveFile.writeframes(b''.join(self.frames))
         waveFile.close()
