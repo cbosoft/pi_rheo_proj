@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 ############################################################################################################################
 print "process latest log file"
-log_files = sorted(glob("./../logs/rheometry*.csv"))
+log_files = sorted(glob("./../logs/rheometry_test_c*.csv"))
 log_file = log_files[-1]
 dt_ind = log_file[-15:-4]
 
@@ -58,8 +58,8 @@ ph.multi_multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_vi
 ph.multi_multi_plot(st, [filt_speeds, norm_visc_filt, vfilc, pv], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed, RPM", "Viscosity Ref", "Piezo Voltage, V", "Strain Ref"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 
 ############################################################################################################################
-l = 6 # number of logs to try to compare
-if len(log_files) < l: l = len(logs)
+l = 8 # number of logs to try to compare
+if len(log_files) < l: l = len(log_files)
 print "comparing last {} logs".format(l)
 
 import random
@@ -80,7 +80,7 @@ colours.append([1, 0, 0, 1])
 
 symbols = "ovs*xD^+8.hovs*xD^+8.hovs*xD^+8.h"
 
-f = plt.figure(figsize=(8,8))
+f = plt.figure(figsize=(16,16))
 ax = f.add_subplot(111)
 
 leg = list()
@@ -105,11 +105,11 @@ for f in log_files[-(l):]:
     ax.plot([st[0], st[-1]], av, color=full)
     
     idx += 1
-plt.ylim(ymin=1.65)
+#plt.ylim(ymin=1.65)
 #ax.set_ylim((1.5, 2))
 ax.set_xlabel("Time, s")
 ax.set_ylabel("Piezo signal, V")
-plt.legend()
+plt.legend(loc=3)
 plt.savefig("./logs_piezo_compare.png")
 
 
