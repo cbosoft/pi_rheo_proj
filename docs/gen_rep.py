@@ -8,6 +8,7 @@ from filter import filter as ft
 import resx
 import matplotlib
 matplotlib.use('Agg')#
+import numpy as np
 import matplotlib.pyplot as plt
 
 ## plot figures
@@ -25,7 +26,7 @@ long_date = "{}.{}.{}".format(short_date[:2], short_date[2:4], short_date[4:])
 long_time = "{}:{}".format(short_time[0:2], short_time[2:])
 
 ############################################################################################################################
-print "  reading log..."
+print "  reading log \"{}\"".format(log_file)
 t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, logtag = ph.read_logf(log_file)
 
 ############################################################################################################################
@@ -33,29 +34,41 @@ print "  plotting speed check"
 speeds = resx.cal_dynamo[0] * dr + resx.cal_dynamo[1]
 filt_speeds = ft(st, speeds, method="gaussian")
 
-ph.multi_plot(st, [speeds, filt_speeds], "strain_check.png".format(dt_ind), xlab="Time, s", ylab="Speed, RPM", leg=["Raw", "Filtered"])
+ph.multi_plot(st, [speeds, filt_speeds], "../graphics/strain_check.png".format(dt_ind), xlab="Time, s", ylab="Speed, RPM", leg=["Raw", "Filtered"])
 
 ############################################################################################################################
 print "  plotting rheometry check"
 norm_visc = ph.simple_get_results(log_file)
 norm_visc_filt = ft(st, norm_visc, method="gaussian")
 
-ph.multi_plot(st, [norm_visc, norm_visc_filt], "viscometry.png".format(dt_ind), xlab="Time, s", ylab="Normalised Rheometry, unitless", leg=["Raw", "Filtered"])
+ph.multi_plot(st, [norm_visc, norm_visc_filt], "../graphics/viscometry.png".format(dt_ind), xlab="Time, s", ylab="Normalised Rheometry, unitless", leg=["Raw", "Filtered"])
 
 ############################################################################################################################
 print "  plotting piezo results"
-vraw = Vpz1
-vcorr = vraw - Vpzbg - Vadcbg
-#vcorr = vraw - Vpz2 # temp
-vfilc = ft(t, vcorr, method="gaussian")
+#vraw = Vpz1
+#vcorr = vraw - Vpzbg - Vadcbg # doesn't actually work - better results without
+vfilc = ft(t, Vpz1, method="gaussian")
 
-ph.multi_plot(st, [vraw, vcorr, vfilc], "./general_piezo.png".format(dt_ind), xlab="Time, s", ylab="Piezo (1) signal, V", leg=["Raw signal", "Corrected signal", "Corrected and filtered signal"])
+vdiff = [0.0]
+
+vdiff.extend(np.diff(vfilc))
+
+#ph.multi_plot(st, [vraw, vcorr, vfilc], "../graphics/general_piezo.png".format(dt_ind), xlab="Time, s", ylab="Piezo (1) signal, V", leg=["Raw signal", "Corrected signal", "Corrected and filtered signal"])
 
 ############################################################################################################################
 print "  plotting overall comparison"
-ph.multi_multi_plot(st, [filt_speeds / filt_speeds[-1], norm_visc_filt / norm_visc_filt[-1], vfilc / vfilc[-1], pv], "norm_signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed (Norm'd)", "Viscosity (Norm'd)", "Piezo Voltage (Norm'd)", "Strain (Norm'd)"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
 
-ph.multi_multi_plot(st, [filt_speeds, norm_visc_filt, vfilc, pv], "signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Speed, RPM", "Viscosity Ref", "Piezo Voltage, V", "Strain Ref"], leg=["Speeds", "Viscosity", "Piezo", "Strain"])
+# get list of minimums in visc indicator plot
+mins_idx = ph.get_significant_minimums(norm_visc_filt)
+mins_x = list()
+mins_y = list()
+for i in mins_idx:
+    mins_x.append(st[i])
+    #mins_y.append(norm_visc_filt[i])
+
+cu = resx.get_current(cr, cr2a, cr2b)
+
+ph.multi_multi_plot(st, [norm_visc_filt, filt_speeds, vfilc, vdiff, cu], "./../graphics/signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Viscosity Ref", "Speed, RPM", "Piezo Voltage, V", "Derivative Piezo Signal, V/s", "Current, A"], highlights=True, hl_x=mins_x)
 
 ############################################################################################################################
 l = 8 # number of logs to try to compare
@@ -110,7 +123,7 @@ for f in log_files[-(l):]:
 ax.set_xlabel("Time, s")
 ax.set_ylabel("Piezo signal, V")
 plt.legend(loc=3)
-plt.savefig("./logs_piezo_compare.png")
+plt.savefig("./../graphics/logs_piezo_compare.png")
 
 
 ############################################################################################################################
