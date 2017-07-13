@@ -80,6 +80,11 @@ try:
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
 try:
+    print "\tpyaudio"
+    import pyaudio as pa
+except ImportError as ex:
+    packages_missing.append("pippyaudio")
+try:
     print "\tSymPy"
     from sympy.parsing.sympy_parser import parse_expr as pe
     import sympy as sp
@@ -95,23 +100,23 @@ if len(packages_missing) > 1:
     print "!! -- Packages missing -- !!"
     for i in range(1, len(packages_missing)): 
         print "\t" + packages_missing[i][3:]
-    print "Automatically trying to obtain missing packages...\n"
-    for i in range(1, len(packages_missing)):
-        if packages_missing[i][:3] == "apt":
-            os.system("sudo apt-get install {}".format(packages_missing[i][3:]))
-        elif packages_missing[i][:3] == "pip":
-            os.system("sudo -H pip install {}".format(packages_missing[i][3:]))
+    #print "Automatically trying to obtain missing packages...\n"
+    #for i in range(1, len(packages_missing)):
+    #    if packages_missing[i][:3] == "apt":
+    #        os.system("sudo apt-get install {}".format(packages_missing[i][3:]))
+    #    elif packages_missing[i][:3] == "pip":
+    #        os.system("sudo -H pip install {}".format(packages_missing[i][3:]))
 
-crit_fail = False
-for p in packages_missing:
-    if p[:3] == "crt":
-        crit_fail = True
-
-if crit_fail:
-    print "Some packages could not be automatically installed:\n"
+    crit_fail = False
     for p in packages_missing:
-        print "\t{}".format(p[3:])
-    print "\nIs there a typo in the rheometer script? Broken python install?"
+        if p[:3] == "crt":
+            crit_fail = True
+
+    if crit_fail:
+        print "Some packages suggest something worse is going on:\n"
+        for p in packages_missing:
+            print "\t{}".format(p[3:])
+        print "\nIs there a typo in the rheometer script? Broken python install?"
     print "Press any key to continue"
     raw_input()
     exit()
@@ -126,6 +131,10 @@ print "\tplot_help.py"
 from plothelp import fit_line
 from plothelp import read_logf
 from plothelp import simple_get_results
+
+print "\trecorder.py"
+
+import recorder as rec
 
 try:
     import spidev
@@ -738,6 +747,8 @@ class rheometer(object):
         self.display(["Rheometry Test", "", ""],[""], get_input=False)
         ln = "./../logs/rheometry_test_{}_{}.csv".format(tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
         
+        rec.start_recording(ln[:-3] + "wav")
+        
         if not debug: self.mot.start_poll(ln)
         
         gd = sp.Symbol('gd')
@@ -768,9 +779,9 @@ class rheometer(object):
             self.display(blurb, options, get_input=False)
             time.sleep(1)
         
+        rec.stop_recording()
         self.mot.clean_exit()
         return ln
-        
     #################################################################################################################################################
     def calc_visc(self, filename, fill_vol):
         self.fill_height = fill_vol / self.dxsa
