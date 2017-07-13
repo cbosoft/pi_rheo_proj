@@ -39,3 +39,17 @@ class recorder(object):
         waveFile.setframerate(self.rate)
         waveFile.writeframes(b''.join(self.frames))
         waveFile.close()
+        
+if __name__ == "__main__":
+    from time import sleep
+    
+    print "creating recorder object"
+    recx = recorder()
+    
+    print "beginning 10s recording"
+    recx.start_recording("outp.wav")
+    
+    sleep(10)
+    
+    print "recording finished. saved as \"./outp.wav\""
+    recx.stop_recording()
