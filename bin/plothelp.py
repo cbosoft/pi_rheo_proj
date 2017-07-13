@@ -8,10 +8,11 @@ matplotlib.use('Agg')#
 import matplotlib.pyplot as plt
 from filter import filter
 import resx
+import math
 
 def fitf(x, a):
     return a * x
-
+    
 
 def fit_grad(x, y, number, x_name="x", y_name="y"):
     coeffs, __ = curve_fit(fitf, x, y)
@@ -143,6 +144,7 @@ def simple_plot(x, y, outp, xlab="", ylab="", leg=None):
     ax.set_ylabel(ylab)
     
     if not leg == None: plt.legend(leg)
+    plt.grid()
     plt.savefig(outp)
     
 def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
@@ -153,6 +155,7 @@ def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
         yp = y
         if filtering: yp = filter(x, y, method="butter", A=2, B=0.001)
         ax.plot(x, yp)
+        plt.grid()
         
     ax.set_xlabel(xlab)
     ax.set_ylabel(ylab)
@@ -160,7 +163,7 @@ def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
     if not leg == None: plt.legend(leg)
     plt.savefig(outp)
     
-def multi_multi_plot(x, ys, outp, xlab="", ylab=None, leg=None, filtering=False):
+def multi_multi_plot(x, ys, outp, xlab="", ylab=None, leg=None, filtering=False, highlights=False, hl_x=None, hl_y=None):
     f = plt.figure(figsize=(10,(5*len(ys))))
     sbp = (len(ys) * 100) + 10
     
@@ -169,9 +172,50 @@ def multi_multi_plot(x, ys, outp, xlab="", ylab=None, leg=None, filtering=False)
         yp = ys[i]
         if filtering: yp = filter(x, ys[i], method="butter", A=2, B=0.001)
         ax.plot(x, yp)
+        
+        if highlights:
+            for k in range(0, len(hl_x)):
+                hl_xs = [hl_x[k]] * 11
+                hl_ys = list()
+                min_y = min(yp)
+                max_y = max(yp)
+                for G in range(0, 11):
+                    hl_ys.append(min_y + (G / 10.0) * (max_y - min_y))
+                #ax.plot([hl_x[k], hl_x[k]], [min(yp), max(yp)], color=(0, 0, 0, 0.75), linestyle="--", marker="x")
+                ax.plot(hl_xs, hl_ys, color=(0, 0, 0, 0.75), linestyle="--", marker="x")
+                
+        plt.grid()
         ax.set_xlabel(xlab)
         ax.set_ylabel(ylab[i])
         if not leg == None: plt.legend([leg[i]])
         
+
     plt.savefig(outp)
+
+def get_significant_minimums(y, sens=10):
+    '''
+    get_significant_minimums(y, sens=10)
     
+    Gets the most significantly minimum values of a dataseries.
+    
+    returns list of indexes of the points at which the Y value is more than [sens]% lower than the average magnitude of the y-series
+    '''
+    
+    av = np.average(y)
+    
+    diff = (sens / 100.0) * math.fabs(av)
+    
+    res = list()
+    
+    is_descending = False
+    
+    
+    for i in range(1, len(y)):
+        if y[i] < y[i - 1]:
+            is_descending = True
+        elif y[i] >= y[i - 1] and is_descending:
+            is_descending = False
+            if y[i] < (av - diff):
+                res.append(i)
+            
+    return res

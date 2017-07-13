@@ -58,3 +58,13 @@ def writeout(path="./../etc/data.xml"):
     root[7][1].text = str(cal_5AHES[1])
     tree = ET.ElementTree(root)
     tree.write(path)
+
+def get_current(cr, cr2a, cr2b):
+    cu1 = cal_30AHES[0] * cr + cal_30AHES[1]
+    cu2 = cal_5AHES[0] * cr2a + cal_5AHES[1]
+    cu3 = cal_5AHES[0] * cr2b + cal_5AHES[0]
+    
+    cu = cu1 + cu2 + cu3
+    cu = cu / 3.0
+    
+    return cu
