@@ -15,11 +15,11 @@ class recorder(object):
     def start_recording(self, output_name):
         self.recording = True
         self.outname = output_name
-        td.start_new_thread(self.rec_str, tuple())
         self.stream = self.audio.open(format=pyaudio.paInt16, channels=self.channels,
                 rate=self.rate, input=True,
                 frames_per_buffer=self.chunk)
         self.frames = []
+        td.start_new_thread(self.rec_str, tuple())
     
     def stop_recording(self):
         self.recording = False
