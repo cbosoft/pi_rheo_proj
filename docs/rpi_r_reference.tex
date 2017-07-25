@@ -1,6 +1,7 @@
 \documentclass{report}
 
 \usepackage{geometry}
+\usepackage{graphicx}
 
 \geometry{left=25mm, right=25mm, top=30mm, bottom=30mm}
 
@@ -9,10 +10,16 @@
 	{
 		\pagenumbering{gobble}
 		\centering
+		--\\
+		\hline
+		\vskip3cm
+		\Huge \texttt{RPi-R:R} \\
+		\Large \texttt{Raspberry Pi-Rheometer: Reference}\\
+		\vskip3cm
+		\large For software version: 0.1.3\\
 		\vfill
-		\Huge \texttt{RPi-R} \\
-		\Large \texttt{Raspberry Pi Rheometer Reference}
-		\vfill
+		\hline
+		--\\
 		\newpage
 	}
 	
@@ -72,11 +79,31 @@
 	
 		\section{Using the rheometer script}
 		
-		\section{Custom usage scripts}
+		The \texttt{rheometer.py} script should be run from the command line in your favourite terminal emulator. Normally, you should only need to run the script alone (no arguments), however there are two recognised:
+		\begin{verbatim}
+			python rheometer.py [-r|-c]
+			
+			-c: complex calculation mode
+			-r: "raw" mode
+		\end{verbatim}
+		``Raw'' mode does not catch errors as they occur, instead throws the excpetions to the user. Use this flag if the rheometer is acting up. Complex calculation mode is, as the name suggests, a more complex way of calculating the rheometry of the test fluid. However, this mode has not been finished and has proved very troublesome. Hence, simple mode is used by default.
+		
+		Once the rheometry script has started up, you will be greeted by the main menu. From here you can choose what you want to do. Use up and down the arrow keys to navigate the options, and the enter key to select. Figure \ref{figmenumain} is a screenshot of the main menu. 
+		
+		\begin{figure}
+			\centering
+			\includegraphics[width=.8\textwidth]{./../graphics/figmenumain.png}
+			\caption{Main Menu}
+			\label{figmenumain}
+		\end{figure}
+		
+		The menu has 5 options. The first two ("Run sample (quick)", "Run sample (custom") run the data logger and control the voltage supply to the motor. The information from these tests are saved in comma separated value (.csv) files, (in the "logs" folder). These files can be automatically read, the data extracted, and the results calculated using the \texttt{"docs/gen\_rep.py"} script. Alternatively, the .csv log files can be opened in your favourite spreadsheet program (MS Office Excel, Libre Office Calc, \&c). The quick test uses middling preset options (these can be altered in the script). The custom test allows you to set the run parameters before starting. There are two parameters for a run: run length, and strain rate. The run length is given in seconds. The strain rate, in inverse seconds, can be defined as a function of time (if you wish), or just give a constant. An optional parameter of the test run is a string informational tag attached to the log to identify what physical parameters have been set (e.g. fluid concentration, volume, temperature \&c). Once the run has finished, the save location of the log will appear on screen.
+		
+		The third menu option ("View results") does nothing at the moment. Neither does the fourth option. The fifth, shows a vague summary of what the rheometer does. And finally, "Quit" exits the program.
 	
 	\chapter{}
 	
-	\chapter{Why?}
+	\chapter{Forte, For}
 
 	
 
