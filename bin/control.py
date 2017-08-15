@@ -60,7 +60,8 @@ class tf_pi_controller(object):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
             # create controller transfer function
-            self.Gc = sg.TransferFunction((self.tuning[0], self.tuning[1]), (1, 0), dt=sample_time)
+            # self.Gc = sg.TransferFunction((self.tuning[0], self.tuning[1]), (1, 0), dt=sample_time)
+            # ^^ UNCOMMENT AND FIX PLS ^^
     
     def get_control_action(self, Y):
         # set next input and error values in memory
