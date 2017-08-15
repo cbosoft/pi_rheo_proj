@@ -215,6 +215,7 @@ class motor(object):
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
+        self.clean_exit()
 
     def update_filt_hist(self, srv, crv, tim):
         if (len(self.srvs) + 1) > self.filtlen:
@@ -235,6 +236,8 @@ class motor(object):
         self.control_stopped = True
         time.sleep(0.5)
         
+        gpio.cleanup()
+
         if (self.poll_logging):
             self.logf.close()
 

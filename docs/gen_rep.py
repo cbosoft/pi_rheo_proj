@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 ############################################################################################################################
 print "process latest log file"
-log_files = sorted(glob("./../logs/rheometry_test_c*.csv"))
+log_files = sorted(glob("./../logs/rheometry_test_*.csv"))
 log_file = log_files[-1]
 dt_ind = log_file[-15:-4]
 
@@ -51,7 +51,7 @@ vfilc = ft(t, Vpz1, method="gaussian")
 
 vdiff = [0.0]
 
-vdiff.extend(np.diff(vfilc))
+vdiff.extend(np.diff(vfilc)) # REPLACE WITH ANTIDERIVATIVE
 
 #ph.multi_plot(st, [vraw, vcorr, vfilc], "../graphics/general_piezo.png".format(dt_ind), xlab="Time, s", ylab="Piezo (1) signal, V", leg=["Raw signal", "Corrected signal", "Corrected and filtered signal"])
 
@@ -71,7 +71,7 @@ cu = resx.get_current(cr, cr2a, cr2b)
 ph.multi_multi_plot(st, [norm_visc_filt, filt_speeds, vfilc, vdiff, cu], "./../graphics/signal_compare.png".format(dt_ind), xlab="Time, s", ylab=["Viscosity Ref", "Speed, RPM", "Piezo Voltage, V", "Derivative Piezo Signal, V/s", "Current, A"], highlights=True, hl_x=mins_x)
 
 ############################################################################################################################
-l = 8 # number of logs to try to compare
+l = 12 # number of logs to try to compare
 if len(log_files) < l: l = len(log_files)
 print "comparing last {} logs".format(l)
 
@@ -83,6 +83,12 @@ colours = list()
 colours.append([0, 0, 1, 1]) # blue
 colours.append([0, 1, 0, 1]) # green
 colours.append([0, 0.5, 0.5, 1]) # cyan
+colours.append([1, 0, 0, 1])
+colours.append([1, 0, 1, 1])
+colours.append([1, 1, 0, 1])
+colours.append([1, 0.5, 0, 1])
+colours.append([0, 0.5, 0.5, 1])
+colours.append([1, 0, 0, 1])
 colours.append([1, 0, 0, 1])
 colours.append([1, 0, 1, 1])
 colours.append([1, 1, 0, 1])
@@ -112,8 +118,8 @@ for f in log_files[-(l):]:
     trans = copy(full)
     trans[3] = 0.25
     #ax.plot(st, vcorr, color=trans)
-    av = np.average(vfilc[-100:])
-    ax.plot(st[0:-1:10], vfilc[0:-1:10], color=full, marker=symbols[idx], linestyle='None', label="{}: {:.3f}".format(leg[idx], av))
+    av = np.average(vfilc[:])
+    ax.plot(st[0:-1:10], vfilc[0:-1:10], color=trans, marker=symbols[idx], linestyle='None', label="{}: {:.3f}".format(leg[idx], av))
     av = [av] * 2
     ax.plot([st[0], st[-1]], av, color=full)
     
