@@ -6,8 +6,10 @@ sys.path.append("./../bin")
 import plothelp as ph
 from filter import filter as ft
 import resx
+
 import matplotlib
 matplotlib.use('Agg')#
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -34,14 +36,20 @@ print "  plotting speed check"
 speeds = resx.cal_dynamo[0] * dr + resx.cal_dynamo[1]
 filt_speeds = ft(st, speeds, method="gaussian")
 
-ph.multi_plot(st, [speeds, filt_speeds], "../graphics/strain_check.png".format(dt_ind), xlab="Time, s", ylab="Speed, RPM", leg=["Raw", "Filtered"])
+ph.multi_plot(st, [speeds, filt_speeds], 
+    "../graphics/strain_check.png".format(dt_ind), 
+    xlab="Time, s", ylab="Speed, RPM", 
+    leg=["Raw", "Filtered"])
 
 ############################################################################################################################
 print "  plotting rheometry check"
 norm_visc = ph.simple_get_results(log_file)
 norm_visc_filt = ft(st, norm_visc, method="gaussian")
 
-ph.multi_plot(st, [norm_visc, norm_visc_filt], "../graphics/viscometry.png".format(dt_ind), xlab="Time, s", ylab="Normalised Rheometry, unitless", leg=["Raw", "Filtered"])
+ph.multi_plot(st, [norm_visc, norm_visc_filt], 
+    "../graphics/viscometry.png".format(dt_ind), 
+    xlab="Time, s", ylab="Normalised Rheometry, 
+    unitless", leg=["Raw", "Filtered"])
 
 ############################################################################################################################
 print "  plotting piezo results"
@@ -119,7 +127,8 @@ for f in log_files[-(l):]:
     trans[3] = 0.25
     #ax.plot(st, vcorr, color=trans)
     av = np.average(vfilc[:])
-    ax.plot(st[0:-1:10], vfilc[0:-1:10], color=trans, marker=symbols[idx], linestyle='None', label="{}: {:.3f}".format(leg[idx], av))
+    ax.plot(st[0:-1:10], vfilc[0:-1:10], color=trans, marker=symbols[idx], 
+        linestyle='None', label="{}: {:.3f}".format(leg[idx], av))
     av = [av] * 2
     ax.plot([st[0], st[-1]], av, color=full)
     
