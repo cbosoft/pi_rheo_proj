@@ -3,8 +3,8 @@
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
-import matplotlib
-matplotlib.use('Agg')#
+from matplotlib import use as mpluse
+mpluse('Agg')#
 import matplotlib.pyplot as plt
 from filter import filter
 import resx
