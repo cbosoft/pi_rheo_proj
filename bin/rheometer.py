@@ -269,12 +269,12 @@ class rheometer(object):
                     "Welcome to RPi-R: Simple rheometry recording with a Raspberry Pi",
                     ]
         options =   [
-                    "> Run sample (quick)",
-                    "> Run sample (custom)",
-                    "> View results",
-                    "> Re-calibrate sensors",
-                    "> View Readme",
-                    "> Quit"
+                    "Run sample (quick)",
+                    "Run sample (custom)",
+                    "View results",
+                    "Re-calibrate sensors",
+                    "View Readme",
+                    "Quit"
                     ]
         res = self.display(blurb, options, selected=initsel)
         
@@ -294,9 +294,9 @@ class rheometer(object):
                 while not inp_k:
                     blurb = ["Run sample - setup",
                              "",
-                             "Length:     --",
-                             "Function:   --",
-                             "Log tag:    --",
+                             "Length:     --".center(40),
+                             "Function:   --".center(40),
+                             "Log tag:    --".center(40),
                              "",
                              extra_info,
                              "Enter run length (seconds)"]
@@ -319,9 +319,9 @@ class rheometer(object):
                 while not inp_k:
                     blurb = ["Run sample - setup",
                              "",
-                             "Length:     {}s".format(length),
-                             "Function:   --",
-                             "Log tag:    --",
+                             "Length:     {}s".format(length).center(40),
+                             "Function:   --".center(40),
+                             "Log tag:    --".center(40),
                              "",
                              extra_info,
                              "Enter strain rate function (inverse seconds)",
@@ -354,9 +354,9 @@ class rheometer(object):
             while not inp_k:
                 blurb = ["Run sample - setup",
                          "",
-                         "Length:     {}s".format(length),
-                         "Function:   gd = {} (s^-1)".format(gd_expr),
-                         "Log tag:    --",
+                         "Length:     {}s".format(length).center(40),
+                         "Function:   gd = {} (s^-1)".format(gd_expr).center(40),
+                         "Log tag:    --".center(40),
                          "",
                          extra_info,
                          "Enter identifier for the run: (test material composition etc)"]
@@ -374,9 +374,9 @@ class rheometer(object):
             
             blurb = ["Run sample - setup",
                      "",
-                     "Length:    {}s".format(length),
-                     "Function:  gd = {} (s^-1)".format(gd_expr),
-                     "Log tag:    \"{}\"".format(tag),
+                     "Length:    {}s".format(length).center(40),
+                     "Function:  gd = {} (s^-1)".format(gd_expr).center(40),
+                     "Log tag:    \"{}\"".format(tag).center(40),
                      ""]
             options = ["> Continue", "> Quit"]
             res = self.display(blurb, options)
