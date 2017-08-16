@@ -1,35 +1,39 @@
-### RPi-R ###
+# RPi-R #
 
 Raspberry Pi Rheometer. A rheometer using a Taylor-Couette cell along with 
 a plethora of sensors to record a bunch of data like temperature, revolution
 speed, motor supply current etc etc.
 
-Due to time constraints and difficulty of getting the rheometer to work properly 
-(i.e. it doesn't accurately report viscosity vs time and I can't be bothered to
-fix it), The rheometer will now be used simply as a rough guide. The power into 
-the motor is directly related to the torque output, and therefore (at constant
-strain rate) the viscosity. The rheometer will normalise the power draw with 
-respect to the empty rheometer.
+The project has been extended, so more effort can be put into designing the 
+hardware.
 
-The important part here is how the piezo-sensor output and the normal rheometer 
-output match up.
+With now a choice of motor and what-have-you, a better (read: working) rheometer
+can be produced in the next few months. A few different design are being considered,
+one possible novel method which could be cool (although there is nothing new under
+the sun, someone must have tried it before).
 
-TO DO:
-* Attach piezo sensors in such a way as to minimise noise (i.e. from motor)
-* Re-write software to reflect new simplified method of indication
-* Figure out best method for plotting results
-* ~~Calibration scripts~~
-* ~~Central calibration storage (not as var in each class!)~~
-* ~~Redo cals (TS vs. Vms & Iemf vs.  Vms)~~
-* ~~Analogue filtering?~~ Not necessary, might implement later
-* Dead-time compensation?
-* Speed control
-* ~~Temperature control (monitoring)~~
+I have started with a software overhaul, and will continue to ponder what direction
+to go in with the hardware until October, when I will begin to put plans into action.
+
+
+## Changelog ##
+
+**v0.1.5**
+
+- Cleaned up gui
+- Rewrote recalibration algo
+- Added cal override (if cal is wrong or previous was better whatever)
+- General tidying of script
+- Removed quick run as an option (when would this ever be used?)
+- Added info about why each package is being imported
+- Removed "Plot" as a main menu option - this may return later on
+- Removed complex menu system
+- Removed rheometry calculation function (was incorrect anyway)
 
 
 ```
 /bin                            code lives here
-/etc                            meta data lives here (calibrations, rheometer geometry)
+/etc/data.xml                   meta data lives here (calibrations, rheometer geometry)
 /logs                           data logged from experimental runs lives here (temporary)
 /misc/datasheets                hardware datasheets live here
 /plot                           scripts for plotting results live here
