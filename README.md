@@ -30,6 +30,7 @@ to go in with the hardware until October, when I will begin to put plans into ac
 - Removed complex menu system
 - Removed rheometry calculation function (was incorrect anyway)
 
+## Rough Index ##
 
 ```
 /bin                            code lives here
@@ -38,6 +39,9 @@ to go in with the hardware until October, when I will begin to put plans into ac
 /misc/datasheets                hardware datasheets live here
 /plot                           scripts for plotting results live here
 ```
+
+## License Spiel ##
+
 *Distributed under GNU General Public License (GPL).*
 
 *You can use this as much as you like, share it as you like, whatever.*
