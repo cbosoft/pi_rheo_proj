@@ -17,9 +17,13 @@ import filter
 from warnings import warn
 
 #from glob import glob # Not necessary?
+print "\tdig_pot.py"
 from dig_pot import MCP4131 as dp
+print "\tadc.py"
 from adc import MCP3008 as ac
+print "\tcontrol.py"
 from control import tf_pi_controller as pitf
+print "\ttempsens.py"
 from tempsens import ds18b20 as ts
 
 
