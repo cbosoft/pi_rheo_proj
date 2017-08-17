@@ -9,106 +9,119 @@ packages_missing = [""]
 print "Loading packages.."
 
 ## Included in python...
-print "Packages Included in Python2.7+"
-print "\ttime           (for telling the time)"
+print "\nPackages Included in Python2.7+\n"
+print "\ttime"  #           (for telling the time)"
 import time
-print "\tsys            (to read arguments passed to the script)"
+print "\tsys"  #            (to read arguments passed to the script)"
 import sys
-print "\tmath           (to do simple maths)"
+print "\tmath"  #           (to do simple maths)"
 import math
 from math import sin
 from math import cos
-print "\tcopy           (to make proper copies of variables)"
+print "\tcopy"  #           (to make proper copies of variables)"
 import copy
-print "\trandom         (to generate random numbers)"
+print "\trandom"  #         (to generate random numbers)"
 import random
-print "\tglob.glob      (to search for files)"
+print "\tglob.glob"  #      (to search for files)"
 from glob import glob
+print "\tplatform"  #       (to check what os this is on)"
+import platform
 
 ## Third party
-print "3rd Party Packages"
-print "\tnumpy          (to do cool things with arrays, and other maths)"
+print "\n3rd Party Packages\n"
+print "\tnumpy"  #          (to do cool things with arrays, and other maths)"
 try:
     import numpy as np
 except ImportError as ex:
     packages_missing.append("pipnumpy")
-    print "error!"
+    print "\t !! error !!"
     
-print "\tpandas         (to read .csv files easily)"
+print "\tpandas"  #         (to read .csv files easily)"
 try:
     import pandas as pd
 except ImportError as ex:
     packages_missing.append("pippandas")
-    print "error!"
+    print "\t !! error !!"
     
-print "\tcurses         (to display things nicely)"
+print "\tcurses"  #         (to display things nicely)"
 try:
     import curses
 except ImportError as ex:
     packages_missing.append("pipcurses")
-    print "error!"
+    print "\t !! error !!"
     
-print "\tmatplotlib     (to plot information)"
+print "\tmatplotlib"  #     (to plot information)"
 try:
     import matplotlib
 except ImportError as ex:
     packages_missing.append("pipmatplotlib")
-    print "error!"
+    print "\t !! error !!"
     
-print "\tSymPy          (to solve functions symbolically)"
+print "\tSymPy"  #          (to solve functions symbolically)"
 try:
     from sympy.parsing.sympy_parser import parse_expr as pe
     import sympy as sp
 except ImportError as ex:
     packages_missing.append("pipsympy")
-    print "error!"
+    print "\t !! error !!"
     
-print "\tpython-tk      (fixes a bug I think...)"
+print "\tpython-tk"  #      (fixes a bug I think...)"
 try:
     import _tkinter
 except ImportError as ex:
     packages_missing.append("aptpython-tk")
-    print "error!"
+    print "\t !! error !!"
+    
+print "\tspidev"  #         (to communicate over SPI with hardware)
+try:
+    import spidev
+except:
+    packages_missing.append("aptspidev")
+    print "\t !! error !!"
     
 ## RPi-Rheo packages
-print "RPi-Rheo Packages"
-print "\tresx.py        (to read/save calibration and other misc data)"
+print "\nRPi-Rheo Packages\n"
+print "\tresx.py"  #        (to read/save calibration and other misc data)"
 import resx
 
-print "\tfilter.py      (digital signal filtering wrapper for scipy)"
+print "\tfilter.py"  #      (digital signal filtering wrapper for scipy)"
 from filter import filter
 
-print "\tplot_help.py   (easy reading of logs)"
+print "\tplot_help.py"  #   (easy reading of logs)"
 from plothelp import fit_line
 from plothelp import read_logf
 from plothelp import simple_get_results
     
-print "\tmotor.py       (allows control of motor)"
+print "\tmotor.py"  #       (allows control of motor)"
 from motor import motor
 
-if len(packages_missing) > 1: 
-    print "!! -- Packages missing -- !!"
-    exit()
+def linux_distribution():
+  try:
+    return platform.linux_distribution()
+  except:
+    return "N/A"
 
 try:
-    import spidev
+    dist = platform.linux_distribution()
 except:
     debug = True
 else:
     debug = False
 
-print "\nPress Enter to Begin!"
+if dist == "Raspbian": debug = True
+
+if debug: print "\tDEBUG MODE !!"
+
+if len(packages_missing) > 1: 
+    print ""
+    print "!! -- Packages missing -- !!"
+    exit()
+
+
+
 r = raw_input()
     
-version = resx.version          # maj.typ.min
-                                # MAJOR: Indicates release version
-                                # TYPE: What type of release? 
-                                #   0: LTS
-                                #   1: pre-alpha development
-                                #   2: alpha
-                                #   3: beta
-                                # MINOR: Indicates progress through release (towards next version)
-
+version = resx.version
 
 class rheometer(object):
     
@@ -150,14 +163,14 @@ class rheometer(object):
         if self.motor_running: mode_string = "!! MOTOR ON !!"
         if debug: mode_string = "!! DEBUG !!"
             
-        stdscr.addstr(3, 3,  r"                                 _        _                                     ")
-        stdscr.addstr(4, 3,  r"                      _ __ _ __ (_)  _ __| |__   ___  ___                       ")
-        stdscr.addstr(5, 3,  r"                     | '__| '_ \| | | '__| '_ \ / _ \/ _ \                      ")
-        stdscr.addstr(6, 3,  r"                     | |  | |_) | |_| |  | | | |  __/ (_) |                     ")
-        stdscr.addstr(7, 3,  r"                     |_|  | .__/|_(_)_|  |_| |_|\___|\___/                      ")
-        stdscr.addstr(8, 3,  r"                          |_|  Raspberry Pi Rheometer v{}                    ".format(version))
-        stdscr.addstr(9, 3,  r"                                                                                ")
-        stdscr.addstr(10, 3,  r"{}".format(mode_string.center(80)))
+        stdscr.addstr(3, 1,  r"                                 _        _                                     ")
+        stdscr.addstr(4, 1,  r"                      _ __ _ __ (_)  _ __| |__   ___  ___                       ")
+        stdscr.addstr(5, 1,  r"                     | '__| '_ \| | | '__| '_ \ / _ \/ _ \                      ")
+        stdscr.addstr(6, 1,  r"                     | |  | |_) | |_| |  | | | |  __/ (_) |                     ")
+        stdscr.addstr(7, 1,  r"                     |_|  | .__/|_(_)_|  |_| |_|\___|\___/                      ")
+        stdscr.addstr(8, 1,  r"                          |_|  Raspberry Pi Rheometer v{}                    ".format(version))
+        stdscr.addstr(9, 1,  r"                                                                                ")
+        stdscr.addstr(10, 1,  r"{}".format(mode_string.center(80)))
 
         blurbheight = 12
 
@@ -168,9 +181,9 @@ class rheometer(object):
         # Show Options
         for i in range(0, len(options)):
             if (selected == i and input_type != "string" and get_input):
-                stdscr.addstr(blurbheight + len(blurb) + i + 1, 3, options[i].center(80), curses.A_STANDOUT)
+                stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80), curses.A_STANDOUT)
             else:
-                stdscr.addstr(blurbheight + len(blurb) + i + 1, 3, options[i].center(80))
+                stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80))
 
         # Get Input
         stdscr.addstr(0,0, "")
