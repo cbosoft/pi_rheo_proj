@@ -4,6 +4,7 @@
 # class object controlling the rheometer from the rasbperry pi
 #
 
+debug = False
 
 packages_missing = [""]
 print "Loading packages.."
@@ -76,8 +77,8 @@ print "\tspidev"  #         (to communicate over SPI with hardware)
 try:
     import spidev
 except:
-    packages_missing.append("aptspidev")
-    print "\t !! error !!"
+    debug = True
+    print "\t inactive !!"
     
 ## RPi-Rheo packages
 print "\nRPi-Rheo Packages\n"
@@ -105,8 +106,6 @@ try:
     dist = platform.linux_distribution()
 except:
     debug = True
-else:
-    debug = False
 
 if dist == "Raspbian": debug = True
 
@@ -117,10 +116,6 @@ if len(packages_missing) > 1:
     print "!! -- Packages missing -- !!"
     exit()
 
-
-
-r = raw_input()
-    
 version = resx.version
 
 class rheometer(object):
@@ -176,7 +171,7 @@ class rheometer(object):
 
         # Display Blurb
         for i in range(0, len(blurb)):
-            stdscr.addstr(blurbheight + i, 3, blurb[i].center(80))
+            stdscr.addstr(blurbheight + i, 1, blurb[i].center(80))
         
         # Show Options
         for i in range(0, len(options)):
@@ -285,9 +280,10 @@ class rheometer(object):
                          "Enter strain rate function (inverse seconds)",
                          "",
                          "Input in form of an expression (gamma dot = ...)",
-                         "NOTE:",
-                         "\tMinimum value =   5 (s^-1)",
-                         "\tMaximum value = 250 (s^-1)"]
+                         "",
+                         "Note:",
+                         "Minimum value =   5 (s^-1)",
+                         "Maximum value = 250 (s^-1)"]
                 options = [""]
                 
                 gd_expr = self.display(blurb, options, get_input=True, input_type="string")
@@ -538,11 +534,13 @@ class rheometer(object):
             perc = int(math.ceil((i / float(length)) * width))
             neg_perc = int(math.floor(((float(length) - i) / length) * width))
             blurb = [
-                    "Rheometry Test", 
+                    "Rheometry Test",
+                    "",
                     "{}{}".format("Supply voltage set to:".center(40), "{:.3f} V".format(vms).center(40)),
                     "{}{}".format("Target strain rate:".center(40), "{:.3f} (s^-1)".format(gd_val).center(40)),
                     "{}{}".format("Value sent to potentiometer:".center(40), str(self.mot.pot.lav).center(40)),
                     "{}{}".format("Time remaining:".center(40), "{}s".format(length - i).center(40)),
+                    "",
                     "[{}{}]".format("#" * perc, " " * neg_perc)
                     ]
             options = [" "]
@@ -707,7 +705,7 @@ class rheometer(object):
 if __name__ == "__main__":
     # setup curses window
     bigscr = curses.initscr()
-    stdscr = curses.newwin(35, 90, 1, 1)
+    stdscr = curses.newwin(35, 82, 1, 1)
     #stdscr.border(0)
     curses.noecho()
     curses.cbreak()
@@ -725,9 +723,7 @@ if __name__ == "__main__":
     menu_mode_simple = True
     catch_mode_on = True
     
-    #if "-c" in sys.argv: menu_mode_simple = False # complex calculation mode
     if "-r" in sys.argv: catch_mode_on = False # raw operation, errors are not caught.
-    
 
     if not catch_mode_on:
         a = r.simple_mode()
