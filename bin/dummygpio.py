@@ -24,3 +24,6 @@ def setmode(numbering_system):
     
 def setup(channel, direction):
     pass
+
+def cleanup():
+    pass
