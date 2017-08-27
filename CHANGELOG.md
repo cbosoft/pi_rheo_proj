@@ -1,4 +1,4 @@
-## Upcoming: 0.1.6 ##
+## v0.1.6 ##
 - Added proper changelog tracking
 - Added rheology data calculation to logger
 - Added motor calibration
