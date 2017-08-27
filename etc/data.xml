@@ -20,7 +20,7 @@
         <units>m</units>
     </geometry>
     <misc name="version">
-        <ver>0.1.5</ver>
+        <ver>0.1.6</ver>
     </misc>
     <calibration name="dynamo">
         <coeff1>360.245152725</coeff1>
@@ -34,13 +34,13 @@
         <coeff1>2.74838639209</coeff1>
         <coeff2>-6.34690907003</coeff2>
     </calibration>
-    <calibration name="IemfVms">
-        <coeff1>312.806</coeff1>
-        <coeff2>-159.196</coeff2>
-    </calibration>
     <calibration name="IcoVms">
-        <coeff1>312.806</coeff1>
-        <coeff2>-159.196</coeff2>
+        <coeff1>0.02948</coeff1>
+        <coeff2>0.4506</coeff2>
+    </calibration>
+    <calibration name="TauIco">
+        <coeff1>0.02974</coeff1>
+        <coeff2>0.002967</coeff2>
     </calibration>
     <calibration name="TsVms">
         <coeff1>312.806</coeff1>
