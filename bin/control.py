@@ -1,38 +1,44 @@
-#
-# control.py
-#
-# Controller class. Provides support for controlling a process using python.
-#
+'''
+    Simple PI control in python.
 
-# Imports
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
+
+# System
 from time import time
 from time import sleep
 import sys
+import warnings
+
+# 3rd Party
 import matplotlib.pyplot as plt
 import scipy.signal as sg
 import numpy as np
-import warnings
 
 class tf_pi_controller(object):
     '''
+    Usage: 
+
     object = tf_pi_controller(tuning, set_point)
 
     Creates an instance of a PI controller.
-    
-    args:
-    tuning      -   tuple: (float, float). Represents the gain parameters Kc and Kc/Ti respectively
-    set_point   -   float. Represents the desired output from the process. Default is 0
-    sample_time -   float. Time between iterations in seconds. Default is 0.1
-    
-    accessible data:
-    tuning      -   tuple: (float, float). Represents the gain parameters Kc and Kc/Ti respectively
-    set_point   -   float. Represents the desired output from the process. Default is 0
-    
-    Ys          -   list, float. List of past process outputs. By default, maximum 100 items.
-    Us          -   list, float. List of past controller outputs. By default, maximum 100 items.
-    Es          -   list, float. List of past error values. By default, maximum 100 items.
 
-    remd_len    -   integer. "Remembered Length" number of items to remember. Default is 100.
+    Parameters:
+        tuning              (float, float)      Represents the gain parameters Kc and Kc/Ti respectively
+        set_point           (float)             Represents the desired output from the process. Default is 0
+        sample_time         (float)             Time between iterations in seconds. Default is 0.1
+
+    Accessible Data:
+        tuning              (float, float)      Represents the gain parameters Kc and Kc/Ti respectively
+        set_point           (float)             Represents the desired output from the process. Default is 0
+
+        Ys                  (list, float)       List of past process outputs.
+        Us                  (list, float)       List of past controller outputs.
+        Es                  (list, float)       List of past error values.
+
+        remd_len            (integer)           'Remembered Length'; number of items to remember. Default is 100
+                                                Higher number means better precision, but slower operation. RPi2 
+                                                might not be able to take it.
     '''
     tuning = [0.0, 0.0]
 
@@ -50,10 +56,10 @@ class tf_pi_controller(object):
 
         Creates an instance of a PI controller.
         
-        args:
-        tuning      -   tuple: (float, float). Represents the gain parameters Kc and Kc/Ti respectively
-        set_point   -   float. Represents the desired output from the process. Default is 0
-        sample_time -   float. Time between iterations in seconds. Default is 0.1
+        Parameters:
+            tuning              (float, float)  Represents the gain parameters Kc and Kc/Ti respectively
+            set_point           (float)         Represents the desired output from the process. Default is 0
+            sample_time         (float)         Time between iterations in seconds. Default is 0.1
         '''
         self.tuning = tuning  # Set tuning
         self.set_point = set_point  # Set set point
@@ -64,6 +70,16 @@ class tf_pi_controller(object):
             # ^^ UNCOMMENT AND FIX PLS ^^
     
     def get_control_action(self, Y):
+        '''
+        tf_pi_controller.get_control_action(Y)
+        
+        With the current tuning, and the history of process outputs, 
+        calculates the next control action to keep the process output 
+        at the setpoint.
+        
+        Parameters:
+            Y                   (float)         Value of the controlled process output.
+        '''
         # set next input and error values in memory
         self.Ys.append(Y)
         self.Es.append(self.set_point - Y)
@@ -83,15 +99,15 @@ class tf_pi_controller(object):
         
         Simulates the controller's response to a step change in set point.
         
-        args:
-        time_constant - float. Coefficient of s in denominator of transfer function
-        steady_state_gain - float. Numerator of transfer function.
+        Parameters:
+            time_constant       (float)         Coefficient of s in denominator of transfer function
+            steady_state_gain   (float)         Numerator of transfer function.
 
         kwargs**:
-        sp          -   float. Initial set point. Default is 0.0
-        step_to     -   float. Final set point. Defailt is 200.0
-        at_t        -   integer. Number of samples to wait before stepping up. Default is 10
-        length      -   integer. Number of samples overall to compute. Default is 100
+            sp                  (float)         Initial set point. Default is 0.0
+            step_to             (float)         Final set point. Defailt is 200.0
+            at_t                (integer)       Number of samples to wait before stepping up. Default is 10
+            length              (integer)       Number of samples overall to compute. Default is 100
         '''
         set_point = sp
         # Set up transfer functions
@@ -129,4 +145,5 @@ class tf_pi_controller(object):
         return (Ys, Es, Us, Ts)
 
 if __name__ == "__main__":
+    print __doc__
     print tf_pi_controller.__doc__

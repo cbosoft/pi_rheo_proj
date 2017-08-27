@@ -74,49 +74,35 @@ def get_error(variable):
 def read_logf(log_n):
     datf = pd.read_csv(log_n)
     
-    t       =   np.array(datf['t'], np.float64)
-    dr      =   np.array(datf['dr'], np.float64)
-    cr      =   np.array(datf['cr'], np.float64)
-    cr2a    =   np.array(datf['cr2a'], np.float64)
-    cr2b    =   np.array(datf['cr2b'], np.float64)
-    pv      =   np.array(datf['pv'], np.float64)
-    fdr     =   np.array(datf['fdr'], np.float64)
-    fcr     =   np.array(datf['fcr'], np.float64)
-    T       =   np.array(datf['T'], np.float64)
+    t         =   np.array(datf['t'], np.float64)
+    dr        =   np.array(datf['dr'], np.float64)
+    cr        =   np.array(datf['cr'], np.float64)
+    cr2a      =   np.array(datf['cr2a'], np.float64)
+    cr2b      =   np.array(datf['cr2b'], np.float64)
+    pv        =   np.array(datf['pv'], np.float64)
+    T         =   np.array(datf['T'], np.float64)
     
-    Vpz1    =   [0.0] * len(t)
     try:
-        Vpz1    =   np.array(datf['Vpz1'], np.float64)
+        Vpz       =   np.array(datf['Vpz'], np.float64)
     except:
-        pass
+        Vpz       =   np.array(datf['Vpz1'], np.float64)
     
-    Vpz2    =   [0.0] * len(t)
     try:
-        Vpz2    =   np.array(datf['Vpz2'], np.float64)
+        tau       =   np.array(datf['tau'], np.float64)
+        gamma_dot =   np.array(datf['gamma_dot'], np.float64)
     except:
-        pass
-    
-    Vpzbg    =   [0.0] * len(t)
-    try:
-        Vpzbg   =   np.array(datf['Vpzbg'], np.float64)
-    except:
-        pass
-    
-    Vadcbg    =   [0.0] * len(t)
-    try:
-        Vadcbg  =   np.array(datf['Vadcbg'], np.float64)
-    except:
-        pass
+        tau       = [0] * len(t)
+        gamma_dot = [0] * len(t)
     
     st = t - t[0]
     
     #rheometry_test_TAG_DATE_TIME.csv
-    parts = log_n.split("_")
+    tag = log_n.split("_")[2]
     
-    return t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, parts[2]
+    return t, st, dr, cr, cr2a, cr2b, pv, T, Vpz, gamma_dot, tau, tag
 
 def simple_get_results(log_n):    
-    t, st, dr, cr, cr2a, cr2b, pv, fdr, fcr, T, Vpz1, Vpz2, Vpzbg, Vadcbg, tag = read_logf(log_n)
+    __, st, dr, cr, cr2a, cr2b, pv, __, __, __, __, __, __, tag = read_logf(log_n)
     
     voltage = 0.066 * pv + 2.422
     

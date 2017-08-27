@@ -1,12 +1,17 @@
-#
-# rheometer.py
-#
-# class object controlling the rheometer from the rasbperry pi
-#
+#! usr/bin/env python
+
+'''
+Controller object for the concentric cylinder rotational rheometer from a Raspberry Pi 2.
+
+Allows the running of tests and control of the hardware, and the logging of data, for the
+prototype jamming study rheometer.
+
+Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
 
 debug = False
 
-packages_missing = [""]
+packages_missing = False
 print "Loading packages.."
 
 ## Included in python...
@@ -34,28 +39,28 @@ print "\tnumpy"  #          (to do cool things with arrays, and other maths)"
 try:
     import numpy as np
 except ImportError as ex:
-    packages_missing.append("pipnumpy")
+    packages_missing = True
     print "\t !! error !!"
     
 print "\tpandas"  #         (to read .csv files easily)"
 try:
     import pandas as pd
 except ImportError as ex:
-    packages_missing.append("pippandas")
+    packages_missing = True
     print "\t !! error !!"
     
 print "\tcurses"  #         (to display things nicely)"
 try:
     import curses
 except ImportError as ex:
-    packages_missing.append("pipcurses")
+    packages_missing = True
     print "\t !! error !!"
     
 print "\tmatplotlib"  #     (to plot information)"
 try:
     import matplotlib
 except ImportError as ex:
-    packages_missing.append("pipmatplotlib")
+    packages_missing = True
     print "\t !! error !!"
     
 print "\tSymPy"  #          (to solve functions symbolically)"
@@ -63,13 +68,14 @@ try:
     from sympy.parsing.sympy_parser import parse_expr as pe
     import sympy as sp
 except ImportError as ex:
-    packages_missing.append("pipsympy")
+    packages_missing = True
     print "\t !! error !!"
     
 print "\tpython-tk"  #      (fixes a bug I think...)"
 try:
     import _tkinter
-except ImportError as ex:
+except:
+    packages_missing = True
     packages_missing.append("aptpython-tk")
     print "\t !! error !!"
     
@@ -86,7 +92,7 @@ print "\tresx.py"  #        (to read/save calibration and other misc data)"
 import resx
 
 print "\tfilter.py"  #      (digital signal filtering wrapper for scipy)"
-from filter import filter
+from filter import filter as filt_r
 
 print "\tplot_help.py"  #   (easy reading of logs)"
 from plothelp import fit_line
@@ -111,7 +117,7 @@ if dist == "Raspbian": debug = True
 
 if debug: print "\tDEBUG MODE !!"
 
-if len(packages_missing) > 1: 
+if packages_missing: 
     print ""
     print "!! -- Packages missing -- !!"
     exit()
@@ -281,13 +287,21 @@ class rheometer(object):
                          "",
                          "Input in form of an expression (gamma dot = ...)",
                          "",
-                         "Note:",
-                         "Minimum value =   5 (s^-1)",
-                         "Maximum value = 250 (s^-1)"]
+                         "Max GD = 250, min GD = 5.",
+                         "",
+                         "A special case: GD = linear from <MIN> to <MAX>"]
                 options = [""]
                 
                 gd_expr = self.display(blurb, options, get_input=True, input_type="string")
                 
+                gd_expr_split = gd_expr.split()
+                
+                ### Special Cases ###
+                if gd_expr_split[0] == "linear":
+                    gd_min = gd_expr_split[2]
+                    gd_max = gd_expr_split[4]
+                    gd_expr = "{0} + (({1} - {0}) / {2}) * t".format(gd_min, gd_max, length)
+                    
                 inp_k = True
                 
                 try:
@@ -318,6 +332,14 @@ class rheometer(object):
                 
                 tag = self.display(blurb, options, get_input=True, input_type="string")
                 
+                gd_expr_split = gd_expr.split()
+                
+                ### Special Cases ###
+                if gd_expr_split[0] == "linear":
+                    gd_min = gd_expr_split[2]
+                    gd_max = gd_expr_split[4]
+                    gd_expr = "{0} + (({1} - {0}) / {2}) * t".format(gd_min, gd_max, length)
+                    
                 inp_k = True
                 
                 try:
@@ -346,11 +368,15 @@ class rheometer(object):
             # Recalibrate
             # As calibration override, but with 10 minute run before hand
             
+            ### Part 1: Sensor Calibration ###
+            
             length = 0
             res = "car"
             not_okay = True
             while not_okay:
-                blurb = [   "To calibrate the sensors, allow the inner cylinder to freely rotate.",
+                blurb = [   "Calibration 1",
+                            "",
+                            "To calibrate the sensors, allow the inner cylinder to freely rotate.",
                             "Ensure there is nothing impacting on the rotation of the cylinder, nothing touching it",
                             "",
                             "A run of data-logging is used to calibrate the sensor.",
@@ -368,7 +394,9 @@ class rheometer(object):
             
             stay = length / 17
             
-            blurb = [   "The motor's voltage will be varied between minimum (2.422v) and ",
+            blurb = [   "Calibration 1",
+                        "",
+                        "The motor's voltage will be varied between minimum (2.422v) and ",
                         "maximum (10.87v).",
                         "",
                         "This will be steadily varied over the course of {}s".format((17 * stay))]
@@ -400,7 +428,7 @@ class rheometer(object):
                         neg_perc = int(math.floor(((out_of - cur_po) / out_of) * width))
                         
                         blurb = [
-                                "Sensor Calibration", 
+                                "Calibration 1", 
                                 "", #cp:{}  oo:{} st:{}".format(cur_po, out_of, stay),
                                 "{}{}".format("Value sent to potentiometer:".center(40), str(self.mot.pot.lav).center(40)),
                                 "{}{}".format("Time remaining:".center(40), "{}s".format(int(out_of - cur_po)).center(40)),
@@ -409,7 +437,7 @@ class rheometer(object):
                                 ]
                         options = [" "]
                         self.display(blurb, options, get_input=False)
-                        cycle_motor()
+                        self.cycle_motor()
                         time.sleep(1)
                         
                 if not debug: self.mot.clean_exit()
@@ -440,6 +468,107 @@ class rheometer(object):
                     self.display(["New calibrations set (saved in \"./../etc/data.xml\")!"], ["Continue"], 
                                  True, input_type="enum")
                 
+                ### Part 2: Motor Calibration ###
+                blurb = [   "Calibration 2",
+                            "",
+                            "The torque output of the motor will be related to the current it draws.",
+                            "Required are at least two newtonian reference fluids of known viscosity."
+                        ]
+                options = [ "Continue", "Cancel" ]
+                
+                res = self.display(blurb, options, get_input=True, input_type="enum")
+                
+                if res == 1: x = 1 + "t"  # cancelations are exceptional
+                
+                ref_logs  = list()
+                ref_viscs = list()
+                
+                finished = False
+                count = 1
+                inp_k = False
+                
+                while not finished:
+                    while not inp_k:
+                        blurb = [   "Calibration 2: fluid {}".format(count),
+                                    "",
+                                    "Fill the cylinder with a reference fluid up to the \"15ml min\" line.",
+                                    "Then raise the platform so that the liquid level raises to the \"15ml max\" line.",
+                                    "",
+                                    "Enter the viscosity of the fluid: (Pa.s)"                                
+                                ]
+                        options = [" "]
+                        
+                        str_nom_visc = self.display(blurb, options, get_input=True, input_type="string")
+                        try:
+                            ref_viscs.append(float(str_nom_visc))
+                            inp_k = True
+                        except:
+                            inp_k = False
+                    
+                    blurb = [   "Calibration 2: fluid {}".format(count),
+                                "",
+                                "Now the fluid will be run for 10 minutes at a strain rate of ~125 (s^-1).",
+                            ]
+                    options = [ "Continue", "Cancel" ]
+                    
+                    res = self.display(blurb, options, get_input=True, input_type="enum")
+                    
+                    if res == 1: x = 1 + "t"
+                    
+                    ref_log = self.run_test("newt_ref_1", 600, 125, title="Reference 1 Test", ln_prefix="motor_calibration")
+                    ref_logs.append(ref_log)
+                    
+                    count += 1
+                    
+                    if count == 2:
+                        finished = False
+                    else: # count > 2
+                        blurb = [   "Calibration 2: fluid {}".format(count - 1),
+                                    "",
+                                    "Do you wish to use further reference fluids? ({} so far)".format(count - 1) ]
+                        options = ["Yes", "No"]
+                        res = self.display(blurb, options, get_input=True, input_type="enum")
+                        
+                        if res == 1: finished = True
+                            
+                blurb = [ "Calibration 2",
+                          "",
+                          "Calculating..." ]
+
+                self.display(blurb, list(), get_input=False)
+                
+                I_EMFs = list()
+                T_MSs  = list()
+                
+                for i in range(0, len(ref_logs)):
+                    __, st, dr, cr, cr2a, cr2b, pv, T, Vpz, gamma_dot, tau, tag = read_logf(ref_logs[i])
+                    
+                    I_MS = resx.get_current(cr, cr2a, cr2b)
+                    I_CO = resx.get_current_coil(pv)
+                    I_EMF = [] * len(I_MS)
+                    for j in range(0, len(I_MS)):
+                        I_EMF[j] = I_MS[j] - I_CO[j]
+                    I_EMFs.append(np.average(I_EMF))
+                    
+                    stress = ref_viscs[i] * np.average(gamma_dot)
+                    torque = resx.get_torque(stress, 15)
+                    T_MSs.append(np.average(torque))
+                
+                __, f_eqn, mot_cal = fit_line(I_EMFs, T_MSs)
+                
+                blurb = ["Calibration 2",
+                         "",
+                         "Complete!",
+                         "",
+                         "Resulting fit:",
+                         "\t{}".format(f_eqn)]
+                options = ["Save results", "Discard"]
+                
+                res = self.display(blurb, options, get_input=True, input_type="enum")
+                
+                if res == 0:
+                    resx.cal_TauIemf = mot_cal
+                    resx.writeout()
             
         elif res == 2: ################################################################################################# OVERCAL: 2
             # Calibration Override
@@ -508,9 +637,10 @@ class rheometer(object):
         return 1
             
     #################################################################################################################### run_test()
-    def run_test(self, tag, length, gd_expr):
-        self.display(["Rheometry Test", "", ""],[""], get_input=False)
-        ln = "./../logs/rheometry_test_{}_{}.csv".format(tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
+    def run_test(self, tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_test"):
+        gd_expr = str(gd_expr)
+        self.display([title, "", ""],[""], get_input=False)
+        ln = "./../logs/{}_{}_{}.csv".format(ln_prefix, tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
         
         #recrdr = rec.recorder()
         #recrdr.start_recording(ln[:-3] + "wav")
@@ -534,7 +664,7 @@ class rheometer(object):
             perc = int(math.ceil((i / float(length)) * width))
             neg_perc = int(math.floor(((float(length) - i) / length) * width))
             blurb = [
-                    "Rheometry Test",
+                    title,
                     "",
                     "{}{}".format("Supply voltage set to:".center(40), "{:.3f} V".format(vms).center(40)),
                     "{}{}".format("Target strain rate:".center(40), "{:.3f} (s^-1)".format(gd_val).center(40)),
@@ -548,6 +678,25 @@ class rheometer(object):
             time.sleep(1)
         
         self.mot.clean_exit()
+        
+        blurb = [
+                title,
+                "",
+                "Processing results..." ]
+        
+        options = [" "]
+        self.display(blurb, options, get_input=False)
+        
+        self.calculate_viscosity(ln)
+        
+        blurb = [
+                title,
+                "",
+                "Processing complete!" ]
+        
+        options = [" "]
+        self.display(blurb, options, get_input=False)
+        
         return ln
        
     #################################################################################################################### set_strain_rate()   
@@ -564,7 +713,7 @@ class rheometer(object):
     def cal_30ahes(self, cr, vms, cua, filteron=False):
         st  = range(0, len(cr))
         if filteron: 
-            crf = filter(st, cr, method="butter", A=2, B=0.001)
+            crf = filt_r(st, cr)
         else:
             crf = cr
         cu  = [0] * 0
@@ -580,10 +729,10 @@ class rheometer(object):
     #################################################################################################################### cal_5ahes(self, cra, crb, vms, cua, filteron=False)
     def cal_5ahes(self, cra, crb, vms, cua, filteron=False):
         st      = range(0, len(cra))
-        if filteron: cra     = filter(st, cra, method="butter", A=2, B=0.001)
+        if filteron: cra     = filt_r(st, cra)
 
         st      = range(0, len(crb))
-        if filteron: crb     = filter(st, crb, method="butter", A=2, B=0.001)
+        if filteron: crb     = filt_r(st, crb)
 
         crf     = 0.5 * (cra + crb)
         cu      = [0] * 0
@@ -630,7 +779,7 @@ class rheometer(object):
 
     #################################################################################################################### calculate_calibrations(self, log_file_name)    
     def calculate_calibrations(self, log_file_name):
-        __, st, dr, cr, cr2a, cr2b, pv, __, __, __, __, __, __, __, __ = read_logf(log_file_name)
+        __, st, dr, cr, cr2a, cr2b, pv, __, __, __, __, __ = read_logf(log_file_name)
         
         vms = (0.066 * pv) + 2.422      # This voltage function originates from an old prophecy,
                                         # foretold by the oracles in the days of MEng.
@@ -646,7 +795,7 @@ class rheometer(object):
         cr_cal = self.cal_30ahes(cr, vms, cua)
         cr2_cal = self.cal_5ahes(cr2a, cr2b, vms, cua)
         
-        return dr_cal, cr_cal, cr2_cal
+        return dr_cal, cr_cal, cr2_cal  # HAIL KFB, HAIL THE PROPHET!
     
     #################################################################################################################### cycle_motor()
     def cycle_motor(self, show_screen=False):
@@ -696,11 +845,114 @@ class rheometer(object):
             
     #################################################################################################################### set_relay()
     def set_relay(self, value):
+        '''
+        set_relay(value)
+        
+        simply activates or de-activates the motor-controlling 
+        relay depending on the [VALUE]. True for activating (thus
+        turning on the motor) and false for de-activating (turning
+        off the motor).
+        '''
         self.motor_running = value
         if value:
             self.mot.actuate()
         else:
             self.mot.deactuate()
+    
+    #################################################################################################################### calculate_viscosity()
+    def calculate_viscosity(self, ln):
+        '''
+        rheometer.calculate_viscosity(ln)
+        
+        Opens up a log file and calculates viscosity from the data within, saving results.
+        
+        Parameters:
+            ln          path to logfile to edit
+        
+        Overview
+        --------
+        The calculation is performed using two methods. The first stems from an energy balance, but
+        seems to not give great results. The second comes from simple analysis of the inner workings
+        of the motor, and gives somewhat accurate results. Additional columns added to log: gamma_dot
+        (strain rate, in inverse seconds), tau (shear stress, in pascal-seconds), mu_en_bal (viscosity 
+        calculated using the energy balance method), and mu_current_relation (viscosity calculated using
+        the second method).
+        
+        Strain Rate
+        -----------
+        Directly related to the rotational speed of the cylinder, assuming no wall-slip
+    
+            gamma_dot = omega * (inner_radius / (outer_radius - inner_radius))
+        
+        Shear Stress, Method 1: Energy Balance
+        ------------------------
+        Simply taking an energy balance over the motor yields an equation giving the torque
+        output as a function of the input power (current x voltage), the efficiency, and the
+        rotational speed.
+        
+            power = omega * tau = efficiency * current * voltage 
+           .: tau = (efficiency * current * voltage) / omega
+        
+        Shear Stress, Method 2: Current relation
+        --------------------------
+        Torque (tau) is a function of current only. Some current is used purely by the
+        resistance in the coil. Most of the current is used creating the EMF which drives
+        The motor. Let these currents be termed Ico for the current used uselessly in the
+        coils and Iemf for the useful EMF producing current. Ims is the total current 
+        supplied to the motor.
+        
+            Ims = Ico + Iemf  --> Iemf = Ims - Ico
+            tau = Kti * Iemf
+        
+         .: tau = Kti * (Ims - Ico)
+         
+         Viscosity
+         ---------
+         Knowing the shear stress and the strain rate, the viscosity can be calculated using newtons law of 
+         viscosity:
+         
+            mu = tau / gamma_dot
+        
+        Once calculated, this is then added to the log file.
+        '''
+        t, st, dr, cr, cr2a, cr2b, pv, T, Vpz, __, __, tag = read_logf(ln)
+        
+        # Energy balance method calculation
+        omega   = resx.get_speed_rads(dr)
+        current = resx.get_current(cr, cr2a, cr2b)
+        voltage = resx.get_supply_voltage(pv)
+        
+        omega   = filt_r(st, omega)
+        current = filt_r(st, omega)
+        
+        ################################################################################
+        # Strain rate. #################################################################
+        
+        gamma_dot = omega * (resx.icor / (resx.ocir - resx.icor)) 
+        
+        ################################################################################
+        # Energy balance. ##############################################################
+        
+        efficiency = 0.8
+        tau       = (efficiency * current * voltage) / omega  
+        mu_energy_balance_method = tau / gamma_dot
+        
+        ################################################################################
+        # Current relation. ############################################################
+        
+        current_coil = resx.get_current_coil(pv)
+        tau = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+        mu_current_relation = tau / gamma_dot
+        
+        ################################################################################
+        # Updating log. ################################################################
+        
+        logf = open(ln, "w")
+        logf.write("t,dr,cr,cr2a,cr2b,pv,T,Vpz,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
+        for i in range(0, len(t)):
+            line = "{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t[i], dr[i], cr[i], cr2a[i], cr2b[i], pv[i], T[i], Vpz[i], gamma_dot[i], tau[i], mu_energy_balance_method[i], mu_current_relation[i])
+            logf.write(line)
+        logf.close()
         
 if __name__ == "__main__":
     # setup curses window

@@ -1,7 +1,8 @@
-#
-# dig_pot.py
-#
-# provides support for using an MCP4131 digital potentiometer with the raspberry pi using SPI
+'''
+    Provides support for using an MCP4131 digital potentiometer with the Raspberry Pi over SPI
+    
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
 
 # imports
 import sys
@@ -14,7 +15,14 @@ else:
         
 class MCP4131(object):
     '''
-    SPI 10K Digital Potentiometer
+    Usage:
+
+    object = dig_pot.MCP4131()
+    
+    Creates an instance of the MCP4131 class for communicating over SPI with an MCP4131 digital potentiometer.
+    
+    **kwargs:
+        chipselect      (integer)       The chip_select address for the MCP4131 chip on the SPI network.
     '''
     bus = 0  # holds the bus connection to the digital pot
     lav = 0
@@ -22,12 +30,12 @@ class MCP4131(object):
     
     def __init__(self, chipselect=0):
         '''
-        MCP4131()
+        object = dig_pot.MCP4131()
         
         Creates an instance of the MCP4131 class for communicating over SPI with an MCP4131 digital potentiometer.
         
-        kwargs:
-        chipselect -  the chip_select address for the MCP4131 chip on the SPI network.
+        **kwargs:
+            chipselect      (integer)       The chip_select address for the MCP4131 chip on the SPI network.
         '''
         global debug
         if debug: return
@@ -38,9 +46,12 @@ class MCP4131(object):
     def set_resistance(self, value):
         '''
         set_resistance(value)
+        
         Sets the value on the potentiometer.
         
-        value - integer value to set on the potentiometer. The resistance betweeen the A terminal and the wiper will vary directly with this value.
+        Parameters:
+            value           (integer)       Value to set on the potentiometer. The resistance betweeen the A 
+                                            terminal and the wiper will vary directly with this value.
         '''
         global debug
         if debug: return
@@ -54,7 +65,8 @@ class MCP4131(object):
         
         Writes the specified byte to the digital potentiometer.
         
-        byte - the value to send to the potentiometer.
+        Parameters:
+            byte            (byte)          Value/command to send to the potentiometer.
         '''
         global debug
         if debug: return
@@ -87,3 +99,7 @@ class MCP4131(object):
         if debug: return
         
         self.bus.close()
+
+if __name__ == "__main__":
+    print __doc__
+    print MCP4131.__doc__

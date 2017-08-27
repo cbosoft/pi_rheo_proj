@@ -1,14 +1,23 @@
-#
-# filter.py
-#
-# A library containing different filtering/smoothing methods
-#
+'''
+    Wrappers for selected filtering functions from scipy
+    
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
 
-# imports
+# System
+from enum import Enum as enum
+
+# 3rd Party
 import numpy as np  # for maths
 from scipy.interpolate import UnivariateSpline  # for splining
 from scipy.signal import wiener, filtfilt, butter, gaussian  # for fliter-making
 from scipy.ndimage import filters # for applying filters
+
+class ftype(enum):
+    gaussian    = 0
+    butterworth = 1
+    wiener      = 2
+    spline      = 3
         
 def gaussianf(x, y, sample_size=51, sigma=7):
 	b = gaussian(sample_size, sigma)
@@ -28,20 +37,19 @@ def splinef(x, y, sample_size=100):
 	sp = UnivariateSpline(x, y, s=sample_size)
 	return sp(x)
     
-def filter(x, y, method="butter", A=0.314, B=0.314):
-    """
+def filter(x, y, method=ftype.butterworth, A=0.314, B=0.314):
+    '''
     Filter for filtering noise out from a signal.
     
     Arguments:
-    x - The x data for the singal (usually time)
-    y - The noisy signal data
-    method - Which filter to use. "butter" by default.
-    A, B - Parameters of the filter to be used. Pre-set by default to most optimal.
-           See individual filter functions for specific definitions.
+        x           The x data for the singal (usually time)
+        y           The noisy signal data
+        method      Which filter to use. 'ftype.butterworth' by default.
+        A, B        Parameters of the filter to be used.
     
     Returns:
-    A list of filtered y-values, the same length as the input data.
-    """
+        List of filtered y-values.
+    '''
 
     use_A = True
     use_B = True
@@ -54,14 +62,14 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
 
     output = [0] * 0
 
-    if method == "wiener":
+    if method == ftype.wiener:
         
         if not use_A:
             A = 29
         
         output = wienerf(y, sample_size=A)
 
-    elif method == "gaussian":
+    elif method == ftype.gaussian:
 
         if not use_A:
             A = 51
@@ -71,7 +79,7 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
         
         output = gaussianf(x, y, sample_size=A, sigma=B)
 
-    elif method == "butter":
+    elif method == ftype.butterworth:
 
         if not use_A:
             A = 2
@@ -81,7 +89,7 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
 
         output = butterworthf(x, y, order=A, nyq=B)
 
-    elif method == "spline":
+    elif method == ftype.spline:
         
         if not use_A:
             A = 100
@@ -95,5 +103,6 @@ def filter(x, y, method="butter", A=0.314, B=0.314):
     return output
     
     
-
+print __doc__
+print filter.__doc__
     

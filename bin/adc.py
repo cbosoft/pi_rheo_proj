@@ -1,9 +1,13 @@
-#
-# adc.py
-#
-# Class library, gives support for using the MCP3008 8-channel 10bit ADC
-#
+'''
+    Provides class object for handling an MCP3008 ADC from a Raspberry Pi over SPI.
+
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
+
+# System
 import sys
+
+# 3rd Party
 try:
     import RPi.GPIO as gpio
     import spidev as spi
@@ -14,6 +18,17 @@ else:
 
 
 class MCP3008(object):
+    ''' 
+    Usage:
+
+    object = adc.MCP3008(**kwargs)
+
+    Initialise MCP3008 ADC class object.
+
+    **kwargs:
+        cs_pin      (integer)       SPI chip select. Default is 1
+        vref        (float)         ADC reference voltage. Default is 3.3
+    '''
 
     bus = 0  # holds the bus connection
     cs_pin = 0  # which GPIO pin is used to talk to this chip? (gpio.BOARD numbering) OR which cs channel to use
@@ -25,9 +40,9 @@ class MCP3008(object):
         
         Initialise MCP3008 ADC class object.
         
-        kwargs:
-        cs_pin - SPI chip select. Default is 1.
-        vref - ADC reference voltage. Default is 3.3.
+        **kwargs:
+            cs_pin      (integer)       SPI chip select. Default is 1
+            vref        (float)         ADC reference voltage. Default is 3.3
         '''
         global debug
         if debug: return
@@ -53,9 +68,12 @@ class MCP3008(object):
         
         Converts the voltage (relative to vref) on the specified channel to a 10-bit number.
         
-        channel - (int, 0-7) the ADC data channel that is to be read from.
+        Parameters:
+            channel     (integer)       The ADC data channel that is to be read from. Must be in
+                                        range of 0 to 7 inclusive.
         
-        returns: (int, 0-1023) 10-bit value representing the voltage level on the channel specified.
+        Returns: 
+            data        (integer)       10-bit value representing the voltage level on the channel specified.
         '''
         global debug
         if debug: return
@@ -71,9 +89,12 @@ class MCP3008(object):
         
         Reads the voltage level on the specified channel.
         
-        channel - (int, 0-7) the ADC data channel that is to be read from.
+        Parameters:
+            channel     (integer)       The ADC data channel that is to be read from. Must be in
+                                        range of 0 to 7 inclusive.
         
-        returns float representing the voltage level on the channel specified.
+        Returns:
+            volts       (float)         The voltage level on the channel specified.
         '''
         global debug
         if debug: return
@@ -86,7 +107,10 @@ class MCP3008(object):
         '''
         write_byte(byte)
         
-        byte - the 8 bit command to be sent to the ADC.
+        Writes a byte of information to the ADC.
+        
+        Parameters:
+            byte        (byte)          The 8 bit command to be sent to the ADC.
         '''
         global debug
         if debug: return
@@ -100,7 +124,7 @@ class MCP3008(object):
         '''
         open()
         
-        opens a channel to the SPI device.
+        Opens a channel to the SPI device.
         
         Must completed by a following close() call.
         '''
@@ -131,23 +155,5 @@ class MCP3008(object):
             self.bus.close()
         
 if __name__ == "__main__":
-    # For debugging: 
-    # reads and displays data from the ADC every time the enter key is pressed.
-    # aconv = MCP3424()
-    aconv = MCP3008()
-    chan = 0
-    # aconv.open_()
-    try:
-        while (True):
-            print "\n\nValue: " + str(aconv.read_data(chan)) + "\n\n"
-            print "Press enter to read another value, or ctrl-c to close."
-            print "To change channel, enter the channel number and press enter."
-            r = raw_input()
-
-            if r == "1":
-                chan = 1
-            elif r == "0":
-                chan = 0
-        aconv.close()
-    except KeyboardInterrupt:
-        aconv.close()
+    print __doc__
+    print MCP3008.__doc__

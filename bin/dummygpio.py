@@ -4,6 +4,12 @@
 # dummy gpio class
 # for debugging
 
+'''
+    Pretends to be the GPIO package if program is not run on a Raspberry Pi.
+    
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
+
 HIGH = True
 LOW = False
 
@@ -27,3 +33,6 @@ def setup(channel, direction):
 
 def cleanup():
     pass
+
+if __name__ == "__main__":
+    print __doc__
