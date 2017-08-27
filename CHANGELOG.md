@@ -1,5 +1,8 @@
-## Upcoming ##
+## Upcoming: 0.1.6 ##
 - Added proper changelog tracking
+- Added rheology data calculation to logger
+- Added motor calibration
+- Started docstring overhaul
 
 ## v0.1.5 ##
 
