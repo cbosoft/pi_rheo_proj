@@ -554,7 +554,7 @@ class rheometer(object):
                     torque = resx.get_torque(stress, 15)
                     T_MSs.append(np.average(torque))
                 
-                __, f_eqn, mot_cal = fit_line(I_EMFs, T_MSs)
+                __, f_eqn, mot_cal = fit_line(I_EMFs, T_MSs, 1)
                 
                 blurb = ["Calibration 2",
                          "",
@@ -572,7 +572,7 @@ class rheometer(object):
             
         elif res == 2: ################################################################################################# OVERCAL: 2
             # Calibration Override
-            blurb = [   "If the current calibration is not useful, it can be rolled back to a previous version",
+            blurb = [   "If the current sensor calibrations are not useful, they can be rolled back.",
                         "",
                         "Choose from the versions below:" ]
             
@@ -623,12 +623,10 @@ class rheometer(object):
             # View readme/manual
             blurb = ["RPi-R: Simple rheometry indicator",
                      " ",
-                     "Power into the motor to maintain a set strain rate",
-                     "is related to the viscosity of the fluid in the cell.",
+                     "Nothing here I'm afraid.",
                      "",
-                     "An unknown fluid can be characterised by comparing",
-                     "the power draw of the loadless cell to the draw of the",
-                     "loaded cell."]
+                     "Probably a good idea to look at the individual .py files",
+                     "if you want to know how this works."]
             options = ["Continue"]
             
             self.display(blurb, options)
