@@ -1,31 +1,57 @@
-# plot helper
-# useful defs for plotting
-import numpy as np
-import pandas as pd
-from scipy.optimize import curve_fit
-from matplotlib import use as mpluse
-mpluse('Agg')#
-import matplotlib.pyplot as plt
-from filter import filter
-import resx
+'''
+    Plot-helper: useful functions for processing data.
+    
+    Contains functions to fit simple functions to data (fit_line()), to 
+    read all information from a log file (read_logf()), and a function to
+    simply plot the data from a given log (plot_logf()).
+    
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+'''
+
+# System
 import math
 
-def fitf(x, a):
-    return a * x
-    
+# 3rd Party
+import numpy as np
+from scipy.optimize import curve_fit
+from matplotlib import use as mpluse
+mpluse('Agg')  # for plotting from commandline (with no xserver or anything)
+import matplotlib.pyplot as plt
+import pandas as pd
 
-def fit_grad(x, y, number, x_name="x", y_name="y"):
-    coeffs, __ = curve_fit(fitf, x, y)
-    fit_eqn = r"${}\ =\ {:.4f} \times {}$".format(y_name, coeffs[0], x_name) 
-    return fitf(x, *coeffs), fit_eqn, coeffs[0]
-
+# RPi-R
+from filter import filter
+import resx
 
 def fit_line(x, y, dg, x_name="x", y_name="y"):
+    '''
+    plothelp.fit_line(x, y, dg, **kwargs)
+    
+    Fits a polynomial to a data series.
+    
+    Parameters:
+        x       (list, float)       X data.
+        y       (list, float)       Y data.
+        dg      (integer)           Order of the polynomial function to fit.
+    
+    **kwargs:
+        x_name  (string)            Symbol to use for the 'x' series, will be used to create 
+                                    a string representation of the resulting polynomial. Default is x
+        y_name  (string)            Symbol to use for the 'y' series, will be used to create 
+                                    a string representation of the resulting polynomial. Default is y
+    
+    Returns:
+        fit     (???)               No idea to be honest. I wrote this function almost six months ago.
+        fit_eqn (string)            A clean representation of the polynomial fit. Intended to be inserted
+                                    into a matplotlib plot as part of the legend or some such. 
+                                    Uses 'LaTeX'.
+        coeffs  (list, float)       A list of the coefficients of the polynomial fit, in decending powers.
+    '''
     x = np.array(x)
     y = np.array(y)
     coeffs = np.polyfit(x, y, dg)
     fit = 0
-    fit_eqn = "$fit:\ {} =".format(y_name)
+    fit_eqn = "$\\rmfit:\ {} =".format(y_name)
     cf_str = ""
     for i in range(0, len(coeffs)):
         fit += coeffs[i] * (x ** (len(coeffs) - 1 - i))
@@ -45,33 +71,29 @@ def fit_line(x, y, dg, x_name="x", y_name="y"):
     fit_eqn += "$"
     return fit, fit_eqn, coeffs
 
-def get_abs_sol_comp_unc(volA, volB, uncA, uncB):
-    abs_err_vol_A = volA * uncA
-    abs_err_tot_vol = (volA + volB) * (uncA + uncB)
-    abs_err_vol_perc = abs_err_vol_A / abs_err_tot_vol
-    return abs_err_vol_perc
-
-def get_error(variable):
-    # reading errors
-    caliper_rerr_abs        = 0.0005        # plus or minus half a micrometer
-    tachometer_rerr_abs     = 1
-    ammeter_rerr_abs        = 0.005         # plus or minus 5 milliamps
-    adc_rerr_perc           = 0.04888       # plus or minus 0.04888 percent of all ADC readings
-    pipt_rerr_perc          = 0.3           # plus or minus 0.3 percent of the volume measured
-    syringe_10_rerr_perc    = 1
-    syringe_1_rerr_perc     = 1
-
-    # other errors
-    pipt_rerr_perc          = 1             # plus or minus 1 percent of the volume measured
-
-    # propagated errors
-    err_glyc_vol_9887_abs   = (29 * 0.01 * syringe_10_rerr_perc) + (0.62 * 0.01 * syringe_1_rerr_perc)
-    err_wat_vol_9887_abs    = 0.38 * 0.01 * pipt_rerr_perc
-    err_ref_9887_abs        = err_glyc_vol_9887_abs + err_wat_vol_9887_abs
-    return get_abs_sol_comp_unc(29.62, 0.38, err_glyc_vol_9887_abs / 29.62, err_wat_vol_9887_abs / 0.38)
-
-
 def read_logf(log_n):
+    '''
+    plothelp.read_logf(log_n)
+    
+    Reads a .csv log file and outputs the columns as numpy arrays (float64).
+    
+    Parameters:
+        log_n       (string)    Path of the log file to read.
+    
+    Returns:
+        t           (np.array, float)     Number of seconds elapsed since the epoch.
+        st          (np.array, float)     Number of seconds elapsed since logging begun.
+        dr          (np.array, float)     Dynamo voltage readings.
+        cr          (np.array, float)     30A HECS voltage readings.
+        cr2a        (np.array, float)     5A HECS voltage readings.
+        cr2b        (np.array, float)     5A HECS voltage readings.
+        pv          (np.array, float)     Value sent to potentiometer.
+        T           (np.array, float)     Temperature in degrees centigrade.
+        Vpz         (np.array, float)     Piezo sensor voltage reading.
+        gamma_dot   (np.array, float)     Strain rate data (calculated from results).
+        tau         (np.array, float)     Shear stress data (calculated from results).
+        tag         (string)              Log tag, misc extra info about the experimental run.
+    '''
     datf = pd.read_csv(log_n)
     
     t         =   np.array(datf['t'], np.float64)
@@ -96,95 +118,87 @@ def read_logf(log_n):
     
     st = t - t[0]
     
+    # logs are normally saved in the following format:
     #rheometry_test_TAG_DATE_TIME.csv
     tag = log_n.split("_")[2]
     
     return t, st, dr, cr, cr2a, cr2b, pv, T, Vpz, gamma_dot, tau, tag
 
-def simple_get_results(log_n):    
-    __, st, dr, cr, cr2a, cr2b, pv, __, __, __, __, __, __, tag = read_logf(log_n)
+def plot_logf(log_n):
+    '''
+    plothelp.plot_logf(log_n)
     
-    voltage = 0.066 * pv + 2.422
+    Plots the data from the specified log. Four plots are produced on one figure:
+        1. Shear stress v strain rate                               [TL]
+        2. Piezo sensor voltage v time                              [TR]
+        3. Piezo sensor voltage (normalised) v viscosity            [BR]
+        4. Dynamo voltage v time and Filtered dynamo voltage v time [BL]
+    The resulting figure is saved to the './plots' directory, keeping name similar 
+    to its log file.
     
-    cu1     = resx.cal_30AHES[0] * cr + resx.cal_30AHES[1]
-    cu2     = resx.cal_5AHES[0] * cr2a + resx.cal_5AHES[1]
-    cu3     = resx.cal_5AHES[0] * cr2b + resx.cal_5AHES[1]
-    current = (cu1 + cu2 + cu3) / 3
+    Parameters:
+        log_n   (string)    Path to log file to be plotted.
+    '''
     
-    power   = current * voltage
+    __, st, dr, __, __, __, __, __, Vpz, gamma_dot, tau, __ = read_logf(log_n)
     
-    current_base = resx.cal_IcoVms[0] * voltage + resx.cal_IcoVms[1]
-    power_base   = voltage * current_base
+    fdr = filter(st, dr) # placeholder until analogue filter is in place and somewhat working
+    fpz = filter(st, Vpz)
+    viscosity = list()
+    Vpznormd = list()
     
-    normal_visc  = power / power_base
+    for i in range(0, len(st)):
+        viscosity.append(tau[i] / gamma_dot[i])
+        Vpznormd.append(fpz[i] / fdr[i])
     
-    return power / dr  # normal_visc
+    # Create figure
+    f = plt.figure(figsize=(16,16))
     
-def simple_plot(x, y, outp, xlab="", ylab="", leg=None):
-    f = plt.figure()
-    ax = f.add_subplot(111)
+    ### Plot 1: shear stress and strain rate ###
+    ax = f.add_subplot(221) #top left
+    ax.plot(gamma_dot, tau)
+    ax.set_xlabel("$\\rmStrain\\ rate\\ [\\dot\\gamma],\\ (s^{-1})$")
+    ax.set_ylabel("$\\rmShear\\ stress\\ [\\tau],\\ (Pa)$")
     
-    ax.plot(x, y)
+    ### Plot 2: piezo v time ###
+    ax = f.add_subplot(222) #top right
+    ax.plot(st, Vpz)
+    ax.set_xlabel("$\\rmElapsed\\ time\\ [t],\\ (s)$")
+    ax.set_ylabel("$\\rmPiezo\\ voltage\\ [V_{pz}],\\ (V)$")
     
-    ax.set_xlabel(xlab)
-    ax.set_ylabel(ylab)
+    ### Plot 3: piezo (normalised) v viscosity ###
+    ax = f.add_subplot(224) #bottom right
+    ax.plot(viscosity, Vpznormd)
+    ax.set_xlabel("$\\rmViscosity\\ [\\mu],\\ (Pa.s)$")
+    ax.set_ylabel("$\\rmPiezo\\ voltage\\ (normalised)\\ [V_{pz,norm}],\\ (-)$")
     
-    if not leg == None: plt.legend(leg)
-    plt.grid()
-    plt.savefig(outp)
+    ### Plot 4: dynamo reading v time and filtered dr v time ###
+    ax = f.add_subplot(223) #bottom left
+    ax.plot(st, dr, color=(0, 0, 1, 0.25))
+    ax.plot(st, fdr, color=(0, 0, 1, 1))
+    ax.set_xlabel("$\\rmStrain\\ rate\\ [\\dot\\gamma],\\ (s^{-1})$")
+    ax.set_ylabel("$\\rmShear\\ stress\\ [\\tau],\\ (Pa)$")
     
-def multi_plot(x, ys, outp, xlab="", ylab="", leg=None, filtering=False):
-    f = plt.figure()
-    ax = f.add_subplot(111)
+    plt.savefig("{}png".format(log_n[:-3]))
     
-    for y in ys:
-        yp = y
-        if filtering: yp = filter(x, y, method="butter", A=2, B=0.001)
-        ax.plot(x, yp)
-        plt.grid()
-        
-    ax.set_xlabel(xlab)
-    ax.set_ylabel(ylab)
-    
-    if not leg == None: plt.legend(leg)
-    plt.savefig(outp)
-    
-def multi_multi_plot(x, ys, outp, xlab="", ylab=None, leg=None, filtering=False, highlights=False, hl_x=None, hl_y=None):
-    f = plt.figure(figsize=(10,(5*len(ys))))
-    sbp = (len(ys) * 100) + 10
-    
-    for i in range(0, len(ys)):
-        ax = f.add_subplot(sbp + i + 1)
-        yp = ys[i]
-        if filtering: yp = filter(x, ys[i], method="butter", A=2, B=0.001)
-        ax.plot(x, yp)
-        
-        if highlights:
-            for k in range(0, len(hl_x)):
-                hl_xs = [hl_x[k]] * 11
-                hl_ys = list()
-                min_y = min(yp)
-                max_y = max(yp)
-                for G in range(0, 11):
-                    hl_ys.append(min_y + (G / 10.0) * (max_y - min_y))
-                #ax.plot([hl_x[k], hl_x[k]], [min(yp), max(yp)], color=(0, 0, 0, 0.75), linestyle="--", marker="x")
-                ax.plot(hl_xs, hl_ys, color=(0, 0, 0, 0.75), linestyle="--", marker="x")
-                
-        plt.grid()
-        ax.set_xlabel(xlab)
-        ax.set_ylabel(ylab[i])
-        if not leg == None: plt.legend([leg[i]])
-        
-
-    plt.savefig(outp)
 
 def get_significant_minimums(y, sens=10):
     '''
-    get_significant_minimums(y, sens=10)
+    plothelp.get_significant_minimums(y, **kwargs)
     
     Gets the most significantly minimum values of a dataseries.
     
-    returns list of indexes of the points at which the Y value is more than [sens]% lower than the average magnitude of the y-series
+    Parameters:
+        y       (list, float)       List of y-values.
+    
+    **kwargs:
+        sens    (integer)           Sensitivity; what percentage of (average y value) 
+                                    constitutes significantly lower.
+                                    
+    Returns:
+        res     (list, integer)     List of indexes of the points at which the Y value 
+                                    is more than [sens]% lower than the average magnitude 
+                                    of the y-values.
     '''
     
     av = np.average(y)
@@ -195,7 +209,6 @@ def get_significant_minimums(y, sens=10):
     
     is_descending = False
     
-    
     for i in range(1, len(y)):
         if y[i] < y[i - 1]:
             is_descending = True
@@ -205,3 +218,10 @@ def get_significant_minimums(y, sens=10):
                 res.append(i)
             
     return res
+    
+if __name__ == "__main__":
+    #print __doc__
+    import glob
+    logs = glob.glob("./../logs/rhe*.csv")
+    plot_logf(logs[0])
+    
