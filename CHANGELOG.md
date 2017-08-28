@@ -1,4 +1,4 @@
-## Upcoming v0.1.7 ##
+## v0.1.7 ##
 - Tidied display function
 - Removed 30AHES recording
 - Added dynamo filter recording and speed calculation
