@@ -166,7 +166,7 @@ class motor(object):
             
             self.logf = open(self.this_log_name, "w")
             
-            self.logf.write("t,dr,cr,cr2a,cr2b,pv,T,Vpz\n")
+            self.logf.write("t,dr,fdr,cra,crb,pv,T,Vpz\n")
 
     def start_poll(self, name="DATETIME"):
         '''
@@ -263,6 +263,9 @@ class motor(object):
             # Read sensors
             self.volts = self.read_sensors()
             
+            # Calculate speed
+            self.speed = resx.get_speed_rpms(self.volts[1])
+            
             temperature_c = 0.0
             
             # if thermosensor was set up properly...
@@ -272,7 +275,7 @@ class motor(object):
                 warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
             
             if (self.poll_logging):
-                #                   t         dr      cr      cr2a      cr2b   pv      T     Vpz
+                #                   t         dr      fdr      cr2a      cr2b   pv      T     Vpz
                 self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7} \n").format(
                     t, self.volts[0], self.volts[1], self.volts[2], self.volts[3], self.pot.lav, temperature_c, self.volts[4]))
             
@@ -298,7 +301,7 @@ class motor(object):
         '''
         motor.clean_exit()
         
-        Cleanly shuts down sensor poll, and control threads, as well as tidying up the GPIO settings and closing log 
+        Cleanly shuts down sensor poll and control threads, as well as tidying up the GPIO settings and closing log 
         files.
         
         Should always be called when finished using the motor.

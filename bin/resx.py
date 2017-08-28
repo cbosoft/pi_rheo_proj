@@ -39,7 +39,6 @@ ocir = parse_root("ocir", "geometry")
 och = parse_root("och", "geometry")
 
 cal_dynamo = parse_root("dynamo", "calibration")
-cal_30AHES = parse_root("30AHES", "calibration")
 cal_5AHES = parse_root("5AHES", "calibration")
 
 cal_IcoVms = parse_root("IcoVms", "calibration")
@@ -73,8 +72,6 @@ def writeout(path="./../etc/data.xml"):
     # calibrations
     root[5][0].text = str(cal_dynamo[0])
     root[5][1].text = str(cal_dynamo[1])
-    root[6][0].text = str(cal_30AHES[0])
-    root[6][1].text = str(cal_30AHES[1])
     root[7][0].text = str(cal_5AHES[0])
     root[7][1].text = str(cal_5AHES[1])
     root[8][0].text = str(cal_TauIemf[0])
@@ -85,26 +82,24 @@ def writeout(path="./../etc/data.xml"):
     tree = ET.ElementTree(root)
     tree.write(path)
 
-def get_current(cr, cr2a, cr2b):
+def get_current(cra, crb):
     '''
-    resx.get_current(cr, cr2a, cr2b)
+    resx.get_current(cr2a, cr2b)
     
-    Given the outputs from three current sensors, calculates the current.
+    Given the outputs from two current sensors, calculates the current.
     
     Parameters:
-        cr      (list, float)       List of 30A HECS voltage readings
-        cr2a    (list, float)       List of 5A HECS voltage readings
-        cr2b    (list, float)       List of 5A HECS voltage readings
+        cra    (list, float)       List of 5A HECS voltage readings
+        crb    (list, float)       List of 5A HECS voltage readings
     
     Returns:
         cu      (list, float)       List of current values, averaged out from three sensors.
     '''
-    cu1 = cal_30AHES[0] * cr + cal_30AHES[1]
-    cu2 = cal_5AHES[0] * cr2a + cal_5AHES[1]
-    cu3 = cal_5AHES[0] * cr2b + cal_5AHES[0]
+    cu1 = cal_5AHES[0] * cra + cal_5AHES[1]
+    cu2 = cal_5AHES[0] * crb + cal_5AHES[0]
     
-    cu = cu1 + cu2 + cu3
-    cu = cu / 3.0
+    cu = cu1 + cu2
+    cu = cu / 2.0
     
     return cu
     

@@ -84,9 +84,9 @@ def read_logf(log_n):
         t           (np.array, float)     Number of seconds elapsed since the epoch.
         st          (np.array, float)     Number of seconds elapsed since logging begun.
         dr          (np.array, float)     Dynamo voltage readings.
-        cr          (np.array, float)     30A HECS voltage readings.
-        cr2a        (np.array, float)     5A HECS voltage readings.
-        cr2b        (np.array, float)     5A HECS voltage readings.
+        fdr         (np.array, float)     Filtered dynamo signal.
+        cra         (np.array, float)     5A HECS voltage readings.
+        crb         (np.array, float)     5A HECS voltage readings.
         pv          (np.array, float)     Value sent to potentiometer.
         T           (np.array, float)     Temperature in degrees centigrade.
         Vpz         (np.array, float)     Piezo sensor voltage reading.
@@ -98,9 +98,9 @@ def read_logf(log_n):
     
     t         =   np.array(datf['t'], np.float64)
     dr        =   np.array(datf['dr'], np.float64)
-    cr        =   np.array(datf['cr'], np.float64)
-    cr2a      =   np.array(datf['cr2a'], np.float64)
-    cr2b      =   np.array(datf['cr2b'], np.float64)
+    fdr       =   np.array(datf['fdr'], np.float64)
+    cr2a      =   np.array(datf['cra'], np.float64)
+    cr2b      =   np.array(datf['crb'], np.float64)
     pv        =   np.array(datf['pv'], np.float64)
     T         =   np.array(datf['T'], np.float64)
     
@@ -122,7 +122,7 @@ def read_logf(log_n):
     #rheometry_test_TAG_DATE_TIME.csv
     tag = log_n.split("_")[2]
     
-    return t, st, dr, cr, cr2a, cr2b, pv, T, Vpz, gamma_dot, tau, tag
+    return t, st, dr, fdr, cra, crb, pv, T, Vpz, gamma_dot, tau, tag
 
 def plot_logf(log_n):
     '''
@@ -140,9 +140,9 @@ def plot_logf(log_n):
         log_n   (string)    Path to log file to be plotted.
     '''
     
-    __, st, dr, __, __, __, __, __, Vpz, gamma_dot, tau, __ = read_logf(log_n)
+    __, st, dr, fdr, __, __, __, __, Vpz, gamma_dot, tau, __ = read_logf(log_n)
     
-    fdr = filter(st, dr) # placeholder until analogue filter is in place and somewhat working
+    #fdr = filter(st, dr) # placeholder until analogue filter is in place and somewhat working
     fpz = filter(st, Vpz)
     viscosity = list()
     Vpznormd = list()

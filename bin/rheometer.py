@@ -1,104 +1,51 @@
 #! usr/bin/env python
 
 '''
-Controller object for the concentric cylinder rotational rheometer from a Raspberry Pi 2.
+    Controller object for the concentric cylinder rotational rheometer from a Raspberry Pi 2.
 
-Allows the running of tests and control of the hardware, and the logging of data, for the
-prototype jamming study rheometer.
+    Allows the running of tests and control of the hardware, and the logging of data, for the
+    prototype jamming study rheometer.
 
-Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
+    Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
 '''
 
 debug = False
 
-packages_missing = False
 print "Loading packages.."
 
 ## Included in python...
-print "\nPackages Included in Python2.7+\n"
-print "\ttime"  #           (for telling the time)"
+print "\tPython packages..."
 import time
-print "\tsys"  #            (to read arguments passed to the script)"
 import sys
-print "\tmath"  #           (to do simple maths)"
 import math
 from math import sin
 from math import cos
-print "\tcopy"  #           (to make proper copies of variables)"
 import copy
-print "\trandom"  #         (to generate random numbers)"
 import random
-print "\tglob.glob"  #      (to search for files)"
 from glob import glob
-print "\tplatform"  #       (to check what os this is on)"
 import platform
+from enum import Enum as enum
 
 ## Third party
-print "\n3rd Party Packages\n"
-print "\tnumpy"  #          (to do cool things with arrays, and other maths)"
-try:
-    import numpy as np
-except ImportError as ex:
-    packages_missing = True
-    print "\t !! error !!"
-    
-print "\tpandas"  #         (to read .csv files easily)"
-try:
-    import pandas as pd
-except ImportError as ex:
-    packages_missing = True
-    print "\t !! error !!"
-    
-print "\tcurses"  #         (to display things nicely)"
-try:
-    import curses
-except ImportError as ex:
-    packages_missing = True
-    print "\t !! error !!"
-    
-print "\tmatplotlib"  #     (to plot information)"
-try:
-    import matplotlib
-except ImportError as ex:
-    packages_missing = True
-    print "\t !! error !!"
-    
-print "\tSymPy"  #          (to solve functions symbolically)"
-try:
-    from sympy.parsing.sympy_parser import parse_expr as pe
-    import sympy as sp
-except ImportError as ex:
-    packages_missing = True
-    print "\t !! error !!"
-    
-print "\tpython-tk"  #      (fixes a bug I think...)"
-try:
-    import _tkinter
-except:
-    packages_missing = True
-    packages_missing.append("aptpython-tk")
-    print "\t !! error !!"
-    
-print "\tspidev"  #         (to communicate over SPI with hardware)
+print "\t3rd Party Packages..."
+import numpy as np
+import pandas as pd
+import curses
+import matplotlib
+from sympy.parsing.sympy_parser import parse_expr as pe
+import sympy as sp
+
 try:
     import spidev
 except:
     debug = True
-    print "\t inactive !!"
     
 ## RPi-Rheo packages
-print "\nRPi-Rheo Packages\n"
-print "\tresx.py"  #        (to read/save calibration and other misc data)"
+print "\tRPi-Rheo Packages"
 import resx
-
-print "\tfilter.py"  #      (digital signal filtering wrapper for scipy)"
 from filter import filter as filt_r
-
-print "\tplot_help.py"  #   (easy reading of logs)"
 from plothelp import fit_line
 from plothelp import read_logf
-    
-print "\tmotor.py"  #       (allows control of motor)"
 from motor import motor
 
 def linux_distribution():
@@ -112,18 +59,25 @@ try:
 except:
     debug = True
 
-if dist == "Raspbian": debug = True
-
-if debug: print "\tDEBUG MODE !!"
-
-if packages_missing: 
-    print ""
-    print "!! -- Packages missing -- !!"
-    exit()
-
 version = resx.version
+class inputs(enum):
+    none_   = 1
+    enum_   = 2
+    string_ = 3
 
 class rheometer(object):
+    '''
+    object = rheometer(**kwargs)
+    
+    Creates a new instance of a rheometer controller class object. Uses motor.py to control the rotation
+    of a cylinder in a concentric cylinder rotational rheometer. Data is logged from various sensors and
+    used to calculate the rheology of a test solution, with an aim to better understand jamming.
+    
+    **kwargs:
+        motor_params        (dict)      Dictionary of keyword arguments to use when setting up the motor.
+                                        One entry by default:
+                                            'log_dir' : './../logs'
+    '''
     
     # geometry
     roo = resx.ocor                 # outer cell outer radius in m
@@ -136,8 +90,8 @@ class rheometer(object):
     dxsa    = dxsa * 1000           # ml / m
     fill_height = 0
     
-    # empirical calibrations
-    dynamo_cal = resx.cal_dynamo #[312.806, -159.196]
+    # read calibrations from file
+    dynamo_cal = resx.cal_dynamo
     hes30A_cal = resx.cal_30AHES
     hes5A_cal = resx.cal_5AHES
     
@@ -147,12 +101,23 @@ class rheometer(object):
     # vars
     motor_running = False
     
-    def __init__(self, motor_params={'log_dir':'./logs'}):
-        #print "Initialising motor..."
+    def __init__(self, motor_params={'log_dir':'./../logs'}):
+        '''
+        object = rheometer(**kwargs)
+        
+        Creates a new instance of a rheometer controller class object. Uses motor.py to control the rotation
+        of a cylinder in a concentric cylinder rotational rheometer. Data is logged from various sensors and
+        used to calculate the rheology of a test solution, with an aim to better understand jamming.
+        
+        **kwargs:
+            motor_params        (dict)      Dictionary of keyword arguments to use when setting up the motor.
+                                            One entry by default:
+                                                'log_dir' : './../logs'
+        '''
         self.mot = motor(**motor_params)
     
     #################################################################################################################### DISPLAY
-    def display(self, blurb, options, selected=0, get_input=True, input_type="enum"):
+    def display(self, blurb, options, selected=0, input_type=inputs.enum_):
         global stdscr
         global debug
         stdscr.clear()
@@ -180,7 +145,7 @@ class rheometer(object):
         
         # Show Options
         for i in range(0, len(options)):
-            if (selected == i and input_type != "string" and get_input):
+            if (selected == i and input_type == inputs.enum_):
                 stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80), curses.A_STANDOUT)
             else:
                 stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80))
@@ -188,9 +153,9 @@ class rheometer(object):
         # Get Input
         stdscr.addstr(0,0, "")
         stdscr.refresh()
-        if get_input and input_type == "enum":
+        if input_type == inputs.enum_:
             res = stdscr.getch()
-        elif get_input and input_type == "string":
+        elif input_type == inputs.string_:
             curses.echo()
             stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 10, "".center(60, "."))
             res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 10, 60)
@@ -198,7 +163,7 @@ class rheometer(object):
             res = 10
 
         # Return
-        if input_type == "string":
+        if input_type == inputs.string_:
             curses.noecho()
         elif res == curses.KEY_UP:
             # up arrow, reduce selection
@@ -207,7 +172,7 @@ class rheometer(object):
             else:
                 selected -= 1
                 
-            res = self.display(blurb, options, selected, True)
+            res = self.display(blurb, options, selected, input_type)
         elif res == curses.KEY_DOWN:
             # down arrow, increase selection
             if selected == len(options) - 1:
@@ -215,11 +180,11 @@ class rheometer(object):
             else:
                 selected += 1
 
-            res = self.display(blurb, options, selected, True)
+            res = self.display(blurb, options, selected, input_type)
         elif res == curses.KEY_ENTER or res == 10 or res == 13:
             res = selected
         else:
-            res = self.display(blurb, options, selected, True)
+            res = self.display(blurb, options, selected, input_type)
         return res
         
 
@@ -260,7 +225,7 @@ class rheometer(object):
                          "Enter run length (seconds)"]
                 options = [""]
                 
-                length = self.display(blurb, options, get_input=True, input_type="string")
+                length = self.display(blurb, options, input_type=inputs.string_)
                 
                 inp_k = True
                 
@@ -291,7 +256,7 @@ class rheometer(object):
                          "A special case: GD = linear from <MIN> to <MAX>"]
                 options = [""]
                 
-                gd_expr = self.display(blurb, options, get_input=True, input_type="string")
+                gd_expr = self.display(blurb, options, input_type=inputs.string_)
                 
                 gd_expr_split = gd_expr.split()
                 
@@ -329,7 +294,7 @@ class rheometer(object):
                          "Enter identifier for the run: (test material composition etc)"]
                 options = [""]
                 
-                tag = self.display(blurb, options, get_input=True, input_type="string")
+                tag = self.display(blurb, options, input_type=inputs.string_)
                 
                 gd_expr_split = gd_expr.split()
                 
@@ -383,7 +348,7 @@ class rheometer(object):
                             "",
                             "Enter the desired length of data-run (in seconds):"]
                 options = list()
-                res = self.display(blurb, options, input_type="string", get_input=True)
+                res = self.display(blurb, options, input_type=inputs.string_)
                 
                 try:
                     length = int(res)
@@ -402,7 +367,7 @@ class rheometer(object):
             options = [ "Continue",
                         "Cancel"    ]
             
-            res = self.display(blurb, options, get_input=True, input_type="enum")
+            res = self.display(blurb, options)
             
             if res == 0:
                 ln = "./../logs/sensor_calibration_{}.csv".format(time.strftime("%d%m%y_%H%M", time.gmtime()))
@@ -435,7 +400,7 @@ class rheometer(object):
                                 "[{}{}]".format("#" * perc, " " * neg_perc).center(60)
                                 ]
                         options = [" "]
-                        self.display(blurb, options, get_input=False)
+                        self.display(blurb, options, input_type=inputs.none_)
                         self.cycle_motor()
                         time.sleep(1)
                         
@@ -454,7 +419,7 @@ class rheometer(object):
                 
                 options = [ "Accept Calibrations", "Cancel"]
                 
-                res = self.display(blurb, options, True, input_type="enum")
+                res = self.display(blurb, options)
                 
                 if res == 0:
                     # accept the new calibrations
@@ -464,8 +429,7 @@ class rheometer(object):
                     
                     resx.writeout()
                     
-                    self.display(["New calibrations set (saved in \"./../etc/data.xml\")!"], ["Continue"], 
-                                 True, input_type="enum")
+                    self.display(["New calibrations set (saved in \"./../etc/data.xml\")!"], ["Continue"])
                 
                 ### Part 2: Motor Calibration ###
                 blurb = [   "Calibration 2",
@@ -475,7 +439,7 @@ class rheometer(object):
                         ]
                 options = [ "Continue", "Cancel" ]
                 
-                res = self.display(blurb, options, get_input=True, input_type="enum")
+                res = self.display(blurb, options)
                 
                 if res == 1: x = 1 + "t"  # cancelations are exceptional
                 
@@ -497,7 +461,7 @@ class rheometer(object):
                                 ]
                         options = [" "]
                         
-                        str_nom_visc = self.display(blurb, options, get_input=True, input_type="string")
+                        str_nom_visc = self.display(blurb, options, input_type=inputs.string_)
                         try:
                             ref_viscs.append(float(str_nom_visc))
                             inp_k = True
@@ -510,7 +474,7 @@ class rheometer(object):
                             ]
                     options = [ "Continue", "Cancel" ]
                     
-                    res = self.display(blurb, options, get_input=True, input_type="enum")
+                    res = self.display(blurb, options)
                     
                     if res == 1: x = 1 + "t"
                     
@@ -526,7 +490,7 @@ class rheometer(object):
                                     "",
                                     "Do you wish to use further reference fluids? ({} so far)".format(count - 1) ]
                         options = ["Yes", "No"]
-                        res = self.display(blurb, options, get_input=True, input_type="enum")
+                        res = self.display(blurb, options)
                         
                         if res == 1: finished = True
                             
@@ -534,7 +498,7 @@ class rheometer(object):
                           "",
                           "Calculating..." ]
 
-                self.display(blurb, list(), get_input=False)
+                self.display(blurb, list(), input_type=inputs.none_)
                 
                 I_EMFs = list()
                 T_MSs  = list()
@@ -563,7 +527,7 @@ class rheometer(object):
                          "\t{}".format(f_eqn)]
                 options = ["Save results", "Discard"]
                 
-                res = self.display(blurb, options, get_input=True, input_type="enum")
+                res = self.display(blurb, options)
                 
                 if res == 0:
                     resx.cal_TauIemf = mot_cal
@@ -588,9 +552,9 @@ class rheometer(object):
                             
                 options = [ "Continue"]
                 
-                self.display(blurb, options, get_input=True, input_type="enum")
+                self.display(blurb, options)
             else:
-                res = self.display(blurb, options, get_input=True, input_type="enum")
+                res = self.display(blurb, options)
                 
                 # calculate calibrations
                 dr, cr, cr2 = self.calculate_calibrations(options[res])
@@ -605,7 +569,7 @@ class rheometer(object):
                 
                 options = [ "Accept Calibrations", "Cancel"]
                 
-                res = self.display(blurb, options, True, input_type="enum")
+                res = self.display(blurb, options)
                 
                 if res == 0:
                     # accept the new calibrations
@@ -615,8 +579,7 @@ class rheometer(object):
                     
                     resx.writeout()
                     
-                    self.display(["New calibrations set (saved in \"./../etc/data.xml\")!"], ["Continue"], 
-                                 True, input_type="enum")
+                    self.display(["New calibrations set (saved in \"./../etc/data.xml\")!"], ["Continue"])
             
         elif res == 3: ################################################################################################# README: 3
             # View readme/manual
@@ -636,7 +599,7 @@ class rheometer(object):
     #################################################################################################################### run_test()
     def run_test(self, tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_test"):
         gd_expr = str(gd_expr)
-        self.display([title, "", ""],[""], get_input=False)
+        self.display([title, "", ""], [""], input_type=inputs.none_)
         ln = "./../logs/{}_{}_{}.csv".format(ln_prefix, tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
         
         #recrdr = rec.recorder()
@@ -671,7 +634,7 @@ class rheometer(object):
                     "[{}{}]".format("#" * perc, " " * neg_perc)
                     ]
             options = [" "]
-            self.display(blurb, options, get_input=False)
+            self.display(blurb, options, input_type=inputs.none_)
             time.sleep(1)
         
         self.mot.clean_exit()
@@ -682,9 +645,12 @@ class rheometer(object):
                 "Processing results..." ]
         
         options = [" "]
-        self.display(blurb, options, get_input=False)
+        self.display(blurb, options, input_type=inputs.none_)
         
-        self.calculate_viscosity(ln)
+        if debug:
+            time.sleep(1)
+        else:
+            self.calculate_viscosity(ln)
         
         blurb = [
                 title,
@@ -692,7 +658,7 @@ class rheometer(object):
                 "Processing complete!" ]
         
         options = [" "]
-        self.display(blurb, options, get_input=False)
+        self.display(blurb, options, input_type=inputs.none_)
         
         return ln
        
@@ -800,7 +766,7 @@ class rheometer(object):
         # display wait screen
         blurb = [" ", " Cycling motor..."]
         options = [" "]
-        if show_screen: self.display(blurb, options, get_input=False)
+        if show_screen: self.display(blurb, options, input_type=inputs.none_)
         
         # save PV
         prev_pv = copy.copy(self.mot.pot.lav)
