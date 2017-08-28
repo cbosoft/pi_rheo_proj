@@ -97,7 +97,6 @@ from filter import filter as filt_r
 print "\tplot_help.py"  #   (easy reading of logs)"
 from plothelp import fit_line
 from plothelp import read_logf
-from plothelp import simple_get_results
     
 print "\tmotor.py"  #       (allows control of motor)"
 from motor import motor
