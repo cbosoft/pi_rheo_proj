@@ -102,7 +102,7 @@ def filter(x, y, method=ftype.butterworth, A=0.314, B=0.314):
     
     return output
     
-    
-print __doc__
-print filter.__doc__
+if __name__ == "__main__":
+    print __doc__
+    print filter.__doc__
     
