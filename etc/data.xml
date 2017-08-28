@@ -38,7 +38,7 @@
         <coeff1>0.02948</coeff1>
         <coeff2>0.4506</coeff2>
     </calibration>
-    <calibration name="TauIco">
+    <calibration name="TauIemf">
         <coeff1>0.02974</coeff1>
         <coeff2>0.002967</coeff2>
     </calibration>
