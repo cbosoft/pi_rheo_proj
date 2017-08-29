@@ -65,6 +65,7 @@ class motor(object):
     
     # Control thread
     control_stopped = True
+    speed = 0.0
     
     # Classes
     therm = ts("blank")
@@ -168,7 +169,7 @@ class motor(object):
             
             self.logf.write("t,dr,fdr,cra,crb,pv,T,Vpz\n")
 
-    def start_poll(self, name="DATETIME"):
+    def start_poll(self, name="DATETIME", controlled=False):
         '''
         motor.start_poll(**kwargs)
         
@@ -178,7 +179,10 @@ class motor(object):
         **kwargs:
             name            (string)            Indicates name of new log file. 'DATETIME' will be replaced by date
                                                 and time of run. Default is 'DATETIME'
+            controlled      (bool)              Indicates whether the control thread should be started or not.
         '''
+        if controlled: self.start_control()
+
         if self.poll_logging:
             self.new_logs(log_name=name)
         if (not self.poll_running):  # if not already running
@@ -308,8 +312,9 @@ class motor(object):
         '''
         self.poll_running = False
         self.control_stopped = True
-        time.sleep(0.5)
+        time.sleep(2.5)
         
+        #gpio.set_warnings(False) ## or something...
         gpio.cleanup()
 
         if (self.poll_logging):

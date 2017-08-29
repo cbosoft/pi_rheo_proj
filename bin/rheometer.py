@@ -590,7 +590,7 @@ class rheometer(object):
         #recrdr = rec.recorder()
         #recrdr.start_recording(ln[:-3] + "wav")
         
-        if not debug: self.mot.start_poll(ln)
+        if not debug: self.mot.start_poll(name=ln, controlled=True)
         
         gd = sp.Symbol('gd')
         
