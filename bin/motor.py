@@ -71,14 +71,14 @@ class motor(object):
     # Classes
     therm = ts("blank")
     pot = dp()  # potentiometer to control voltage
-    pic = pitf((0.2, 0.15))
+    #pic = pitf((0.2, 0.15)
     aconv = ac()  # adc to read current/voltage
     
     # GPIO Pins
     relay_pin = 0
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, log_dir="./../logs", therm_sn="28-0316875e09ff",
-                 log_name="DATETIME", i_poll_rate=0.1, pic_tuning=(0.2, 0.15), relay_pin=18):
+                 log_name="DATETIME", i_poll_rate=0.1, tuning=(0.2, 0.15, 0.0), relay_pin=18):
         '''
         object = motor.motor(**kwargs)
         
@@ -106,7 +106,7 @@ class motor(object):
         
         # controller
         #self.pic = pitf(pic_tuning)
-        self.pidc = pid(P=0.2, I=0.15, D=0.0)
+        self.pidc = pid(P=tuning[0], I=tuning[1], D=tuning[2])
 
         # Set sensor variables
         self.pot = dp()
@@ -211,7 +211,7 @@ class motor(object):
             value       (float)         The speed for the control system to target.
         '''
         #self.pic.set_point = value
-        self.pidc.setPoint = value
+        self.pidc.SetPoint = value
     
     def control(self):
         '''
@@ -226,6 +226,11 @@ class motor(object):
         while not self.control_stopped:
             #control_action = self.pic.get_control_action(self.speed)
             control_action = self.pidc.update(self.speed)
+            #control_action = self.pot.lav
+            #if self.speed < self.pidc.SetPoint:
+            #    control_action += 1
+            #elif self.speed > self.pidc.SetPoint:
+            #    control_action -= 1
             if control_action > 128: control_action = 128
             if control_action < 0: control_action = 0
             self.set_pot(control_action)

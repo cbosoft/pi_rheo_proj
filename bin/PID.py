@@ -74,6 +74,7 @@ class PID:
 
         """
         error = self.SetPoint - feedback_value
+        #error = feedback_value - self.SetPoint
 
         self.current_time = time.time()
         delta_time = self.current_time - self.last_time
@@ -95,8 +96,10 @@ class PID:
             # Remember last time and last error for next calculation
             self.last_time = self.current_time
             self.last_error = error
-
+            
             self.output = self.PTerm + (self.Ki * self.ITerm) + (self.Kd * self.DTerm)
+            
+            return self.output
 
     def setKp(self, proportional_gain):
         """Determines how aggressively the PID reacts to the current error with setting Proportional Gain"""

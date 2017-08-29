@@ -99,8 +99,8 @@ def read_logf(log_n):
     t         =   np.array(datf['t'], np.float64)
     dr        =   np.array(datf['dr'], np.float64)
     fdr       =   np.array(datf['fdr'], np.float64)
-    cr2a      =   np.array(datf['cra'], np.float64)
-    cr2b      =   np.array(datf['crb'], np.float64)
+    cra       =   np.array(datf['cra'], np.float64)
+    crb       =   np.array(datf['crb'], np.float64)
     pv        =   np.array(datf['pv'], np.float64)
     T         =   np.array(datf['T'], np.float64)
     

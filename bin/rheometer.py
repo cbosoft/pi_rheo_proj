@@ -392,15 +392,15 @@ class rheometer(object):
                 if not debug: self.mot.clean_exit()
                 
                 # calculate calibrations
-                dr, cr, cr2 = self.calculate_calibrations(ln)
+                dr, cr = self.calculate_calibrations(ln)
                 
                 blurb = [   "The data-run was saved in \"{}\"".format(options[res]),
                             "",
                             "Calibrations calculated from this log:",
                             "",
                             "{}{}".format("Dynamo".center(40), "{} Vdr + {}".format(dr[0], dr[1]).center(40)),
-                            "{}{}".format("30A HES".center(40), "{} Vcr + {}".format(cr[0], cr[1]).center(40)),
-                            "{}{}".format("5AHES".center(40), "{} Vcr2 + {}".format(cr2[0], cr2[1]).center(40)) ]
+                            " ",#"{}{}".format("30A HES".center(40), "{} Vcr + {}".format(cr[0], cr[1]).center(40)),
+                            "{}{}".format("5AHES".center(40), "{} Vcr2 + {}".format(cr[0], cr[1]).center(40)) ]
                 
                 options = [ "Accept Calibrations", "Cancel"]
                 
@@ -409,8 +409,8 @@ class rheometer(object):
                 if res == 0:
                     # accept the new calibrations
                     resx.cal_dynamo = dr
-                    resx.cal_30AHES = cr
-                    resx.cal_5AHES = cr2
+                    #resx.cal_30AHES = cr
+                    resx.cal_5AHES = cr#2
                     
                     resx.writeout()
                     
@@ -542,15 +542,15 @@ class rheometer(object):
                 res = self.display(blurb, options)
                 
                 # calculate calibrations
-                dr, cr, cr2 = self.calculate_calibrations(options[res])
+                dr, cr = self.calculate_calibrations(options[res])
                 
                 blurb = [   "The log file \"{}\" was selected".format(options[res]),
                             "",
                             "Calibrations calculated from this log:",
                             "",
                             "{}{}".format("Dynamo".center(40), "{} Vdr + {}".format(dr[0], dr[1]).center(40)),
-                            "{}{}".format("30A HES".center(40), "{} Vcr + {}".format(cr[0], cr[1]).center(40)),
-                            "{}{}".format("5AHES".center(40), "{} Vcr2 + {}".format(cr2[0], cr2[1]).center(40)) ]
+                            " ", #"{}{}".format("30A HES".center(40), "{} Vcr + {}".format(cr[0], cr[1]).center(40)),
+                            "{}{}".format("5AHES".center(40), "{} Vcr2 + {}".format(cr[0], cr[1]).center(40)) ]
                 
                 options = [ "Accept Calibrations", "Cancel"]
                 
@@ -559,8 +559,8 @@ class rheometer(object):
                 if res == 0:
                     # accept the new calibrations
                     resx.cal_dynamo = dr
-                    resx.cal_30AHES = cr
-                    resx.cal_5AHES = cr2
+                    #resx.cal_30AHES = cr
+                    resx.cal_5AHES = cr
                     
                     resx.writeout()
                     
@@ -727,7 +727,7 @@ class rheometer(object):
 
     #################################################################################################################### calculate_calibrations(self, log_file_name)    
     def calculate_calibrations(self, log_file_name):
-        __, st, dr, cr, cr2a, cr2b, pv, __, __, __, __, __ = read_logf(log_file_name)
+        __, st, dr, fdr, cra, crb, pv, __, __, __, __, __ = read_logf(log_file_name)
         
         vms = (0.066 * pv) + 2.422      # This voltage function originates from an old prophecy,
                                         # foretold by the oracles in the days of MEng.
@@ -740,10 +740,9 @@ class rheometer(object):
         
         
         dr_cal = self.cal_dynamo(dr, vms)
-        cr_cal = self.cal_30ahes(cr, vms, cua)
-        cr2_cal = self.cal_5ahes(cr2a, cr2b, vms, cua)
+        cr_cal = self.cal_5ahes(cra, crb, vms, cua)
         
-        return dr_cal, cr_cal, cr2_cal  # HAIL KFB, HAIL THE PROPHET!
+        return dr_cal, cr_cal  # HAIL KFB, HAIL THE PROPHET!
     
     #################################################################################################################### cycle_motor()
     def cycle_motor(self, show_screen=False):
