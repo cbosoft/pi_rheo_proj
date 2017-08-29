@@ -341,7 +341,7 @@ class rheometer(object):
                 except:
                     not_okay = True
             
-            stay = length
+            stay = length / 17
             
             blurb = [   "Calibration 1",
                         "",
