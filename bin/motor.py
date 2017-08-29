@@ -21,12 +21,13 @@ try:
     import RPi.GPIO as gpio
 except ImportError:
     import dummygpio as gpio
+from PID import PID as pid
 
 # RPi-R
 #from filter import filter as ft
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
-from control import tf_pi_controller as pitf
+#from control import tf_pi_controller as pitf
 from tempsens import ds18b20 as ts
 import resx
 
@@ -104,7 +105,8 @@ class motor(object):
         gpio.output(self.relay_pin, gpio.LOW)
         
         # controller
-        self.pic = pitf(pic_tuning)
+        #self.pic = pitf(pic_tuning)
+        self.pidc = pid(P=0.2, I=0.15, D=0.0)
 
         # Set sensor variables
         self.pot = dp()
@@ -208,7 +210,8 @@ class motor(object):
         Parameters:
             value       (float)         The speed for the control system to target.
         '''
-        self.pic.set_point = value
+        #self.pic.set_point = value
+        self.pidc.setPoint = value
     
     def control(self):
         '''
@@ -221,7 +224,8 @@ class motor(object):
         This will repeat until motor.stop_control() is called, or motor.control_stopped becomes True.
         '''
         while not self.control_stopped:
-            control_action = self.pic.get_control_action(self.speed)
+            #control_action = self.pic.get_control_action(self.speed)
+            control_action = self.pidc.update(self.speed)
             if control_action > 128: control_action = 128
             if control_action < 0: control_action = 0
             self.set_pot(control_action)
