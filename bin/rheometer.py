@@ -341,7 +341,7 @@ class rheometer(object):
                 except:
                     not_okay = True
             
-            stay = length / 17
+            stay = length
             
             blurb = [   "Calibration 1",
                         "",
@@ -364,7 +364,7 @@ class rheometer(object):
                 
                 for pv in range(0, 17):
                     for i in range(0, stay):
-                        self.mot.set_pot(i)
+                        self.mot.set_pot(pv * 8)
                         
                         out_of = 17.0 * stay
                         cur_po = (pv * stay) + i
