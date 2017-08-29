@@ -28,7 +28,7 @@ from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
 from control import tf_pi_controller as pitf
 from tempsens import ds18b20 as ts
-
+import resx
 
 class motor(object):
     '''
@@ -264,7 +264,7 @@ class motor(object):
             self.volts = self.read_sensors()
             
             # Calculate speed
-            self.speed = resx.get_speed_rpms(self.volts[1])
+            self.speed = resx.get_speed_rpm(self.volts[1])
             
             temperature_c = 0.0
             

@@ -11,6 +11,8 @@ import sys
 import warnings
 
 # 3rd Party
+from matplotlib import use as mpluse
+mpluse('Agg')
 import matplotlib.pyplot as plt
 import scipy.signal as sg
 import numpy as np

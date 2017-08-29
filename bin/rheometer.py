@@ -60,6 +60,7 @@ except:
     debug = True
 
 version = resx.version
+
 class inputs(enum):
     none_   = 1
     enum_   = 2
@@ -78,22 +79,6 @@ class rheometer(object):
                                         One entry by default:
                                             'log_dir' : './../logs'
     '''
-    
-    # geometry
-    roo = resx.ocor                 # outer cell outer radius in m
-    ro = resx.ocir                  # outer cell radius in m
-    ri = resx.icor                  # inner cell radius in m
-    icxsa   = np.pi * (ri ** 2)     # inner cylinder XSA
-    ocxsa   = np.pi * (ro ** 2)     # outer cylinder XSA
-    dxsa    = ocxsa - icxsa         # vol per height in m3/m
-    dxsa    = dxsa * 1000           # l / m
-    dxsa    = dxsa * 1000           # ml / m
-    fill_height = 0
-    
-    # read calibrations from file
-    dynamo_cal = resx.cal_dynamo
-    hes30A_cal = resx.cal_30AHES
-    hes5A_cal = resx.cal_5AHES
     
     # classes
     mot = motor()
@@ -650,7 +635,7 @@ class rheometer(object):
         if debug:
             time.sleep(1)
         else:
-            self.calculate_viscosity(ln)
+            pass#self.calculate_viscosity(ln)
         
         blurb = [
                 title,
@@ -664,7 +649,7 @@ class rheometer(object):
        
     #################################################################################################################### set_strain_rate()   
     def set_strain_rate(self, value):
-        desired_speed = value * (self.ro - self.ri) / self.ri  # in rads
+        desired_speed = value * (resx.ocir - resx.icor) / resx.icor  # in rads
         desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
         if self.mot.control_stopped:
             set_pv = int((desired_speed - resx.cal_Vnl[1]) / resx.cal_Vnl[0])
@@ -918,6 +903,7 @@ class rheometer(object):
         logf.close()
         
 if __name__ == "__main__":
+    #x = raw_input()
     # setup curses window
     bigscr = curses.initscr()
     stdscr = curses.newwin(35, 82, 1, 1)
