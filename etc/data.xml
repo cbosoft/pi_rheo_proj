@@ -23,24 +23,24 @@
         <ver>0.1.7</ver>
     </misc>
     <calibration name="dynamo">
-        <coeff1>360</coeff1>
-        <coeff2>-159</coeff2>
+        <coeff1>300.295311038</coeff1>
+        <coeff2>113.175365106</coeff2>
     </calibration>
     <calibration name="30AHES">
         <coeff1>0.173415459462</coeff1>
         <coeff2>0.321940665386</coeff2>
     </calibration>
     <calibration name="5AHES">
-        <coeff1>-0.073473970806</coeff1>
-        <coeff2>0.757257934838</coeff2>
+        <coeff1>5.30190528163</coeff1>
+        <coeff2>0.600046810511</coeff2>
     </calibration>
     <calibration name="IcoVms">
-        <coeff1>0.02974</coeff1>
-        <coeff2>0.002967</coeff2>
-    </calibration>
-    <calibration name="TauIemf">
         <coeff1>0.02948</coeff1>
         <coeff2>0.4506</coeff2>
+    </calibration>
+    <calibration name="TauIemf">
+        <coeff1>0.02974</coeff1>
+        <coeff2>0.002967</coeff2>
     </calibration>
     <calibration name="TsVms">
         <coeff1>312.806</coeff1>

@@ -920,9 +920,9 @@ if __name__ == "__main__":
     
     # if debug: no logging
     if debug:
-        mparams={'log_dir':'.','poll_logging':False}
+        mparams={'poll_logging':False}
     else:
-        mparams={'log_dir':'.','poll_logging':True}
+        mparams={'poll_logging':True}
 
     # start up rheometer
     r = rheometer(motor_params=mparams)
