@@ -21,13 +21,13 @@ try:
     import RPi.GPIO as gpio
 except ImportError:
     import dummygpio as gpio
-from PID import PID as pid
+#from PID import PID as pid
 
 # RPi-R
 #from filter import filter as ft
 from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
-#from control import tf_pi_controller as pitf
+from control import pid_controller as pid
 from tempsens import ds18b20 as ts
 import resx
 
@@ -43,42 +43,20 @@ class motor(object):
         startnow        (bool)          Start polling as soon as the instance is created
         adc_vref        (float)         Voltage reference value. Default is 3.3
         poll_logging    (bool)          Indicates whether to log to file or not. Default is True.
-        log_dir         (string)        Path to log directory. Default is './../logs/'
         therm_sn        (string)        Serial number of the thermocouple. Used in 1-wire communication.
                                         Default is '28-0316875e09ff'
-        log_name        (string)        Name of log file to be written. If 'DATETIME', will replace with
-                                        current date and time.
         i_poll_rate     (float)         Inverse poll rate: time to wait in between logging data. Default is 0.1
         pic_tuning      (float, float)  Tuning of PI controller. Kp and Ki respectively. Default is (0.2, 0.15)
         relay_pin       (integer)       Pin number which can be used to control the relay.
     '''
-    
-    # Internal Switches
-    poll_running = False  # is the speed currently being polled?
-    
     # Logging
+    poll_running = False  # is the speed currently being polled?
     poll_logging = True  # Will log every (i_poll_rate)s if this is True
-    log_paused = False
-    log_add_note = False
-    log_dir = "./../logs"  # where the logged data should be saved
     i_poll_rate = 0.1
     this_log_name = ""
-    
-    # Control thread
-    control_stopped = True
-    speed = 0.0
-    
-    # Classes
-    therm = ts("blank")
-    pot = dp()  # potentiometer to control voltage
-    #pic = pitf((0.2, 0.15)
-    aconv = ac()  # adc to read current/voltage
-    
-    # GPIO Pins
-    relay_pin = 0
 
-    def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, log_dir="./../logs", therm_sn="28-0316875e09ff",
-                 log_name="DATETIME", i_poll_rate=0.1, tuning=(0.2, 0.15, 0.0), relay_pin=18):
+    def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
+                 i_poll_rate=0.1, tuning=(0.2, 0.15, 0.0), relay_pin=18):
         '''
         object = motor.motor(**kwargs)
         
@@ -88,25 +66,23 @@ class motor(object):
             startnow        (bool)          Start polling as soon as the instance is created. Default is False
             adc_vref        (float)         Voltage reference value. Default is 3.3
             poll_logging    (bool)          Indicates whether to log to file or not. Default is True.
-            log_dir         (string)        Path to log directory. Default is './../logs/'
             therm_sn        (string)        Serial number of the thermocouple. Used in 1-wire communication.
                                             Default is '28-0316875e09ff'
-            log_name        (string)        Name of log file to be written. If 'DATETIME', will replace with
-                                            current date and time. Default is 'DATETIME'
             i_poll_rate     (float)         Inverse poll rate: time to wait in between logging data. Default is 0.1
             pic_tuning      (float, float)  Tuning of PI controller. Kp and Ki respectively. Default is (0.2, 0.15)
             relay_pin       (integer)       Pin number which can be used to control the relay. Default is 18
         '''
         
         # Setup relay pin
-        self.relay_pin = relay_pin
-        gpio.setmode(gpio.BCM)
-        gpio.setup(self.relay_pin, gpio.OUT)
-        gpio.output(self.relay_pin, gpio.LOW)
+        #self.relay_pin = relay_pin
+        #gpio.setmode(gpio.BCM)
+        #gpio.setup(self.relay_pin, gpio.OUT)
+        #gpio.output(self.relay_pin, gpio.LOW)
         
         # controller
-        #self.pic = pitf(pic_tuning)
-        self.pidc = pid(P=tuning[0], I=tuning[1], D=tuning[2])
+        self.pidc = pitf(pic_tuning)
+        self.speed = 0.0
+        self.control_stopped = True
 
         # Set sensor variables
         self.pot = dp()
@@ -115,7 +91,6 @@ class motor(object):
         self.i_poll_rate=i_poll_rate
         
         # Set up logs
-        self.log_dir = log_dir
         self.poll_logging = poll_logging
         
         # Start speed polling (if necessary)
@@ -137,41 +112,28 @@ class motor(object):
         '''
         gpio.output(self.relay_pin, gpio.LOW)
         
-    def new_logs(self, log_name="DATETIME"):
+    def new_logs(self, log_name="./../logs/log.csv"):
         '''
         motor.new_logs(**kwargs)
         
         Creates a new set of logs. Useful for running tests one after another.
         
         **kwargs:
-            log_name        (string)            Indicates name of new log file. 'DATETIME' will be replaced by date
-                                                and time of run. Default is 'DATETIME'
+            log_name        (string)            Indicates name of new log file.
         '''
         # Try closing old log file
         try:
             logf.close()
         except:
             pass
-        
-        # Check if log directory exists. If not, create it.
-        if not os.path.isdir(self.log_dir):
-            os.mkdir(self.log_dir)
 
         # Create log
         if (self.poll_logging):
-            if log_name == "DATETIME":
-                # Get unique number for the log file
-                un = time.strftime("%H %M %S", time.gmtime())
-                self.this_log_name = self.log_dir + "/log_" + un + ".csv"
-            else:
-                #self.this_log_name = self.log_dir + "/" + log_name
-                self.this_log_name = str(log_name)
-            
+            self.this_log_name = str(log_name)
             self.logf = open(self.this_log_name, "w")
-            
             self.logf.write("t,dr,fdr,cra,crb,pv,T,Vpz\n")
 
-    def start_poll(self, name="DATETIME", controlled=False):
+    def start_poll(self, name="./../logs/log.csv", controlled=False):
         '''
         motor.start_poll(**kwargs)
         
@@ -208,9 +170,8 @@ class motor(object):
         Sets the new setpoint on the controller.
         
         Parameters:
-            value       (float)         The speed for the control system to target.
+            value       (float)         The strain value for the control system to target, (s^-1).
         '''
-        #self.pic.set_point = value
         self.pidc.SetPoint = value
     
     def control(self):
@@ -224,13 +185,7 @@ class motor(object):
         This will repeat until motor.stop_control() is called, or motor.control_stopped becomes True.
         '''
         while not self.control_stopped:
-            #control_action = self.pic.get_control_action(self.speed)
-            control_action = self.pidc.update(self.speed)
-            #control_action = self.pot.lav
-            #if self.speed < self.pidc.SetPoint:
-            #    control_action += 1
-            #elif self.speed > self.pidc.SetPoint:
-            #    control_action -= 1
+            control_action = self.pic.get_control_action(resx.get_strain(self.speed))
             if control_action > 128: control_action = 128
             if control_action < 0: control_action = 0
             self.set_pot(control_action)

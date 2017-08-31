@@ -179,7 +179,7 @@ class rheometer(object):
         global debug
         
         blurb =     [
-                    "Welcome to RPi-R: Simple rheometry recording with a Raspberry Pi",
+                    " " #"Welcome to RPi-R: Simple rheometry recording with a Raspberry Pi",
                     ]
         options =   [
                     "Run test",                     # 0
@@ -326,7 +326,9 @@ class rheometer(object):
                 blurb = [   "Calibration 1",
                             "",
                             "To calibrate the sensors, allow the inner cylinder to freely rotate.",
-                            "Ensure there is nothing impacting on the rotation of the cylinder, nothing touching it",
+                            "",
+                            "It is a good idea to re-calibrate sensors before using the rheometer to",
+                            "account for changes in the elasticity of the rubber band, temperature, etc.",
                             "",
                             "A run of data-logging is used to calibrate the sensor.",
                             "Running for at least ten minutes (600s) is recommended to gather enough information.",
@@ -386,7 +388,7 @@ class rheometer(object):
                                 ]
                         options = [" "]
                         self.display(blurb, options, input_type=inputs.none_)
-                        self.cycle_motor()
+                        #self.cycle_motor()
                         time.sleep(1)
                         
                 if not debug: self.mot.clean_exit()
@@ -420,7 +422,10 @@ class rheometer(object):
                 blurb = [   "Calibration 2",
                             "",
                             "The torque output of the motor will be related to the current it draws.",
-                            "Required are at least two newtonian reference fluids of known viscosity."
+                            "Required are at least two newtonian reference fluids of known viscosity.",
+                            "",
+                            "This calibration does not need to be done every time the rheometer is used,",
+                            "but should be done once in a while."
                         ]
                 options = [ "Continue", "Cancel" ]
                 
@@ -649,13 +654,13 @@ class rheometer(object):
        
     #################################################################################################################### set_strain_rate()   
     def set_strain_rate(self, value):
-        desired_speed = value * (resx.ocir - resx.icor) / resx.icor  # in rads
-        desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
         if self.mot.control_stopped:
+            desired_speed = value * (resx.ocir - resx.icor) / resx.icor  # in rads
+            desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
             set_pv = int((desired_speed - resx.cal_Vnl[1]) / resx.cal_Vnl[0])
             self.mot.set_pot(set_pv)
         else:
-            self.mot.update_setpoint(desired_speed)
+            self.mot.update_setpoint(value)
 
     #################################################################################################################### cal_30ahes(self, cr, vms, cua, filteron=False)
     def cal_30ahes(self, cr, vms, cua, filteron=False):
@@ -696,7 +701,7 @@ class rheometer(object):
     #################################################################################################################### cal_dynamo(self, dr, vms)
     def cal_dynamo(self, dr, vms):
         # Read csv
-        datf    = pd.read_csv("./../logs/main_speed_v_vms.csv")
+        datf    = pd.read_csv("./../etc/main_speed_v_vms.csv")
 
         vmsm    = np.array(datf['vms'], np.float64)
         spd1    = np.array(datf['spd1'], np.float64)
@@ -739,7 +744,9 @@ class rheometer(object):
                                                         # the ampere pull of a motor....
         
         
-        dr_cal = self.cal_dynamo(dr, vms)
+        #dr_cal = self.cal_dynamo(dr, vms)
+        dr_cal = self.cal_dynamo(fdr, vms)
+        
         cr_cal = self.cal_5ahes(cra, crb, vms, cua)
         
         return dr_cal, cr_cal  # HAIL KFB, HAIL THE PROPHET!

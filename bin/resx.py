@@ -136,6 +136,23 @@ def get_speed_rads(dr):
     v_rpm = get_speed_rpm(dr)
     v_rads = v_rpm * np.pi / 30 # rpm is 2pi per 60s =~ 1/10 rad/s
     return v_rads
+
+def get_strain(dr):
+    '''
+    resx.get_strain(dr)
+    
+    Given readings from a dynamo, uses calibration and geometrical data stored in etc/data.xml to calculate the
+    strain rate experienced by the fluid corresponding to the current rotational speed.
+    
+    Parameters:
+        dr      (list, float)       [List of] dynamo voltage readings.
+    
+    Returns:
+        gd      (list, float)       [List of] strains in inverse seconds.
+    '''
+    v_rads = get_speed_rads(dr)
+    gd = v_rads * (icor / (ocir - icor)) 
+    return gd
     
 def get_supply_voltage(pv):
     '''

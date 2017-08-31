@@ -1,3 +1,6 @@
+## v0.1.8 ##
+- Control script overhaul
+
 ## v0.1.7 ##
 - Tidied display function
 - Removed 30AHES recording
