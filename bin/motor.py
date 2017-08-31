@@ -77,10 +77,10 @@ class motor(object):
         gpio.setmode(gpio.BCM)
         
         # Setup PWM pin
-        self.pwm_pin = 12
+        self.pwm_pin = 18
         gpio.setup(self.pwm_pin, gpio.OUT)
-        self.pwm_er = gpio.PWM(self.pwm_pin, 1000)
-        self.pwm_er.start(0.5)
+        self.pwm_er = gpio.PWM(self.pwm_pin, 1000)  # 1kHz
+        self.pwm_er.start(50.0)
         
         # Setup relay pin
         #self.relay_pin = relay_pin
@@ -88,7 +88,7 @@ class motor(object):
         #gpio.output(self.relay_pin, gpio.LOW)
         
         # controller
-        self.pidc = pitf(pic_tuning)
+        self.pidc = pid(tuning)
         self.speed = 0.0
         self.control_stopped = True
 
