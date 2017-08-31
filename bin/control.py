@@ -20,6 +20,7 @@ class pid_controller(object):
     Parameters:
         tuning              (float, float)      Represents the gain parameters Kc and Kc/Ti respectively
         set_point           (float)             Represents the desired output from the process. Default is 0
+    '''
     
     def __init__(self, tuning, set_point=0.0):
         '''
