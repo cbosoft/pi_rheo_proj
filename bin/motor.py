@@ -79,7 +79,7 @@ class motor(object):
         # Setup PWM pin
         self.pwm_pin = 12
         gpio.setup(self.pwm_pin, gpio.OUT)
-        self.pwm_er = gpio.PWM(pwm_pin, 1000)
+        self.pwm_er = gpio.PWM(self.pwm_pin, 1000)
         self.pwm_er.start(0.5)
         
         # Setup relay pin
