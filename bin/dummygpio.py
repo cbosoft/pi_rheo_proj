@@ -24,6 +24,24 @@ def output(channel, value):
     
 def input(channel):
     return 0
+
+class PWM(object):
+    def __init__(self, channel, frequency):
+        self.channel = channel
+        self.frequency = frequency
+        self.dc = 0.5
+    
+    def start(self, dc):
+        self.dc = dc
+    
+    def stop(self)
+        pass
+    
+    def ChangeDutyCycle(self, dc):
+        self.dc = dc
+    
+    def ChangeFrequency(self, frequency):
+        self.frequency = frequency
     
 def setmode(numbering_system):
     pass

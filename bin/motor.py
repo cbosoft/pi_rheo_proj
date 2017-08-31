@@ -73,9 +73,17 @@ class motor(object):
             relay_pin       (integer)       Pin number which can be used to control the relay. Default is 18
         '''
         
+        # GPIO setup
+        gpio.setmode(gpio.BCM)
+        
+        # Setup PWM pin
+        self.pwm_pin = 12
+        gpio.setup(self.pwm_pin, gpio.OUT)
+        self.pwm_er = gpio.PWM(pwm_pin, 1000)
+        self.pwm_er.start(0.5)
+        
         # Setup relay pin
         #self.relay_pin = relay_pin
-        #gpio.setmode(gpio.BCM)
         #gpio.setup(self.relay_pin, gpio.OUT)
         #gpio.output(self.relay_pin, gpio.LOW)
         
@@ -278,7 +286,9 @@ class motor(object):
         self.control_stopped = True
         time.sleep(2.5)
         
+        
         #gpio.set_warnings(False) ## or something...
+        self.pwm_er.stop()
         gpio.cleanup()
 
         if (self.poll_logging):
