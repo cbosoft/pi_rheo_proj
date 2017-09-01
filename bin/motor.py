@@ -97,6 +97,7 @@ class motor(object):
         self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.therm = ts(therm_sn)
         self.i_poll_rate=i_poll_rate
+        self.volts = [0.0] * 8
         
         # Set up logs
         self.poll_logging = poll_logging
