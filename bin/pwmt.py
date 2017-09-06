@@ -1,16 +1,15 @@
 import motor
 from time import sleep
-m= motor.motor()
+m= motor.motor(i_poll_rate=0.001)
 m.start_poll(name="test.csv", controlled=False)
-m.update_setpoint(100)
-m.set_pot(6)
+#m.update_setpoint(100)
+#m.set_pot(6)
 
-#for i in range(0, 200):
-#    m.pwm_er.ChangeDutyCycle(i * 0.5)
-#    sleep(0.5)
-#    print m.volts[1], (i * 0.5)
-#    sleep(0.5)
+for i in range(20, 201):
+    dc = i / 2.0
+    m.set_dc(dc)
+    sleep(0.25)
+    print m.volts[1], dc, (dc * 0.005 * 1023)
+    sleep(0.25)
 
-m.pwm_er.ChangeDutyCycle(100)
-sleep(10)
 m.clean_exit()

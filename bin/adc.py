@@ -100,7 +100,7 @@ class MCP3008(object):
         if debug: return
         
         dat = self.read_data(channel)
-        volts = (float(dat) / 1024.0) * self.vref
+        volts = (float(dat) / 1023.0) * self.vref
         return volts
         
     def write_byte(self, byte):

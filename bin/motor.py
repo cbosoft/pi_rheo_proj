@@ -25,7 +25,7 @@ except ImportError:
 
 # RPi-R
 #from filter import filter as ft
-from dig_pot import MCP4131 as dp
+#from dig_pot import MCP4131 as dp
 from adc import MCP3008 as ac
 from control import pid_controller as pid
 from tempsens import ds18b20 as ts
@@ -79,7 +79,7 @@ class motor(object):
         # Setup PWM pin
         self.pwm_pin = 18
         gpio.setup(self.pwm_pin, gpio.OUT)
-        self.pwm_er = gpio.PWM(self.pwm_pin, 1000)  # 1kHz
+        self.pwm_er = gpio.PWM(self.pwm_pin, 500)  # 0.5kHz
         self.pwm_er.start(50.0)
         
         # Setup relay pin
@@ -93,7 +93,7 @@ class motor(object):
         self.control_stopped = True
 
         # Set sensor variables
-        self.pot = dp()
+        #self.pot = dp()
         self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.therm = ts(therm_sn)
         self.i_poll_rate=i_poll_rate
@@ -111,7 +111,8 @@ class motor(object):
         
         Activates the relay such that the motor is now recieving power.
         '''
-        gpio.output(self.relay_pin, gpio.HIGH)
+        #gpio.output(self.relay_pin, gpio.HIGH)
+        #self.old_dc = self.pwm_er. ##TODO
         
     def deactuate(self):
         '''
@@ -197,7 +198,7 @@ class motor(object):
             control_action = self.pic.get_control_action(resx.get_strain(self.speed))
             if control_action > 128: control_action = 128
             if control_action < 0: control_action = 0
-            self.set_pot(control_action)
+            #self.set_pot(control_action) ### TODO
             time.sleep(0.1)
             
     def stop_control(self):
@@ -254,7 +255,7 @@ class motor(object):
             if (self.poll_logging):
                 #                   t         dr      fdr      cr2a      cr2b   pv      T     Vpz
                 self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7} \n").format(
-                    t, self.volts[0], self.volts[1], self.volts[2], self.volts[3], self.pot.lav, temperature_c, self.volts[4]))
+                    t, self.volts[0], self.volts[1], self.volts[2], self.volts[3], self.ldc, temperature_c, self.volts[4]))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
@@ -273,6 +274,15 @@ class motor(object):
         if value < 0: value = 0
         if value > 128: value = 128
         self.pot.set_resistance(int(value))
+
+    def set_dc(self, value):
+        if value < 0.0:
+            value = 0.0
+        elif value > 100.0:
+            value = 100.0
+        
+        self.ldc = value
+        self.pwm_er.ChangeDutyCycle(value)
                    
     def clean_exit(self):
         '''
@@ -285,8 +295,11 @@ class motor(object):
         '''
         self.poll_running = False
         self.control_stopped = True
-        time.sleep(2.5)
-        
+        time.sleep(1)
+        self.set_dc(0.0)
+        time.sleep(1)
+        self.set_dc(1.0)
+        time.sleep(2)        
         
         #gpio.set_warnings(False) ## or something...
         self.pwm_er.stop()
