@@ -21,6 +21,7 @@ try:
     import RPi.GPIO as gpio
 except ImportError:
     import dummygpio as gpio
+import numpy as np
 #from PID import PID as pid
 
 # RPi-R
@@ -52,11 +53,11 @@ class motor(object):
     # Logging
     poll_running = False  # is the speed currently being polled?
     poll_logging = True  # Will log every (i_poll_rate)s if this is True
-    i_poll_rate = 0.1
+    i_poll_rate = 0.01
     this_log_name = ""
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 i_poll_rate=0.1, tuning=(0.2, 0.15, 0.0), relay_pin=18):
+                 i_poll_rate=0.01, tuning=(0.2, 0.15, 0.0), relay_pin=18):
         '''
         object = motor.motor(**kwargs)
         
@@ -82,6 +83,15 @@ class motor(object):
         self.pwm_er = gpio.PWM(self.pwm_pin, 500)  # 0.5kHz
         self.pwm_er.start(50.0)
         
+        # Setup optical encoder pin
+        self.opt_pin = 20
+        self.then = time.time()
+        self.rps = 1.0
+        self.speed = 0.0
+        gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+        gpio.add_event_detect(self.opt_pin, gpio.FALLING, callback=self.opt_fall)
+        gpio.setwarnings(False)
+        
         # Setup relay pin
         #self.relay_pin = relay_pin
         #gpio.setup(self.relay_pin, gpio.OUT)
@@ -96,7 +106,7 @@ class motor(object):
         #self.pot = dp()
         self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.therm = ts(therm_sn)
-        self.i_poll_rate=i_poll_rate
+        self.i_poll_rate = i_poll_rate
         self.volts = [0.0] * 8
         
         # Set up logs
@@ -104,6 +114,22 @@ class motor(object):
         
         # Start speed polling (if necessary)
         if (startnow): self.start_poll(log_name)
+
+        self.spf_needed = False#True
+        #td.start_new_thread(self.speed_fix, tuple())
+
+    def opt_fall(self, channel):
+        now = time.time()
+        dt = now - self.then
+        self.speed = (2.0 * np.pi) / (dt * self.rps)
+        self.then = now
+
+    def speed_fix(self):
+        #while (self.spf_needed):
+        #    if ((time.time() - self.then) > 1):
+        #        self.speed = 0.0
+        #    time.sleep(2)
+        pass
 
     def actuate(self):
         '''
@@ -240,22 +266,23 @@ class motor(object):
             
             # Read sensors
             self.volts = self.read_sensors()
-            
+
             # Calculate speed
-            self.speed = resx.get_speed_rpm(self.volts[1])
+            # self.speed = resx.get_speed_rpm(self.volts[1])
             
             temperature_c = 0.0
             
             # if thermosensor was set up properly...
-            if self.therm.check_sn(): 
-                temperature_c = self.therm.read_temp()
-            else:
-                warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
+            #if self.therm.check_sn(): 
+            #    temperature_c = self.therm.read_temp()
+            #else:
+            #    warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
+            u = time.time()
             
             if (self.poll_logging):
-                #                   t         dr      fdr      cr2a      cr2b   pv      T     Vpz
+                #                   t         dr      omega   cr2a      cr2b   dc      T     Vpz
                 self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7} \n").format(
-                    t, self.volts[0], self.volts[1], self.volts[2], self.volts[3], self.ldc, temperature_c, self.volts[4]))
+                    t, (u - t), self.speed, self.volts[2], self.volts[3], self.ldc, temperature_c, self.volts[4]))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
@@ -295,10 +322,11 @@ class motor(object):
         '''
         self.poll_running = False
         self.control_stopped = True
+        self.spf_needed = False
         time.sleep(1)
         self.set_dc(0.0)
-        time.sleep(1)
-        self.set_dc(1.0)
+        time.sleep(2)
+        self.set_dc(0.0)
         time.sleep(2)        
         
         #gpio.set_warnings(False) ## or something...
