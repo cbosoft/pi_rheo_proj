@@ -85,11 +85,14 @@ class motor(object):
         
         # Setup optical encoder pin
         self.opt_pin = 20
-        self.then = time.time()
+        self.f_then = time.time()
+        self.r_then = time.time()
         self.rps = 1.0
-        self.speed = 0.0
+        self.f_speed = 0.0
+        self.r_speed = 0.0
         gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
         gpio.add_event_detect(self.opt_pin, gpio.FALLING, callback=self.opt_fall)
+        gpio.add_event_detect(self.opt_pin, gpio.RISING, callback=self.opt_rise)
         gpio.setwarnings(False)
         
         # Setup relay pin
@@ -108,21 +111,31 @@ class motor(object):
         self.therm = ts(therm_sn)
         self.i_poll_rate = i_poll_rate
         self.volts = [0.0] * 8
+        self.thermo_running = True
+        self.temperature_c = 0.0
+        td.start_new_thread(self.thermometer, tuple())
         
         # Set up logs
         self.poll_logging = poll_logging
         
         # Start speed polling (if necessary)
         if (startnow): self.start_poll(log_name)
-
-        self.spf_needed = False#True
-        #td.start_new_thread(self.speed_fix, tuple())
+        
+        self.opt_log = open("./opt_log.csv")
 
     def opt_fall(self, channel):
         now = time.time()
-        dt = now - self.then
-        self.speed = (2.0 * np.pi) / (dt * self.rps)
-        self.then = now
+        dt = now - self.f_then
+        self.f_speed = (60.0 * 2.0 * np.pi) / (dt * self.rps) # in RPM
+        self.f_then = now
+        self.opt_log.write("{},0\n".format(now))
+    
+    def opt_rise(self, channel):
+        now = time.time()
+        dt = now - self.r_then
+        self.r_speed = (60.0 * 2.0 * np.pi) / (dt * self.rps) # in RPM
+        self.r_then = now
+        self.opt_log.write("{},1\n".format(now))
 
     def speed_fix(self):
         #while (self.spf_needed):
@@ -130,23 +143,14 @@ class motor(object):
         #        self.speed = 0.0
         #    time.sleep(2)
         pass
-
-    def actuate(self):
-        '''
-        motor.actuate()
         
-        Activates the relay such that the motor is now recieving power.
-        '''
-        #gpio.output(self.relay_pin, gpio.HIGH)
-        #self.old_dc = self.pwm_er. ##TODO
-        
-    def deactuate(self):
-        '''
-        motor.deactuate()
-        
-        Deactivates the relay such that the motor is now off.
-        '''
-        gpio.output(self.relay_pin, gpio.LOW)
+    def thermometer(self):
+        while (self.thermo_running):
+            if self.therm.check_sn(): 
+                self.temperature_c = self.therm.read_temp()
+            else:
+                self.thermo_running = False
+            time.sleep(1)
         
     def new_logs(self, log_name="./../logs/log.csv"):
         '''
@@ -159,7 +163,7 @@ class motor(object):
         '''
         # Try closing old log file
         try:
-            logf.close()
+            self.logf.close()
         except:
             pass
 
@@ -167,7 +171,7 @@ class motor(object):
         if (self.poll_logging):
             self.this_log_name = str(log_name)
             self.logf = open(self.this_log_name, "w")
-            self.logf.write("t,dr,fdr,cra,crb,pv,T,Vpz\n")
+            self.logf.write("t,f_spd,r_spd,cra,crb,pv,T,Vpz\n")
 
     def start_poll(self, name="./../logs/log.csv", controlled=False):
         '''
@@ -218,22 +222,15 @@ class motor(object):
         (filtered) from the sensor detection thread and calculates the control action (new motor supply voltage) to
         best maintain the setpoint.
         
-        This will repeat until motor.stop_control() is called, or motor.control_stopped becomes True.
+        This will repeat until motor.control_stopped becomes True.
         '''
         while not self.control_stopped:
-            control_action = self.pic.get_control_action(resx.get_strain(self.speed))
-            if control_action > 128: control_action = 128
-            if control_action < 0: control_action = 0
-            #self.set_pot(control_action) ### TODO
+            av_speed = (self.r_speed + self.f_speed) / 2
+            control_action = self.pic.get_control_action(resx.get_strain(av_speed))
+            if control_action > 100.0: control_action = 100.0
+            if control_action < 0.0: control_action = 0
+            self.set_dc(control_action)
             time.sleep(0.1)
-            
-    def stop_control(self):
-        '''
-        motor.stop_control()
-        
-        Halts the motor speed control thread.
-        '''
-        self.control_stopped = True
 
     def read_sensors(self):
         '''
@@ -277,32 +274,28 @@ class motor(object):
             #    temperature_c = self.therm.read_temp()
             #else:
             #    warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
-            u = time.time()
+            #u = time.time()
             
             if (self.poll_logging):
-                #                   t         dr      omega   cr2a      cr2b   dc      T     Vpz
+                #                   t         f_spd    r_spd   cra      crb     dc      T     Vpz
                 self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7} \n").format(
-                    t, (u - t), self.speed, self.volts[2], self.volts[3], self.ldc, temperature_c, self.volts[4]))
+                #   t      f_spd          r_spd        cr2a           crb           dc           T                  Vpz
+                    t, self.f_speed, self.r_speed, self.volts[2], self.volts[3], self.ldc, self.temperature_c, self.volts[4]))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
         self.clean_exit()
 
-    def set_pot(self, value):
+    def set_dc(self, value):
         '''
-        motor.set_pot(value)
+        motor.set_dc(value)
         
-        Sets the value of the digital potentiometer.
+        Sets the duty cycle of the PWM - affecting the voltage supply to the motor.
         
         Parameters:
-            value       (int)       Value to set on digital potentiometer (representing motor supply voltage). Must be
-                                    between 0 and 128 inclusive.
+            value       (float)     Ratio of the 'high' part of the PWM signal to the
+                                    'low' part. 100 is always on, 0 is never on.
         '''
-        if value < 0: value = 0
-        if value > 128: value = 128
-        self.pot.set_resistance(int(value))
-
-    def set_dc(self, value):
         if value < 0.0:
             value = 0.0
         elif value > 100.0:
@@ -320,19 +313,25 @@ class motor(object):
         
         Should always be called when finished using the motor.
         '''
+        # Halt threads
         self.poll_running = False
         self.control_stopped = True
         self.spf_needed = False
+        self.thermo_running = False
+        
+        # Stop motor
         time.sleep(1)
         self.set_dc(0.0)
         time.sleep(2)
         self.set_dc(0.0)
         time.sleep(2)        
         
-        #gpio.set_warnings(False) ## or something...
+        # Release GPIO and whatnot
         self.pwm_er.stop()
         gpio.cleanup()
-
+        
+        # Close log files
+        self.opt_log.close()
         if (self.poll_logging):
             self.logf.close()
 
