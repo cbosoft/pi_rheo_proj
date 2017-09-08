@@ -91,8 +91,7 @@ class motor(object):
         self.f_speed = 0.0
         self.r_speed = 0.0
         gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        gpio.add_event_detect(self.opt_pin, gpio.FALLING, callback=self.opt_fall)
-        gpio.add_event_detect(self.opt_pin, gpio.RISING, callback=self.opt_rise)
+        gpio.add_event_detect(self.opt_pin, gpio.BOTH, callback=self.opt_f_r)
         gpio.setwarnings(False)
         
         # Setup relay pin
@@ -121,7 +120,14 @@ class motor(object):
         # Start speed polling (if necessary)
         if (startnow): self.start_poll(log_name)
         
-        self.opt_log = open("./opt_log.csv")
+        self.opt_log = open("./opt_log.csv", "w")
+
+    def opt_f_r(self, channel):
+        r = bool(gpio.input(self.opt_pin))
+        if r:
+            self.opt_rise(channel)
+        else:
+            self.opt_fall(channel)
 
     def opt_fall(self, channel):
         now = time.time()
