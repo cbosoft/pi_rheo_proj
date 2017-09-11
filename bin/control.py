@@ -58,6 +58,7 @@ class pid_controller(object):
         self.int_err        = 0.0
         self.windup_guard   = 20.0
         self.lov            = 0.0
+        self.last_time      = time()
     
     def get_control_action(self, value):
         '''
@@ -72,11 +73,11 @@ class pid_controller(object):
         Returns:
             lov                 (float)         Value of control action/output: "last output value"
         '''
-        error = self.set_point - value
+        err = self.set_point - value
         
         self.current_time = time()
         dt = self.current_time - self.last_time
-        derr = err - lerr
+        derr = err - self.lerr
         
         self.pterm = self.tuning[0] * err
         self.iterm += err * dt
@@ -94,7 +95,7 @@ class pid_controller(object):
         
         self.lov = self.pterm + (self.tuning[1] * self.iterm) + (self.tuning[2] * self.dterm)
         
-        return lov
+        return self.lov
 
 if __name__ == "__main__":
     print __doc__

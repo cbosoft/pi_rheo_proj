@@ -93,12 +93,15 @@ class motor(object):
         gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
         self.opt_log = open("./opt_log.csv", "w")
         gpio.add_event_detect(self.opt_pin, gpio.BOTH, callback=self.opt_f_r)
+        #self.spf_needed = True
+        #td.start_new_thread(self.speed_fixer, tuple())
         gpio.setwarnings(False)
         
         # controller
         self.pidc = pid(tuning)
         self.speed = 0.0
         self.control_stopped = True
+        self.ldc = 0.0
 
         # Set sensor variables
         #self.pot = dp()
@@ -139,12 +142,17 @@ class motor(object):
         self.opt_log.write("{},0\n".format(now))
         self.opt_log.write("{},1\n".format(now))
 
-    def speed_fix(self):
-        #while (self.spf_needed):
-        #    if ((time.time() - self.then) > 1):
-        #        self.speed = 0.0
-        #    time.sleep(2)
-        pass
+    def speed_fixer(self):
+        while (self.spf_needed):
+            now = time.time()
+            mult = 0.01
+            delay = 1
+            wait_t = 2
+            if ((now - self.r_then) > delay):
+                self.r_speed = self.r_speed * 0.8
+            if ((now - self.f_then) > delay):
+                self.f_speed = self.f_speed * 0.8
+            time.sleep(wait_t)
         
     def thermometer(self):
         while (self.thermo_running):
@@ -214,7 +222,7 @@ class motor(object):
         Parameters:
             value       (float)         The strain value for the control system to target, (s^-1).
         '''
-        self.pidc.SetPoint = value
+        self.pidc.set_point = value
     
     def control(self):
         '''
@@ -228,7 +236,8 @@ class motor(object):
         '''
         while not self.control_stopped:
             av_speed = (self.r_speed + self.f_speed) / 2
-            control_action = self.pic.get_control_action(resx.get_strain(av_speed))
+            #control_action = self.pidc.get_control_action(resx.get_strain(av_speed))
+            control_action = self.pidc.get_control_action(av_speed)
             if control_action > 100.0: control_action = 100.0
             if control_action < 0.0: control_action = 0
             self.set_dc(control_action)
