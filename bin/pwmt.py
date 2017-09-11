@@ -9,7 +9,7 @@ try:
         dc = i / 2.0
         m.set_dc(dc)
         sleep(0.25)
-        print m.speed, dc, (dc * 0.005 * 1023)
+        print "r: ", m.r_speed, " f: ", m.f_speed, "dc: ", dc
         sleep(0.25)
 except KeyboardInterrupt:
     print "Cancelling.."

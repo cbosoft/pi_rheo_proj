@@ -87,17 +87,13 @@ class motor(object):
         self.opt_pin = 20
         self.f_then = time.time()
         self.r_then = time.time()
-        self.rps = 1.0
+        self.rps = 4.0
         self.f_speed = 0.0
         self.r_speed = 0.0
         gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
+        self.opt_log = open("./opt_log.csv", "w")
         gpio.add_event_detect(self.opt_pin, gpio.BOTH, callback=self.opt_f_r)
         gpio.setwarnings(False)
-        
-        # Setup relay pin
-        #self.relay_pin = relay_pin
-        #gpio.setup(self.relay_pin, gpio.OUT)
-        #gpio.output(self.relay_pin, gpio.LOW)
         
         # controller
         self.pidc = pid(tuning)
@@ -119,8 +115,6 @@ class motor(object):
         
         # Start speed polling (if necessary)
         if (startnow): self.start_poll(log_name)
-        
-        self.opt_log = open("./opt_log.csv", "w")
 
     def opt_f_r(self, channel):
         r = bool(gpio.input(self.opt_pin))
@@ -132,15 +126,17 @@ class motor(object):
     def opt_fall(self, channel):
         now = time.time()
         dt = now - self.f_then
-        self.f_speed = (60.0 * 2.0 * np.pi) / (dt * self.rps) # in RPM
+        self.f_speed = (60.0) / (dt * self.rps) # in RPM
         self.f_then = now
+        self.opt_log.write("{},1\n".format(now))
         self.opt_log.write("{},0\n".format(now))
     
     def opt_rise(self, channel):
         now = time.time()
         dt = now - self.r_then
-        self.r_speed = (60.0 * 2.0 * np.pi) / (dt * self.rps) # in RPM
+        self.r_speed = (60.0) / (dt * self.rps) # in RPM
         self.r_then = now
+        self.opt_log.write("{},0\n".format(now))
         self.opt_log.write("{},1\n".format(now))
 
     def speed_fix(self):
@@ -177,7 +173,7 @@ class motor(object):
         if (self.poll_logging):
             self.this_log_name = str(log_name)
             self.logf = open(self.this_log_name, "w")
-            self.logf.write("t,f_spd,r_spd,cra,crb,pv,T,Vpz\n")
+            self.logf.write("t,f_spd,r_spd,cra,crb,pv,T,Vpz,Vms\n")
 
     def start_poll(self, name="./../logs/log.csv", controlled=False):
         '''
@@ -248,7 +244,7 @@ class motor(object):
             out     ([float] * 8)       List of values read from ADC.
         '''
         out = list()
-        for a in range(0, 7):
+        for a in range(0, 8):
             out.append(self.aconv.read_volts(a))
         return out
         
@@ -269,24 +265,12 @@ class motor(object):
             
             # Read sensors
             self.volts = self.read_sensors()
-
-            # Calculate speed
-            # self.speed = resx.get_speed_rpm(self.volts[1])
-            
-            temperature_c = 0.0
-            
-            # if thermosensor was set up properly...
-            #if self.therm.check_sn(): 
-            #    temperature_c = self.therm.read_temp()
-            #else:
-            #    warn("Temperature sensor cannot access its data! (Was the serial number entered correctly?)")
-            #u = time.time()
             
             if (self.poll_logging):
-                #                   t         f_spd    r_spd   cra      crb     dc      T     Vpz
-                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7} \n").format(
+                #                   t         f_spd    r_spd   cra      crb     dc      T     Vpz  Vms
+                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7}, {8} \n").format(
                 #   t      f_spd          r_spd        cr2a           crb           dc           T                  Vpz
-                    t, self.f_speed, self.r_speed, self.volts[2], self.volts[3], self.ldc, self.temperature_c, self.volts[4]))
+                    t, self.f_speed, self.r_speed, self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
