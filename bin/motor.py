@@ -83,18 +83,18 @@ class motor(object):
         self.pwm_er = gpio.PWM(self.pwm_pin, 500)  # 0.5kHz
         self.pwm_er.start(50.0)
         
-        # Setup optical encoder pin
-        self.opt_pin = 20
-        self.f_then = time.time()
-        self.r_then = time.time()
-        self.rps = 4.0
-        self.f_speed = 0.0
-        self.r_speed = 0.0
-        gpio.setup(self.opt_pin, gpio.IN, pull_up_down=gpio.PUD_UP)
-        self.opt_log = open("./opt_log.csv", "w")
-        gpio.add_event_detect(self.opt_pin, gpio.BOTH, callback=self.opt_f_r)
+        # Setup optical encoder pins
+        self.opt_pins   = [16, 20, 21]
+        self.f_thens    = [time.time()] * len(self.opt_pins)
+        self.r_thens    = [time.time()] * len(self.opt_pins)
+        self.rps        = [16.0, 8.0, 4.0]
+        self.f_speeds   = [0.0, 0.0, 0.0]
+        self.r_speeds   = [0.0, 0.0, 0.0]
+        for p in self.opt_pins:
+            gpio.setup(p, gpio.IN, pull_up_down=gpio.PUD_UP)
+            #self.opt_log = open("./opt_log.csv", "w")
+            gpio.add_event_detect(p, gpio.BOTH, callback=self.opt_f_r)
         #self.spf_needed = True
-        #td.start_new_thread(self.speed_fixer, tuple())
         gpio.setwarnings(False)
         
         # controller
@@ -111,16 +111,24 @@ class motor(object):
         self.volts = [0.0] * 8
         self.thermo_running = True
         self.temperature_c = 0.0
-        td.start_new_thread(self.thermometer, tuple())
         
         # Set up logs
         self.poll_logging = poll_logging
         
-        # Start speed polling (if necessary)
+        # Start threads
         if (startnow): self.start_poll(log_name)
+        td.start_new_thread(self.thermometer, tuple())
+        #td.start_new_thread(self.speed_fixer, tuple())
 
-    def opt_f_r(self, channel):
+    def opt_f_r(self, channel_r):
         r = bool(gpio.input(self.opt_pin))
+        if channel_r == 16:
+            channel = 0 # rps 16
+        elif channel_r == 20:
+            channel = 1 # rps 8
+        else:
+            channel = 2 # rps 4
+            
         if r:
             self.opt_rise(channel)
         else:
@@ -128,19 +136,19 @@ class motor(object):
 
     def opt_fall(self, channel):
         now = time.time()
-        dt = now - self.f_then
-        self.f_speed = (60.0) / (dt * self.rps) # in RPM
-        self.f_then = now
-        self.opt_log.write("{},1\n".format(now))
-        self.opt_log.write("{},0\n".format(now))
+        dt = now - self.f_thens[channel]
+        self.f_speeds[channel] = (60.0) / (dt * self.rps[channel]) # in RPM
+        self.f_thens[channel] = now
+        #self.opt_log.write("{},1\n".format(now))
+        #self.opt_log.write("{},0\n".format(now))
     
     def opt_rise(self, channel):
         now = time.time()
-        dt = now - self.r_then
-        self.r_speed = (60.0) / (dt * self.rps) # in RPM
-        self.r_then = now
-        self.opt_log.write("{},0\n".format(now))
-        self.opt_log.write("{},1\n".format(now))
+        dt = now - self.r_thens[channel]
+        self.r_speeds[channel] = (60.0) / (dt * self.rpss[channel]) # in RPM
+        self.r_thens[channel] = now
+        #self.opt_log.write("{},0\n".format(now))
+        #self.opt_log.write("{},1\n".format(now))
 
     def speed_fixer(self):
         while (self.spf_needed):
@@ -149,9 +157,9 @@ class motor(object):
             delay = 1
             wait_t = 2
             if ((now - self.r_then) > delay):
-                self.r_speed = self.r_speed * 0.8
+                self.r_speed = self.r_speed * mult
             if ((now - self.f_then) > delay):
-                self.f_speed = self.f_speed * 0.8
+                self.f_speed = self.f_speed * mult
             time.sleep(wait_t)
         
     def thermometer(self):
@@ -276,10 +284,10 @@ class motor(object):
             self.volts = self.read_sensors()
             
             if (self.poll_logging):
-                #                   t         f_spd    r_spd   cra      crb     dc      T     Vpz  Vms
-                self.logf.write(("{0:.6f}, {1:.3f}, {2:.3f}, {3:.3f}, {4:.3f}, {5}, {6:.3f}, {7}, {8} \n").format(
-                #   t      f_spd          r_spd        cr2a           crb           dc           T                  Vpz
-                    t, self.f_speed, self.r_speed, self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
+                #                   t    f_spd16  r_spd16 f_spd8  r_spd8  f_spd4  r_spd4    cra    crb     dc      T     Vpz  Vms
+                self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
+                #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4           cr2a           crb            dc           T                  Vpz              Vms
+                    t, self.f_speed[0], self.r_speed[0], self.f_speed[1], self.r_speed[1], self.f_speed[2], self.r_speed[2], self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
