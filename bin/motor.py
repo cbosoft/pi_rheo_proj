@@ -73,7 +73,9 @@ class motor(object):
             pic_tuning      (float, float)  Tuning of PI controller. Kp and Ki respectively. Default is (0.2, 0.15)
             relay_pin       (integer)       Pin number which can be used to control the relay. Default is 18
         '''
-        
+        # Debug status string
+        self.dss = ""
+
         # GPIO setup
         gpio.setmode(gpio.BCM)
         
@@ -90,6 +92,9 @@ class motor(object):
         self.rps        = [4.0] * 3#[16.0, 8.0, 4.0]
         self.f_speeds   = [0.0, 0.0, 0.0]
         self.r_speeds   = [0.0, 0.0, 0.0]
+        self.f_misses   = [0, 0, 0]
+        self.r_misses   = [0, 0, 0]
+        self.t_misses   = 10
         for p in self.opt_pins:
             gpio.setup(p, gpio.IN, pull_up_down=gpio.PUD_UP)
             #self.opt_log = open("./opt_log.csv", "w")
@@ -137,7 +142,12 @@ class motor(object):
     def opt_fall(self, channel):
         now = time.time()
         dt = now - self.f_thens[channel]
-        self.f_speeds[channel] = (60.0) / (dt * self.rps[channel]) # in RPM
+        prov_spd = (60.0) / (dt * self.rps[channel]) # speed in rpm
+        if ((prov_spd < (2 * self.f_speeds[channel])) or (self.f_misses[channel] > self.t_misses)):
+            self.f_speeds[channel] = prov_spd
+            self.f_misses[channel] = 0
+        else:
+            self.f_misses[channel] += 1
         self.f_thens[channel] = now
         #self.opt_log.write("{},1\n".format(now))
         #self.opt_log.write("{},0\n".format(now))
@@ -145,7 +155,12 @@ class motor(object):
     def opt_rise(self, channel):
         now = time.time()
         dt = now - self.r_thens[channel]
-        self.r_speeds[channel] = (60.0) / (dt * self.rps[channel]) # in RPM
+        prov_spd = (60.0) / (dt * self.rps[channel]) # speed in rpm
+        if ((prov_spd < (2 * self.r_speeds[channel])) or (self.r_misses[channel] > self.t_misses)):
+            self.r_speeds[channel] = prov_spd
+            self.r_misses[channel] = 0
+        else:
+            self.r_misses[channel] += 1
         self.r_thens[channel] = now
         #self.opt_log.write("{},0\n".format(now))
         #self.opt_log.write("{},1\n".format(now))
@@ -338,7 +353,7 @@ class motor(object):
         gpio.cleanup()
         
         # Close log files
-        self.opt_log.close()
+        #self.opt_log.close()
         if (self.poll_logging):
             self.logf.close()
 
