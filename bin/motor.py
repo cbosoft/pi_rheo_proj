@@ -87,7 +87,7 @@ class motor(object):
         self.opt_pins   = [16, 20, 21]
         self.f_thens    = [time.time()] * len(self.opt_pins)
         self.r_thens    = [time.time()] * len(self.opt_pins)
-        self.rps        = [16.0, 8.0, 4.0]
+        self.rps        = [4.0] * 3#[16.0, 8.0, 4.0]
         self.f_speeds   = [0.0, 0.0, 0.0]
         self.r_speeds   = [0.0, 0.0, 0.0]
         for p in self.opt_pins:
@@ -121,14 +121,14 @@ class motor(object):
         #td.start_new_thread(self.speed_fixer, tuple())
 
     def opt_f_r(self, channel_r):
-        r = bool(gpio.input(self.opt_pin))
         if channel_r == 16:
-            channel = 0 # rps 16
+            channel = 0
         elif channel_r == 20:
-            channel = 1 # rps 8
+            channel = 1
         else:
-            channel = 2 # rps 4
-            
+            channel = 2
+
+        r = bool(gpio.input(self.opt_pins[channel]))            
         if r:
             self.opt_rise(channel)
         else:
@@ -145,7 +145,7 @@ class motor(object):
     def opt_rise(self, channel):
         now = time.time()
         dt = now - self.r_thens[channel]
-        self.r_speeds[channel] = (60.0) / (dt * self.rpss[channel]) # in RPM
+        self.r_speeds[channel] = (60.0) / (dt * self.rps[channel]) # in RPM
         self.r_thens[channel] = now
         #self.opt_log.write("{},0\n".format(now))
         #self.opt_log.write("{},1\n".format(now))
@@ -189,7 +189,7 @@ class motor(object):
         if (self.poll_logging):
             self.this_log_name = str(log_name)
             self.logf = open(self.this_log_name, "w")
-            self.logf.write("t,f_spd,r_spd,cra,crb,pv,T,Vpz,Vms\n")
+            self.logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,pv,T,Vpz,Vms\n")
 
     def start_poll(self, name="./../logs/log.csv", controlled=False):
         '''
@@ -287,7 +287,7 @@ class motor(object):
                 #                   t    f_spd16  r_spd16 f_spd8  r_spd8  f_spd4  r_spd4    cra    crb     dc      T     Vpz  Vms
                 self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
                 #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4           cr2a           crb            dc           T                  Vpz              Vms
-                    t, self.f_speed[0], self.r_speed[0], self.f_speed[1], self.r_speed[1], self.f_speed[2], self.r_speed[2], self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
+                    t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)

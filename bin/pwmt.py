@@ -1,5 +1,6 @@
 import motor
 from time import sleep
+import numpy as np
 m = motor.motor(i_poll_rate=0.01)
 m.start_poll(name="test.csv", controlled=False)
 #m.update_setpoint(200.0)
@@ -15,7 +16,9 @@ try:
         #dc = i / 2.0
         #m.set_dc(11)
         sleep(0.25)
-        print "r: ", m.r_speed, " f: ", m.f_speed, "dc: ", m.ldc, " ca: ", m.pidc.lov, " e: ", m.pidc.lerr
+        f = m.f_speeds
+        r = m.r_speeds
+        print "r0: ", r[0], " f0: ", f[0], "r1: ", r[1], "f1: ", f[1], "r2: ", r[2], "f2: ", f[2], "dc: ", m.ldc
         sleep(0.25)
 except KeyboardInterrupt:
     print "Cancelling.."
