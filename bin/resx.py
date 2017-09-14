@@ -169,7 +169,7 @@ def get_supply_voltage(pv):
     voltage = pv * calc_supply_voltage[0] + calc_supply_voltage[1]
     return voltage
 
-def get_current_coil(pv):
+def get_current_coil(voltage):
     '''
     resx.get_current_coil(pv)
     
@@ -182,7 +182,6 @@ def get_current_coil(pv):
     Returns:
         ico     (list, float)       List of coil currents.
     '''
-    voltage = get_supply_voltage(pv)
     ico = cal_IcoVms[0] * voltage + cal_IcoVms[1]  # Ico = (1/Rco) * Vms + (~0.0)
     return ico
 
