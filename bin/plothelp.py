@@ -44,7 +44,7 @@ def fit_line(x, y, dg, x_name="x", y_name="y"):
         fit     (???)               No idea to be honest. I wrote this function almost six months ago.
         fit_eqn (string)            A clean representation of the polynomial fit. Intended to be inserted
                                     into a matplotlib plot as part of the legend or some such. 
-                                    Uses 'LaTeX'.
+                                    Uses 'LaTeX' formatting.
         coeffs  (list, float)       A list of the coefficients of the polynomial fit, in decending powers.
     '''
     x = np.array(x)
@@ -97,11 +97,15 @@ def read_logf(log_n):
     datf = pd.read_csv(log_n)
     
     t         =   np.array(datf['t'], np.float64)
-    dr        =   np.array(datf['dr'], np.float64)
-    fdr       =   np.array(datf['fdr'], np.float64)
+    f_spd0       =   np.array(datf['f_spd0'], np.float64)
+    r_spd0       =   np.array(datf['r_spd0'], np.float64)
+    f_spd1       =   np.array(datf['f_spd1'], np.float64)
+    r_spd1       =   np.array(datf['r_spd1'], np.float64)
+    f_spd2       =   np.array(datf['f_spd2'], np.float64)
+    r_spd2       =   np.array(datf['r_spd2'], np.float64)
     cra       =   np.array(datf['cra'], np.float64)
     crb       =   np.array(datf['crb'], np.float64)
-    pv        =   np.array(datf['pv'], np.float64)
+    Vms       =   np.array(datf['Vms'], np.float64)
     T         =   np.array(datf['T'], np.float64)
     
     try:
@@ -120,9 +124,13 @@ def read_logf(log_n):
     
     # logs are normally saved in the following format:
     #rheometry_test_TAG_DATE_TIME.csv
-    tag = log_n.split("_")[2]
+    tag = "--"
+    try:
+        tag = log_n.split("_")[2]
+    except:
+        pass
     
-    return t, st, dr, fdr, cra, crb, pv, T, Vpz, gamma_dot, tau, tag
+    return t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag
 
 def plot_logf(log_n):
     '''
