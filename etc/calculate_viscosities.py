@@ -4,7 +4,7 @@ Adds missing viscosity data to log files.
 
 Reads in any log files, calculates shear, strain and viscosity data, and writes to file.
 
-Author: Chris Boyle (christopher.boyle.101@strath.ac.uk
+Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
 '''
 
 # System
@@ -31,20 +31,25 @@ import resx
 #   calculate viscosity (other method?)
 #   add new data to log file
 
-log_files = sorted(glob("./../logs/rheometry*.csv"))
+#log_files = sorted(glob("./../logs/rheometry*.csv"))
 
+log_files = ["./../bin/test.csv"] * 1
 
 for log in log_files:
     print "processing {}".format(log)
-    t, st, dr, cr, cr2a, cr2b, pv, T, Vpz, __, __, tag = ph.read_logf(log)
+    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, voltage, __, __, tag = ph.read_logf(log)
     
     # Energy balance method calculation
-    omega   = resx.get_speed_rads(dr)
-    current = resx.get_current(cr, cr2a, cr2b)
-    voltage = resx.get_supply_voltage(pv)
+    omega   = list()
+    for i in range(0, len(r_spd1)):
+        #omega.append(np.average([r_spd0[i], f_spd0[i], r_spd1[i], f_spd1[i], r_spd2[i], f_spd2[i]]))
+        omega.append((r_spd1[i] + f_spd1[i]) / 2.0)
+    omega = np.array(omega, np.float64)
+    print np.average(omega)
+    current = resx.get_current(cra, crb)
     
-    omega   = filt_r(st, omega)
-    current = filt_r(st, omega)
+    #omega   = filt_r(st, omega)
+    current = filt_r(st, current)
     
     ################################################################################
     # Strain rate. #################################################################
@@ -75,13 +80,17 @@ for log in log_files:
     #
     # .: tau = Kti * (Ims - Ico)
     
-    current_coil = resx.get_current_coil(pv)
-    tau = resx.cal_K_tau_Ico[0] * (current - current_coil) + resx.cal_K_tau_Ico[1]
+    current_coil = resx.get_current_coil(voltage)
+    tau = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
     mu_current_relation = tau / gamma_dot
     
-    logf = open(log, "w")
-    logf.write("t,dr,cr,cr2a,cr2b,pv,T,Vpz,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
+    logf = open("{}_calcd.csv".format(log[:-4]), "w")
+    logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,T,Vpz,Vms,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
     for i in range(0, len(t)):
-        line = "{},{},{},{},{},{},{},{},{},{},{},{}\n".format(t[i], dr[i], cr[i], cr2a[i], cr2b[i], pv[i], T[i], Vpz[i], gamma_dot[i], tau[i], mu_energy_balance_method[i], mu_current_relation[i])
+        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
+                t[i], f_spd0[i], r_spd0[i], f_spd1[i], r_spd1[i], #5
+                f_spd2[i], r_spd2[i], cra[i], crb[i], #4
+                T[i], Vpz[i], voltage[i], gamma_dot[i], tau[i], #5
+                mu_energy_balance_method[i], mu_current_relation[i]) #2
         logf.write(line)
     logf.close()
