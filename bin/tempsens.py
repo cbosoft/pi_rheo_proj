@@ -23,7 +23,6 @@ class ds18b20(object):
             self.on_windows = True
         else:
             self.on_windows = False
-            print "\tInactive !!"
             os.system('sudo -H modprobe w1-gpio')
             os.system('sudo -H modprobe w1-therm')
             self.sens_file = '/sys/bus/w1/devices/{}/w1_slave'.format(serno)
