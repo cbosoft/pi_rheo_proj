@@ -34,7 +34,7 @@ class MCP3008(object):
     cs_pin = 0  # which GPIO pin is used to talk to this chip? (gpio.BOARD numbering) OR which cs channel to use
     vref = 3.3  # Reference voltage in use
 
-    def __init__(self, cs_pin=1, vref=3.3):
+    def __init__(self, cs_pin=1, vref=5):
         ''' 
         object = adc.MCP3008(**kwargs)
         

@@ -301,8 +301,8 @@ class motor(object):
             if (self.poll_logging):
                 #                   t    f_spd16  r_spd16 f_spd8  r_spd8  f_spd4  r_spd4    cra    crb     dc      T     Vpz  Vms
                 self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
-                #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4           cr2a           crb            dc           T                  Vpz              Vms
-                    t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[0], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
+                #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4            cra           crb            dc           T                  Vpz              Vms
+                    t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * 4.0)))
             
             # delay for x seconds
             time.sleep(self.i_poll_rate)
