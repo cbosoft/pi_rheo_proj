@@ -94,31 +94,10 @@ def get_current(cra, crb):
         crb    (list, float)       List of 5A HECS voltage readings
     
     Returns:
-        cu      (list, float)       List of current values, averaged out from three sensors.
+        cu      (list, float)       List of current values, averaged out from two sensors.
     '''
-    cu1 = cal_5AHES[0] * cra + cal_5AHES[1]
-    cu2 = cal_5AHES[0] * crb + cal_5AHES[0]
-    
-    cu = cu1 + cu2
-    cu = cu / 2.0
-    
+    cu = (((cra + crb) / 2) - 2.5) * (5.0 / 2.5)
     return cu
-    
-def get_speed_rpm(dr):
-    '''
-    resx.get_speed_rpm(dr)
-    
-    Given readings from a dynamo, uses calibration data stored in data.xml to calculate the rotational speed in
-    RPM of the motor.
-    
-    Parameters:
-        dr      (list, float)       List of dynamo voltage readings.
-    
-    Returns:
-        v_rpm   (list, float)       List of speeds in RPM.
-    '''
-    v_rpm = dr * cal_dynamo[0] + cal_dynamo[1]
-    return v_rpm
 
 def get_speed_rads(dr):
     '''
@@ -137,43 +116,24 @@ def get_speed_rads(dr):
     v_rads = v_rpm * np.pi / 30 # rpm is 2pi per 60s =~ 1/10 rad/s
     return v_rads
 
-def get_strain(dr):
+def get_strain(spd_omega):
     '''
-    resx.get_strain(dr)
-    
-    Given readings from a dynamo, uses calibration and geometrical data stored in etc/data.xml to calculate the
-    strain rate experienced by the fluid corresponding to the current rotational speed.
-    
+    resx.get_strain(omega)
+
     Parameters:
         dr      (list, float)       [List of] dynamo voltage readings.
     
     Returns:
         gd      (list, float)       [List of] strains in inverse seconds.
     '''
-    v_rads = get_speed_rads(dr)
-    gd = v_rads * (icor / (ocir - icor)) 
+    gd = spd_omega * (icor / (ocir - icor)) 
     return gd
-    
-def get_supply_voltage(pv):
-    '''
-    resx.get_supply_voltage(pv)
-    
-    Given a list of the values sent to the potentiometer, calculates the supply voltage to the motor.
-    
-    Parameters:
-        pv      (list, integer)     List of values sent to potentiometer.
-    
-    Returns:
-        voltage (list, float)       List of motor supply voltages.
-    '''
-    voltage = pv * calc_supply_voltage[0] + calc_supply_voltage[1]
-    return voltage
 
 def get_current_coil(voltage):
     '''
-    resx.get_current_coil(pv)
+    resx.get_current_coil(voltage)
     
-    Given a list of the values sent to the potentiometer, uses calibration data stored in data.xml to 
+    Given the motor's supply voltage, use calibration data stored in data.xml to 
     calculate the current loss due to inefficiency (Icoil).
     
     Parameters:
@@ -198,8 +158,8 @@ def get_torque(stress, fill_volume_ml):
     Returns:
         T       (list, float)       List of torques.
     '''
-    H = (fill_volume_ml * 0.000001) / ((pi * self.ocir * self.ocir) - (pi * self.icor * self.icor)) # height = volume / area
-    T = 2 * pi * self.icor * self.icor * H
+    H = (fill_volume_ml * 0.000001) / ((pi * ocir * ocir) - (pi * icor * icor)) # height = volume / area
+    T = 2 * pi * icor * icor * H
     return T
     
 if __name__ == "__main__": print __doc__

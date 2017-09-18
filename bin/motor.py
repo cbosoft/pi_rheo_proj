@@ -77,36 +77,13 @@ class motor(object):
         self.dss = ""
 
         # GPIO setup
-        gpio.setmode(gpio.BCM)
-        
-        # Setup PWM pin
-        self.pwm_pin = 18
-        gpio.setup(self.pwm_pin, gpio.OUT)
-        self.pwm_er = gpio.PWM(self.pwm_pin, 500)  # 0.5kHz
-        self.pwm_er.start(50.0)
-        
-        # Setup optical encoder pins
-        self.opt_pins   = [16, 20, 21]
-        self.f_thens    = [time.time()] * len(self.opt_pins)
-        self.r_thens    = [time.time()] * len(self.opt_pins)
-        self.rps        = [4.0] * 3#[16.0, 8.0, 4.0]
-        self.f_speeds   = [0.0, 0.0, 0.0]
-        self.r_speeds   = [0.0, 0.0, 0.0]
-        self.f_misses   = [0, 0, 0]
-        self.r_misses   = [0, 0, 0]
-        self.t_misses   = 10
-        for p in self.opt_pins:
-            gpio.setup(p, gpio.IN, pull_up_down=gpio.PUD_UP)
-            #self.opt_log = open("./opt_log.csv", "w")
-            gpio.add_event_detect(p, gpio.BOTH, callback=self.opt_f_r)
-        #self.spf_needed = True
-        gpio.setwarnings(False)
+        self.gpio_ready = False
+        self.setup_gpio()
         
         # controller
         self.pidc = pid(tuning)
         self.speed = 0.0
         self.control_stopped = True
-        self.ldc = 0.0
 
         # Set sensor variables
         #self.pot = dp()
@@ -138,6 +115,36 @@ class motor(object):
             self.opt_rise(channel)
         else:
             self.opt_fall(channel)
+    
+    def setup_gpio(self):
+        if self.gpio_ready: return
+        # GPIO setup
+        gpio.setmode(gpio.BCM)
+        
+        # Setup PWM pin
+        self.pwm_pin = 18
+        gpio.setup(self.pwm_pin, gpio.OUT)
+        self.pwm_er = gpio.PWM(self.pwm_pin, 500)  # 0.5kHz
+        self.ldc = 0.0
+        self.pwm_er.start(0.0)
+        
+        # Setup optical encoder pins
+        self.opt_pins   = [16, 20, 21]
+        self.f_thens    = [time.time()] * len(self.opt_pins)
+        self.r_thens    = [time.time()] * len(self.opt_pins)
+        self.rps        = [4.0] * 3#[16.0, 8.0, 4.0]
+        self.f_speeds   = [0.0, 0.0, 0.0]
+        self.r_speeds   = [0.0, 0.0, 0.0]
+        self.f_misses   = [0, 0, 0]
+        self.r_misses   = [0, 0, 0]
+        self.t_misses   = 10
+        for p in self.opt_pins:
+            gpio.setup(p, gpio.IN, pull_up_down=gpio.PUD_UP)
+            #self.opt_log = open("./opt_log.csv", "w")
+            gpio.add_event_detect(p, gpio.BOTH, callback=self.opt_f_r)
+        #self.spf_needed = True
+        gpio.setwarnings(False)
+        self.gpio_ready = True
 
     def opt_fall(self, channel):
         now = time.time()
@@ -218,6 +225,7 @@ class motor(object):
                                                 and time of run. Default is 'DATETIME'
             controlled      (bool)              Indicates whether the control thread should be started or not.
         '''
+        self.setup_gpio()
         if controlled: self.start_control()
 
         if self.poll_logging:
@@ -351,6 +359,7 @@ class motor(object):
         # Release GPIO and whatnot
         self.pwm_er.stop()
         gpio.cleanup()
+        self.gpio_ready = False
         
         # Close log files
         #self.opt_log.close()

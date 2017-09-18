@@ -14,7 +14,7 @@ sleep(10)
 try:
     for i in range(0, 9):
         for j in range(0, 10):
-            dc = 10 + (i * 10)
+            dc = 15# + (i * 10)
             m.set_dc(dc)
             sleep(0.25)
             f = m.f_speeds
