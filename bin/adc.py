@@ -34,7 +34,7 @@ class MCP3008(object):
     cs_pin = 0  # which GPIO pin is used to talk to this chip? (gpio.BOARD numbering) OR which cs channel to use
     vref = 3.3  # Reference voltage in use
 
-    def __init__(self, cs_pin=1, vref=5):
+    def __init__(self, cs_pin=1, vref=3.33):
         ''' 
         object = adc.MCP3008(**kwargs)
         
@@ -58,7 +58,8 @@ class MCP3008(object):
         
         # Set up bus connection
         self.bus = spi.SpiDev()
-        
+
+
         # Vref setting
         self.vref = vref
         
@@ -79,9 +80,17 @@ class MCP3008(object):
         if debug: return
         
         self.open()
-        indat = self.bus.xfer2([1, 8 + channel << 4, 0])
+        #indat = self.bus.xfer2([1, 8 + channel << 4, 0])
+        command = 0b11 << 6
+        command |= (channel & 0x07) << 3
+        indat = self.bus.xfer2([command, 0, 0])
         self.close()
-        return ((indat[1] & 3) << 8) + indat[2]
+
+        number =  (indat[0] & 0x01) << 9
+        number |= (indat[1] & 0xFF) << 1
+        number |= (indat[2] & 0x80) >> 7
+
+        return number
         
     def read_volts(self, channel):
         '''
@@ -134,10 +143,10 @@ class MCP3008(object):
         if (self.cs_pin > 1):
             gpio.output(self.cs_pin, gpio.HIGH)
             self.bus.open(0, 1)
-            self.bus.max_speed_hz = 10000000
+            self.bus.max_speed_hz = int(1.35 * (10 ** 6))
         else:
             self.bus.open(0, self.cs_pin)
-            self.bus.max_speed_hz = 10000000
+            self.bus.max_speed_hz = int(1.35 * (10 ** 6))
 
     def close(self):
         '''
