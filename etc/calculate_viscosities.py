@@ -43,11 +43,14 @@ for log in log_files:
     omega   = list()
     for i in range(0, len(r_spd1)):
         #omega.append(np.average([r_spd0[i], f_spd0[i], r_spd1[i], f_spd1[i], r_spd2[i], f_spd2[i]]))
-        omega.append((r_spd1[i] + f_spd1[i]) / 2.0)
+        omega.append((r_spd1[i] + f_spd1[i] + r_spd2[i] + f_spd2[i]) / 4.0)
     omega = np.array(omega, np.float64)
     print np.average(omega)
-    current = resx.get_current(cra, crb)
-    
+    current = list()
+    for i in range(0, len(cra)):
+        current.append(((cra[i] + crb[i]) / 2.0 ) - 2.5)
+    current = np.array(current, np.float64)
+    current = current * (5.0 / 2.5)
     #omega   = filt_r(st, omega)
     current = filt_r(st, current)
     
