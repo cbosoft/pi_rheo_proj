@@ -32,6 +32,8 @@ def parse_root(name, type):
             if child.attrib["name"] == name:
                 return child[0].text
 
+## DIMENSIONS
+# in mm
 icor = parse_root("icor", "geometry")
 ich = parse_root("ich", "geometry")
 ocor = parse_root("ocor", "geometry")
@@ -75,15 +77,15 @@ def writeout(path="./../etc/data.xml"):
     root[6][1].text = str(cal_dynamo[1])
     root[8][0].text = str(cal_5AHES[0])
     root[8][1].text = str(cal_5AHES[1])
-    root[9][0].text = str(cal_TauIemf[0])
-    root[9][1].text = str(cal_TauIemf[1])
-    root[10][0].text = str(cal_IcoVms[0])
-    root[10][1].text = str(cal_IcoVms[1])
+    root[9][0].text = str(cal_IcoVms[0])
+    root[9][1].text = str(cal_IcoVms[1])
+    root[10][0].text = str(cal_TauIemf[0])
+    root[10][1].text = str(cal_TauIemf[1])
     
     tree = ET.ElementTree(root)
     tree.write(path)
 
-def get_current(cra, crb):
+def get_current(cv):
     '''
     resx.get_current(cr2a, cr2b)
     
@@ -96,7 +98,8 @@ def get_current(cra, crb):
     Returns:
         cu      (list, float)       List of current values, averaged out from two sensors.
     '''
-    cu = (((cra + crb) / 2) - 2.5) * (5.0 / 2.5)
+    #cu = (cv - 2.5) * (5.0 / 2.5) # current = (signal - (2.5v offset)) * (5A / 2.5v)
+    cu = ((cv - 2.5) / 0.185) 
     return cu
 
 def get_speed_rads(dr):
@@ -143,6 +146,15 @@ def get_current_coil(voltage):
         ico     (list, float)       List of coil currents.
     '''
     ico = cal_IcoVms[0] * voltage + cal_IcoVms[1]  # Ico = (1/Rco) * Vms + (~0.0)
+    #ico = list()
+    #try:
+    #    x = len(voltage)
+    #except:
+    #    voltage = [voltage]
+    #for v in voltage:
+    #    ico.append((-0.003784 * (v ** 2)) + (0.06433 * v) + 0.4964)
+    #ico = np.array(ico, np.float64)
+    #if len(ico) == 1: ico = float(ico)
     return ico
 
 def get_torque(stress, fill_volume_ml):
@@ -158,8 +170,13 @@ def get_torque(stress, fill_volume_ml):
     Returns:
         T       (list, float)       List of torques.
     '''
-    H = (fill_volume_ml * 0.000001) / ((pi * ocir * ocir) - (pi * icor * icor)) # height = volume / area
-    T = 2 * pi * icor * icor * H
+    A_small = (pi * (icor ** 2)) # in m^2
+    A_big   = (pi * (ocir ** 2)) # in m^2
+    A_middle_m2 = A_big - A_small
+    fill_volume_m3 = fill_volume_ml * (10 ** (-9)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
+    H = fill_volume_m3 / A_middle_m2
+    #T = stress / (2 * A_small * H)
+    T = (stress) / (pi * 2 * H)
     return T
     
 if __name__ == "__main__": print __doc__

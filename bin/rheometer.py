@@ -307,7 +307,87 @@ class rheometer(object):
             options = ["Continue"]
             res = self.display(blurb, options)
         elif res == 1: ################################################################################################# RECAL: 1
-            # Recalibrate                
+            # Recalibrate
+            ### Part 1: Current Calibration ###
+            len_ccal = 300
+            blurb = [   "Current Calibration",
+                        "",
+                        "The current drawn due to inefficiencies in the motor will is found in this test.",
+                        "",
+                        "The cylinders must be empty, but in position as if a test was being run.",
+                        "The test will take around {} minutes.".format(float(len_ccal) / 60.0),
+                        ""
+                    ]
+            options = [ "Start", "Skip to motor calibration" ]
+            res = self.display(blurb, options)
+
+            if not res:
+                cur_log = "./../logs/ccal_{}.csv".format(time.strftime("%d.%m.%y-%H%M", time.gmtime()))
+                if not debug: self.mot.start_poll(name=cur_log, controlled=False)
+                for i in range(0, len_ccal):
+                    dc = (100.0 / (len_ccal - 1)) * i
+                    self.mot.set_dc(dc)
+                    width = 40
+                    perc = int(math.ceil((i / float(len_ccal)) * width))
+                    neg_perc = int(math.floor(((float(len_ccal) - i) / len_ccal) * width))
+                    fspd = np.average(self.mot.f_speeds)
+                    rspd = np.average(self.mot.r_speeds)
+                    aspd = (fspd + rspd) * 0.5
+                    vms = self.mot.volts[7] * 4.0
+                    if vms == 0: vms = 10**-10
+                    gd = resx.get_strain(aspd)
+                    if gd == 0: gd = 10**-10
+                    ico = resx.get_current_coil(vms)
+                    ims = resx.get_current(self.mot.volts[2])
+                    iemf = ims - ico
+                    tau = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
+                    if tau < 0: tau = 0.0
+                    mu = tau / gd
+                    blurb = [
+                            "Current Calibration",
+                            "",
+                            "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
+                            "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd).center(19)),
+                            "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
+                            "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{:.3f} Pa".format(tau).center(19)),
+                            "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),
+                            "",
+                            "{}s to go...".format(len_ccal - i).center(80),
+                            "[{}{}]".format("#" * perc, " " * neg_perc)
+                            ]
+                    options = [" "]
+                    self.display(blurb, options, input_type=inputs.none_)
+                    time.sleep(1)
+                self.mot.clean_exit()
+                __, st, __, __, __, __, __, __, cra, __, __, __, Vms, __, __, __ = read_logf(cur_log)
+                Vms = filt_r(st, Vms)
+                cra = filt_r(st, cra)
+                Ims = resx.get_current(cra)
+                blurb = [
+                            "Current Calibration",
+                            "",
+                            "Processing data..."
+                            ]
+                options = [" "]
+                self.display(blurb, options, input_type=inputs.none_)
+                fit, fit_eqn, coeffs = plot_fit(Vms, Ims, 1, x_name="Vms", y_name="Ico", outp="./../plots/cal_cur.png")
+                blurb = ["Current Calibration",
+                 "",
+                 "Complete! Plot saved as \"./../plots/cal_cur.png\"",
+                 "",
+                 "Previous fit:",
+                 "\tIco = Vms * {} + {}".format(resx.cal_IcoVms[0], resx.cal_IcoVms[1]),
+                 "",
+                 "New fit:",
+                 "\tIco = Vms * {} + {}".format(coeffs[0], coeffs[1])]
+                options = ["Save results", "Discard"]
+                
+                res = self.display(blurb, options)
+                
+                if res == 0:
+                    resx.cal_IcoVms = coeffs
+                    resx.writeout()
+                
             ### Part 2: Motor Calibration ###
             blurb = [   "Motor Calibration",
                         "",
@@ -317,7 +397,7 @@ class rheometer(object):
                         "This calibration does not need to be done every time the rheometer is used,",
                         "but should be done once in a while."
                     ]
-            options = [ "Continue", "Cancel" ]
+            options = [ "Continue", "Back to main menu" ]
                
             res = self.display(blurb, options)
                 
@@ -325,6 +405,9 @@ class rheometer(object):
               
             ref_logs  = list()
             ref_viscs = list()
+            ref_nams  = list()
+            
+            cal_len = 120
                 
             finished = False
             count = 1
@@ -347,18 +430,38 @@ class rheometer(object):
                         inp_k = True
                     except:
                         inp_k = False
+                inp_k = False
+
+                while not inp_k:
+                    blurb = [   "Motor Calibration: fluid {}".format(count),
+                                "",
+                                "What fluid is it?"                                
+                            ]
+                    options = [" "]
+                        
+                    str_ref_nam = self.display(blurb, options, input_type=inputs.string_)
+                    blurb = [   "Motor Calibration: fluid {}".format(count),
+                                "",
+                                "\"{}\"?".format(str_ref_nam)
+                            ]
+                    options = ["That is correct", "Oops! Typo"]
+                        
+                    rep = self.display(blurb, options, input_type=inputs.enum_)
+                    if rep == 0:
+                        inp_k = True
+                        ref_nams.append(str_ref_nam)
                     
                 blurb = [   "Motor Calibration: fluid {}".format(count),
                             "",
-                            "Now the fluid will be run for 10 minutes at a strain rate of ~125 (s^-1).",
+                            "Now the fluid will be run for {} minutes at a strain rate of ~125 (s^-1).".format(float(cal_len) / 60.0),
                         ]
                 options = [ "Continue", "Cancel" ]
                     
                 res = self.display(blurb, options)
                     
                 if res == 1: x = 1 + "t"
-                
-                ref_log = self.run_test("newt_ref_1", 600, 125, title="Reference {} Test".format(count), ln_prefix="motor_calibration")
+                ref_log = "./../logs/mcal_{}_{}_pas_{}.csv".format(ref_nams[-1], ref_viscs[-1], time.strftime("%d.%m.%y-%H%M", time.gmtime()))
+                self.run_test("newt_ref", cal_len, 125, title="Reference {} Test".format(count), ln_override=ref_log)
                 ref_logs.append(ref_log)
                     
                 count += 1
@@ -368,65 +471,79 @@ class rheometer(object):
                 else: # count > 2
                     blurb = [   "Motor Calibration",
                                 "",
-                                "Do you wish to use further reference fluids? ({} so far)".format(count - 1) ]
+                                "Do you wish to add further reference fluids? ({} so far)".format(count - 1) ]
                     options = ["Yes", "No"]
                     res = self.display(blurb, options)
                         
                     if res == 1: finished = True
-                            
+            
+            self.mot_cal(ref_logs)
+        else:
+            return 4
+        return 1
+    
+    #################################################################################################################### mot_cal()
+    def mot_cal(self, ref_logs):
+        blurb = [ "Motor Calibration",
+                  "",
+                  "Calculating..." ]
+        self.display(blurb, list(), input_type=inputs.none_)
+                
+        I_EMFs = list()
+        T_MSs  = list()
+                
+        for i in range(0, len(ref_logs)):
             blurb = [ "Motor Calibration",
-                      "",
-                      "Calculating..." ]
-
-            self.display(blurb, list(), input_type=inputs.none_)
-                
-            I_EMFs = list()
-            T_MSs  = list()
-                
-            for i in range(0, len(ref_logs)):
-                blurb = [ "Motor Calibration",
                       "",
                       "Calculating...",
                       "    {}".format(ref_logs[i]) ]
 
-                self.display(blurb, list(), input_type=inputs.none_)
-                __, st, __, __, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag = read_logf(ref_logs[i])
-                I_MS = resx.get_current(cra, crb)
-                I_CO = resx.get_current_coil(Vms)
-                I_EMF = [0.0] * len(I_MS)
-                self.display(["{}  {}  {}".format(len(I_MS), len(I_CO), len(I_EMF))], [], input_type=inputs.none_)
-                for j in range(0, len(I_MS)):
-                    I_EMF[j] = I_MS[j] - I_CO[j]
-                I_EMFs.append(np.average(I_EMF))
+            self.display(blurb, list(), input_type=inputs.none_)
+            __, st, __, __, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag = read_logf(ref_logs[i])
+            
+            # mcal_[name]_[viscosity]_pas_[date+time].csv
+            viscosity = float(ref_logs[i].split('_')[2])
+            
+            I_MS = resx.get_current(cra)
+            I_CO = resx.get_current_coil(Vms)
+            I_EMF = [0.0] * len(I_MS)
+            self.display(["{}  {}  {}".format(len(I_MS), len(I_CO), len(I_EMF))], [], input_type=inputs.none_)
+            for j in range(0, len(I_MS)):
+                I_EMF[j] = I_MS[j] - I_CO[j]
+            I_EMFs.append(np.average(I_EMF))
                     
-                stress = ref_viscs[i] * np.average(gamma_dot)
-                torque = resx.get_torque(stress, 15)
-                T_MSs.append(np.average(torque))
+            stress = viscosity * np.average(gamma_dot) # pa = pa.s * (1/s)
+            torque = resx.get_torque(stress, 15)
+            T_MSs.append(torque)
                 
-            __, f_eqn, mot_cal = plot_fit(I_EMFs, T_MSs, 1, x_name="Iemf", y_name="Tau")
+        __, f_eqn, mot_cal = plot_fit(I_EMFs, T_MSs, 1, x_name="Iemf", y_name="Tau", outp="./../plots/cal_mot.png")
             
-            blurb = ["Motor Calibration",
-                     "",
-                     "Complete!",
-                     "",
-                     "Previous fit:",
-                     "\tTau = Iemf * {} + {}".format(resx.cal_TauIemf[0], resx.cal_TauIemf[1]),
-                     "",
-                     "New fit:",
-                     "\tTau = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])]
-            options = ["Save results", "Discard"]
+        blurb = ["Motor Calibration",
+                 "",
+                 "Complete! Plot saved as \"./../plots/cal_mot.png\"",
+                 "",
+                 "Previous fit:",
+                 "\tTau = Iemf * {} + {}".format(resx.cal_TauIemf[0], resx.cal_TauIemf[1]),
+                 "",
+                 "New fit:",
+                 "\tTau = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])]
+        options = ["Save results", "Discard"]
                 
-            res = self.display(blurb, options)
+        res = self.display(blurb, options)
                 
-            if res == 0:
-                resx.cal_TauIemf = mot_cal
-                resx.writeout()
-        else:
-            return 4
-        return 1
-            
+        if res == 0:
+            resx.cal_TauIemf = mot_cal
+            resx.writeout()
+
+    #################################################################################################################### update_calib_hist()
+    def update_calib_hist(self, nucal):
+        #reads calibration history csv
+        #adds new calibration to csv
+        #writes csv
+        pass
+        
     #################################################################################################################### run_test()
-    def run_test(self, tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_test"):
+    def run_test(self, tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_test", ln_override=None):
         # Calculate initial GD for warm up
         gd_expr = str(gd_expr)
         gd = sp.Symbol('gd')
@@ -438,16 +555,18 @@ class rheometer(object):
 
         #self.display([title, "", ""], [""], input_type=inputs.none_)
         ln = "./../logs/{}_{}_{}.csv".format(ln_prefix, tag, time.strftime("%d%m%y_%H%M", time.gmtime()))
+        if ln_override != None: ln = ln_override
         blurb = [
-                title,
-                "(warming up motor)",
-                "{}{}".format("Supply voltage:".center(40), "-- V".center(40)),
-                "{}{}".format("Target strain rate:".center(40), "-- (s^-1)".center(40)),
-                "{}{}".format("Current rotation rate:".center(40), "-- (RPM)".center(40)),
-                "{}{}".format("Current strain rate:".center(40), "-- (s^-1)".center(40)),
-                "{}{}".format("Time remaining:".center(40), "--s".center(40)),
-                "",
-                "[{}]".format(" " * 40)
+                            title,
+                            "(warming up motor)",
+                            "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
+                            "{}{}    {}{}".format("Vms:".center(19), "-- V".center(19), "omega:".center(19), "-- rad/s".center(19)),
+                            "{}{}    {}{}".format("Ims:".center(19), "-- A".center(19), "gamma dot:".center(19), "-- (s^-1)".center(19)),
+                            "{}{}    {}{}".format("Iemf:".center(19), "-- A".center(19), "tau:".center(19), "-- Pa".center(19)),
+                            "{}{}    {}{}".format("PWM DC:".center(19), "-- %".center(19), "mu:".center(19), "-- Pa.s".center(19)),
+                            "",
+                            "",
+                            "[{}]".format(" " * 40)
                 ]
         options = [" "]
         self.display(blurb, options, input_type=inputs.none_)
@@ -458,12 +577,11 @@ class rheometer(object):
         if not debug: self.mot.start_poll(name=ln, controlled=False)
         
         for i in range(0, length):
+            gd_expr = str(gd_expr)
+            gd = sp.Symbol('gd')
             t = float(copy.copy(i))
-            
             expr = pe(gd_expr) - gd
-            
             gd_val = eval(str(sp.solve(expr, gd)[0]))
-            
             self.set_strain_rate(gd_val)
             
             width = 40
@@ -472,16 +590,28 @@ class rheometer(object):
             fspd = np.average(self.mot.f_speeds)
             rspd = np.average(self.mot.r_speeds)
             aspd = (fspd + rspd) * 0.5
+            dc = self.mot.ldc
+            vms = self.mot.volts[7] * 4.0
+            if vms == 0: vms = 10**-10
+            gd = resx.get_strain(aspd)
+            if gd == 0: gd = 10**-10
+            ico = resx.get_current_coil(vms)
+            ims = resx.get_current(self.mot.volts[2])
+            iemf = ims - ico
+            tau = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
+            if tau < 0: tau = 0.0
+            mu = tau / gd
             blurb = [
-                    title,
-                    "",
-                    "{}{}".format("Supply voltage:".center(40), "{:.3f} V".format((self.mot.volts[7] * 4.0)).center(40)),
-                    "{}{}".format("Target strain rate:".center(40), "{:.3f} (s^-1)".format(gd_val).center(40)),
-                    "{}{}".format("Current rotation rate:".center(40), "{:.3f} (RPM)".format(aspd).center(40)),
-                    "{}{}".format("Current strain rate:".center(40), "{:.3f} (s^-1)".format(resx.get_strain(aspd)).center(40)),
-                    "{}{}".format("Time remaining:".center(40), "{}s".format(length - i).center(40)),
-                    "",
-                    "[{}{}]".format("#" * perc, " " * neg_perc)
+                            title,
+                            "",
+                            "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
+                            "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd).center(19)),
+                            "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
+                            "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{:.3f} Pa".format(tau).center(19)),
+                            "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),
+                            "",
+                            "{}s to go...".format(length - i).center(80),
+                            "[{}{}]".format("#" * perc, " " * neg_perc)
                     ]
             options = [" "]
             self.display(blurb, options, input_type=inputs.none_)
@@ -588,7 +718,7 @@ class rheometer(object):
              omega.append((f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 4.0)
         omega   = np.array(omega, np.float64)
 
-        current = resx.get_current(cra, crb)
+        current = resx.get_current(cra)
         voltage = Vms
         
         omega   = filt_r(st, omega)
