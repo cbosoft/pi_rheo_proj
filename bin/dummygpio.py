@@ -19,6 +19,13 @@ IN = 0
 BCM = 0
 BOARD = 0
 
+PUD_UP = 0
+PUD_DOWN = 1
+
+RISING = 0
+FALLING = 1
+BOTH = 2
+
 def output(channel, value):
     pass
     
@@ -34,7 +41,7 @@ class PWM(object):
     def start(self, dc):
         self.dc = dc
     
-    def stop(self)
+    def stop(self):
         pass
     
     def ChangeDutyCycle(self, dc):
@@ -46,7 +53,13 @@ class PWM(object):
 def setmode(numbering_system):
     pass
     
-def setup(channel, direction):
+def setup(channel, direction, pull_up_down=0):
+    pass
+
+def add_event_detect(pin, direction, callback=None):
+    pass
+
+def setwarnings(b):
     pass
 
 def cleanup():
