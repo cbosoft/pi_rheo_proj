@@ -57,7 +57,7 @@ class motor(object):
     this_log_name = ""
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 i_poll_rate=0.01, tuning=(0.2, 0.15, 0.0), relay_pin=18):
+                 i_poll_rate=0.01, tuning=(0.2, 0.15, 0.0)):
         '''
         object = motor.motor(**kwargs)
         
@@ -86,7 +86,6 @@ class motor(object):
         self.control_stopped = True
 
         # Set sensor variables
-        #self.pot = dp()
         self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.therm = ts(therm_sn)
         self.i_poll_rate = i_poll_rate
@@ -100,7 +99,6 @@ class motor(object):
         # Start threads
         if (startnow): self.start_poll(log_name)
         td.start_new_thread(self.thermometer, tuple())
-        #td.start_new_thread(self.speed_fixer, tuple())
 
     def opt_f_r(self, channel_r):
         if channel_r == 16:
