@@ -558,6 +558,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         fspd = np.average(mot.f_speeds)
         rspd = np.average(mot.r_speeds)
         aspd = (fspd + rspd) * 0.5
+        aspd_rads = (aspd * 2 * np.pi) / 60.0
         dc   = mot.ldc
         vms  = mot.volts[7] * 4.0
         if vms == 0: vms = 10**-10
@@ -697,6 +698,7 @@ def calculate_viscosity(ln):
     for i in range(0, len(f_spd1)):
          omega.append((f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 4.0)
     omega   = np.array(omega, np.float64)
+    omega   = (omega * 2.0 * np.pi) / 60.0
 
     current = resx.get_current(cra)
     voltage = Vms

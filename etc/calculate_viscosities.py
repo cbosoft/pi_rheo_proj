@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 
 # RPi-R
 sys.path.append("./../bin")
-import plothelp as ph
+from plothelp import read_logf
 from filter import filter as filt_r
 import resx
 
@@ -31,63 +31,50 @@ import resx
 #   calculate viscosity (other method?)
 #   add new data to log file
 
-#log_files = sorted(glob("./../logs/rheometry*.csv"))
+log_files = sorted(glob("./../logs/mcal*.csv"))
 
-log_files = ["./../bin/test.csv"] * 1
+#log_files = ["./../bin/test.csv"] * 1
 
-for log in log_files:
-    print "processing {}".format(log)
-    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, voltage, __, __, tag = ph.read_logf(log)
+for ln in log_files:
+    print "processing {}".format(ln)
+    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, __, __, tag = read_logf(ln)
     
     # Energy balance method calculation
     omega   = list()
-    for i in range(0, len(r_spd1)):
-        #omega.append(np.average([r_spd0[i], f_spd0[i], r_spd1[i], f_spd1[i], r_spd2[i], f_spd2[i]]))
-        omega.append((r_spd1[i] + f_spd1[i] + r_spd2[i] + f_spd2[i]) / 4.0)
-    omega = np.array(omega, np.float64)
-    print np.average(omega)
-    current = list()
-    for i in range(0, len(cra)):
-        current.append(((cra[i] + crb[i]) / 2.0 ) - 2.5)
-    current = np.array(current, np.float64)
-    current = current * (5.0 / 2.5)
-    #omega   = filt_r(st, omega)
+    for i in range(0, len(f_spd1)):
+         omega.append((f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 4.0)
+    omega   = np.array(omega, np.float64)
+    omega   = (omega * 2.0 * np.pi) / 60.0
+
+    current = resx.get_current(cra)
+    voltage = Vms
+    
+    omega   = filt_r(st, omega)
     current = filt_r(st, current)
     
     ################################################################################
     # Strain rate. #################################################################
-    # Directly related to the rotational speed of the cylinder, assuming no wall-slip
-    #
-    # gamma_dot = omega * (inner_radius / (outer_radius - inner_radius))
     
-    gamma_dot = omega * (resx.icor / (resx.ocir - resx.icor)) 
+    gamma_dot = resx.get_strain(omega)
     
     ################################################################################
     # Energy balance. ##############################################################
-    # power = omega * tau = efficiency * current * voltage 
-    # .: tau = (efficiency * current * voltage) / omega
+    
     efficiency = 0.8
     tau       = (efficiency * current * voltage) / omega  
     mu_energy_balance_method = tau / gamma_dot
     
     ################################################################################
     # Current relation. ############################################################
-    # Torque (tau) is a function of current only. Some current is used purely by the
-    # resistance in the coil. Most of the current is used creating the EMF which drives
-    # The motor. Let these currents be termed Ico for the current used uselessly in the
-    # coils and Iemf for the useful EMF producing current. Ims is the total current 
-    # supplied to the motor.
-    #
-    # Ims = Ico + Iemf  --> Iemf = Ims - Ico
-    # tau = Kti * Iemf
-    #
-    # .: tau = Kti * (Ims - Ico)
     
     current_coil = resx.get_current_coil(voltage)
     tau = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
     mu_current_relation = tau / gamma_dot
     
-    logf = open("{}_calcd.csv".format(log[:-4]), "w")
+    ################################################################################
+    # Updating log. ################################################################
+    
+    logf = open("{}_calcd.csv".format(ln[:-4]), "w")
     logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,T,Vpz,Vms,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
     for i in range(0, len(t)):
         line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(

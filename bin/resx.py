@@ -13,7 +13,7 @@ Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
 # 3rd Party
 import xml.etree.ElementTree as ET
 import numpy as np
-from math import pi
+from numpy import pi
 
 # read the xml file
 root = ET.parse('./../etc/data.xml').getroot()
@@ -173,10 +173,10 @@ def get_torque(stress, fill_volume_ml):
     A_small = (pi * (icor ** 2)) # in m^2
     A_big   = (pi * (ocir ** 2)) # in m^2
     A_middle_m2 = A_big - A_small
-    fill_volume_m3 = fill_volume_ml * (10 ** (-9)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
+    fill_volume_m3 = fill_volume_ml * (10.0 ** (-9.0)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
     H = fill_volume_m3 / A_middle_m2
-    #T = stress / (2 * A_small * H)
-    T = (stress) / (pi * 2 * H)
+    T = stress * (2 * A_small * H)
+    #T = (stress) / (pi * 2 * H)
     return T
     
 if __name__ == "__main__": print __doc__
