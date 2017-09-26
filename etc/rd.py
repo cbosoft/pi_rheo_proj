@@ -1,6 +1,9 @@
 from glob import glob
+from sys import path
 
 import numpy as np
+
+path.append("./../bin/")
 
 from plothelp import plot_fit
 from plothelp import read_logf
@@ -9,7 +12,7 @@ import resx
 I_EMFs = list()
 T_MSs  = list()
 
-ref_logs = glob("./../logs/mcal*")
+ref_logs = glob("./../logs/mcal*calcd.csv")
 
 for i in range(0, len(ref_logs)):
     print "Calculating...",
@@ -30,8 +33,8 @@ for i in range(0, len(ref_logs)):
             
     stress = viscosity * np.average(gamma_dot)
     torque = resx.get_torque(stress, 15)
-    print "\tStress:   ", stress
     print "\tStrain:   ", np.average(gamma_dot)
+    print "\tStress:   ", stress
     print "\tTorque:   ", torque
     print "\tI emf :   ", I_EMFs[-1]
     T_MSs.append(torque)
