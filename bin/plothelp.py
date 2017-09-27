@@ -75,7 +75,7 @@ def plot_fit(x, y, dg, x_name="x", y_name="y", outp="./test.png"):
     fit, fit_eqn, coeffs = fit_line(x, y, dg, x_name="x", y_name="y")
     f = plt.figure()
     ax = plt.gca()
-    ax.plot(x, y, label="{}({})".format(y_name, x_name))
+    ax.plot(x, y, "x", label="{}({})".format(y_name, x_name))
     ax.plot(x, fit, label=fit_eqn)
     ax.set_xlabel(x_name)
     ax.set_ylabel(y_name)
