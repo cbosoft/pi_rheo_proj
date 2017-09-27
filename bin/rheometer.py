@@ -542,7 +542,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
     set_strain_rate(gd_val)
     time.sleep(3)
 
-    if not debug: mot.start_poll(name=ln, controlled=False)
+    if not debug: mot.start_poll(name=ln, controlled=True)
     
     for i in range(0, length):
         gd_expr = str(gd_expr)
@@ -562,7 +562,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         dc   = mot.ldc
         vms  = mot.volts[7] * 4.0
         if vms == 0: vms = 10**-10
-        gd = resx.get_strain(aspd)
+        gd = resx.get_strain(aspd_rads)
         if gd == 0: gd = 10**-10
         ico = resx.get_current_coil(vms)
         ims = resx.get_current(mot.volts[2])
@@ -620,9 +620,9 @@ def set_strain_rate(value):
         #set_pv = int((desired_speed - resx.cal_Vnl[1]) / resx.cal_Vnl[0])
         #set_vo = (set_pv * 0.066) + 2.422
         #set_dc = set_vo / (3.33 * 4)
-        mot.set_dc(15)
+        mot.set_dc(value / 20)
     else:
-        self.mot.update_setpoint(value)
+        mot.pidc.set_point = value
 
 def solver_expr(expression, t=0.0, T=None):
     global mot
@@ -696,7 +696,7 @@ def calculate_viscosity(ln):
     # Energy balance method calculation
     omega   = list()
     for i in range(0, len(f_spd1)):
-         omega.append((f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 4.0)
+         omega.append((f_spd0[i] + r_spd0[i] + f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 6.0)
     omega   = np.array(omega, np.float64)
     omega   = (omega * 2.0 * np.pi) / 60.0
 
