@@ -39,8 +39,8 @@
         <coeff2>-0.0615875962273</coeff2>
     </calibration>
     <calibration name="TauIemf">
-        <coeff1>0.0000677157954812</coeff1>
-        <coeff2>-0.0000479152047014</coeff2>
+        <coeff1>0.0001296</coeff1>
+        <coeff2>-0.00009172</coeff2>
     </calibration>
     <calibration name="TsVms">
         <coeff1>875543.401758</coeff1>
