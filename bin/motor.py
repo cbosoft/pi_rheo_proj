@@ -57,7 +57,7 @@ class motor(object):
     this_log_name = ""
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 i_poll_rate=0.01, tuning=(0.4, 1, 0.0)):
+                 i_poll_rate=0.01, tuning=(1.8, 2.845, 0.0)):
         '''
         object = motor.motor(**kwargs)
         
@@ -264,7 +264,7 @@ class motor(object):
         This will repeat until motor.control_stopped becomes True.
         '''
         while not self.control_stopped:
-            av_speed = (np.average(self.r_speeds[1:]) + np.average(self.f_speeds[1:])) / 2
+            av_speed = (np.average(self.r_speeds) + np.average(self.f_speeds)) / 2
             self.speed = av_speed
             av_speed = (2 * np.pi * av_speed) / 60.0
             self.speed_rads = av_speed
@@ -273,7 +273,7 @@ class motor(object):
             if control_action > 100.0: control_action = 100.0
             if control_action < 0.0: control_action = 0
             self.set_dc(control_action)
-            time.sleep(0.1)
+            time.sleep(0.01)
 
     def read_sensors(self):
         '''
