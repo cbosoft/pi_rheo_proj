@@ -178,5 +178,14 @@ def get_torque(stress, fill_volume_ml):
     T = stress * (2 * A_small * H)
     #T = (stress) / (pi * 2 * H)
     return T
+
+def get_stress(T, fill_volume_ml):
+    A_small = (pi * (icor ** 2)) # in m^2
+    A_big   = (pi * (ocir ** 2)) # in m^2
+    A_middle_m2 = A_big - A_small
+    fill_volume_m3 = fill_volume_ml * (10.0 ** (-9.0)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
+    H = fill_volume_m3 / A_middle_m2
+    stress = T / (2 * A_small * H)
+    return stress
     
 if __name__ == "__main__": print __doc__

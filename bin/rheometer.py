@@ -67,6 +67,10 @@ class inputs(enum):
     enum_   = 2
     string_ = 3
 
+def CAE(Exception):
+    '''Terrible practice, but handy for easily cancelling out of a deep nest'''
+    pass
+
 ######################################################################################################################## DISPLAY
 def display(blurb, options, selected=0, input_type=inputs.enum_):
     global stdscr
@@ -306,9 +310,10 @@ def menu(initsel=0):
                 fspd = np.average(mot.f_speeds)
                 rspd = np.average(mot.r_speeds)
                 aspd = (fspd + rspd) * 0.5
+                aspd_rads = aspd * 2.0 * np.pi / 60.0
                 vms = mot.volts[7] * 4.0
                 if vms == 0: vms = 10**-10
-                gd = resx.get_strain(aspd)
+                gd = resx.get_strain(aspd_rads)
                 if gd == 0: gd = 10**-10
                 ico = resx.get_current_coil(vms)
                 ims = resx.get_current(mot.volts[2])
@@ -374,7 +379,7 @@ def menu(initsel=0):
            
         res = display(blurb, options)
             
-        if res == 1: x = 1 + "t"  # cancelations are exceptional
+        if res == 1: raise CAE ## Cancellations are exceptional
           
         ref_logs  = list()
         ref_viscs = list()
@@ -567,16 +572,18 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         ico = resx.get_current_coil(vms)
         ims = resx.get_current(mot.volts[2])
         iemf = ims - ico
-        tau = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
-        if tau < 0: tau = 0.0
+        T = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
+        tau = resx.get_stress(T, 15)
+        if tau < 0: tau = 0.01
         mu = tau / gd
+        tau = T
         blurb = [
                 title,
                 "",
                 "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
                 "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd).center(19)),
                 "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
-                "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{:.3f} Pa".format(tau).center(19)),
+                "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{} Pa".format(tau).center(19)),
                 "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),
                 "",
                 "{}s to go...".format(length - i).center(80),
@@ -701,10 +708,10 @@ def calculate_viscosity(ln):
     omega   = (omega * 2.0 * np.pi) / 60.0
 
     current = resx.get_current(cra)
-    voltage = Vms
     
-    omega   = filt_r(st, omega)
-    current = filt_r(st, current)
+    voltage = filt_r(st, Vms)
+    omega  = filt_r(st, omega)
+    current  = filt_r(st, current)
     
     ################################################################################
     # Strain rate. #################################################################
@@ -722,7 +729,8 @@ def calculate_viscosity(ln):
     # Current relation. ############################################################
     
     current_coil = resx.get_current_coil(voltage)
-    tau = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+    T = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+    tau    = resx.get_stress(T, 15)
     mu_current_relation = tau / gamma_dot
     
     ################################################################################
@@ -744,7 +752,10 @@ def main(s):
     stdscr = s
     res = 0
     while res != 4:
-        res = menu(res)
+        try:
+            res = menu(res)
+        except CAE:
+            pass
 
 # if debug: no logging
 if debug:
