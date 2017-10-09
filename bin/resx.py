@@ -100,8 +100,7 @@ def get_current(cv):
     Returns:
         cu      (list, float)       List of current values, averaged out from two sensors.
     '''
-    #cu = (cv - 2.5) * (5.0 / 2.5) # current = (signal - (2.5v offset)) * (5A / 2.5v)
-    cu = ((cv - 2.5) / 0.185) 
+    cu = ((cv - 2.5) / 0.185) # current = (signal - (2.5v offset)) * (0.185 v/A sensitivity)
     return cu
 
 def get_speed_rads(dr):
