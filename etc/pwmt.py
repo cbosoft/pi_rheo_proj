@@ -30,7 +30,7 @@ try:
             r = m.r_speeds
             print "r0: ", r[0], " f0: ", f[0], "r1: ", r[1], "f1: ", f[1], "r2: ", r[2], "f2: ", f[2], "dc: ", m.ldc
             current = resx.get_current(m.volts[2])
-            volt = m.volts[7] * 4.0
+            volt = m.volts[7] * 1.0
             currents.append(current)
             volts.append(volt)
             #"cra: ", m.volts[1], "crb: ", m.volts[2], 
