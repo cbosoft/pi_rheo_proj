@@ -311,7 +311,7 @@ def menu(initsel=0):
                 rspd = np.average(mot.r_speeds)
                 aspd = (fspd + rspd) * 0.5
                 aspd_rads = aspd * 2.0 * np.pi / 60.0
-                vms = mot.volts[7] * 4.0
+                vms = mot.volts[7] * resx.vmsmult
                 if vms == 0: vms = 10**-10
                 gd = resx.get_strain(aspd_rads)
                 if gd == 0: gd = 10**-10
@@ -325,7 +325,7 @@ def menu(initsel=0):
                         "Current Calibration",
                         "",
                         "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
-                        "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd).center(19)),
+                        "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd_rads).center(19)),
                         "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
                         "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{:.3f} Pa".format(tau).center(19)),
                         "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),
@@ -439,7 +439,7 @@ def menu(initsel=0):
                 
             if res == 1: x = 1 + "t"
             ref_log = "./../logs/mcal_{}_{}_pas_{}.csv".format(ref_nams[-1], ref_viscs[-1], time.strftime("%d.%m.%y-%H%M", time.gmtime()))
-            self.run_test("newt_ref", cal_len, 125, title="Reference {} Test".format(count), ln_override=ref_log)
+            run_test("newt_ref", cal_len, 125, title="Reference {} Test".format(count), ln_override=ref_log)
             ref_logs.append(ref_log)
                 
             count += 1
@@ -455,13 +455,13 @@ def menu(initsel=0):
                     
                 if res == 1: finished = True
         
-        self.mot_cal(ref_logs)
+        mot_cal(ref_logs)
     else:
         return 4
     return 1
 
 ######################################################################################################################## mot_cal()
-def mot_cal(self, ref_logs):
+def mot_cal(ref_logs):
     global mot
     blurb = [ "Motor Calibration",
               "",
@@ -565,7 +565,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         aspd = (fspd + rspd) * 0.5
         aspd_rads = (aspd * 2 * np.pi) / 60.0
         dc   = mot.ldc
-        vms  = mot.volts[7] * 4.0
+        vms  = mot.volts[7] * resx.vmsmult
         if vms == 0: vms = 10**-10
         gd = resx.get_strain(aspd_rads)
         if gd == 0: gd = 10**-10
@@ -581,7 +581,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
                 title,
                 "",
                 "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
-                "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd).center(19)),
+                "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd_rads).center(19)),
                 "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
                 "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{} Pa".format(tau).center(19)),
                 "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),

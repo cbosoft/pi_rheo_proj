@@ -31,7 +31,7 @@ import resx
 #   calculate viscosity (other method?)
 #   add new data to log file
 
-log_files = sorted(glob("./../logs/mcal*.csv"))
+log_files = sorted(glob("./../logs/rh*.csv"))
 
 #log_files = ["./../bin/test.csv"] * 1
 

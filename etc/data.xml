@@ -35,12 +35,12 @@
         <coeff2>0.600046810511</coeff2>
     </calibration>
     <calibration name="IcoVms">
-        <coeff1>0.0123123121105</coeff1>
-        <coeff2>0.417911376099</coeff2>
+        <coeff1>0.0299574615053</coeff1>
+        <coeff2>0.230492043487</coeff2>
     </calibration>
     <calibration name="TauIemf">
-        <coeff1>0.0001296</coeff1>
-        <coeff2>-9.172e-05</coeff2>
+        <coeff1>0.001949</coeff1>
+        <coeff2>3.445e-06</coeff2>
     </calibration>
     <calibration name="TsVms">
         <coeff1>875543.401758</coeff1>

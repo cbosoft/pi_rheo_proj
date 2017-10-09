@@ -51,7 +51,7 @@ calc_supply_voltage = [0.066, 2.422]
 
 cal_Vnl = [5.130, 15.275]
 
-vmsmult = 2.0
+vmsmult = 4.0 # due to voltage divider taking motor supply voltage down to a level the ADC can read
 
 version = parse_root("version", "misc")
 
