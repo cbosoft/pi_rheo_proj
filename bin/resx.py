@@ -51,6 +51,8 @@ calc_supply_voltage = [0.066, 2.422]
 
 cal_Vnl = [5.130, 15.275]
 
+vmsmult = 2.0
+
 version = parse_root("version", "misc")
 
 def writeout(path="./../etc/data.xml"):
