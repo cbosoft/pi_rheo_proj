@@ -13,7 +13,7 @@ Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
 # 3rd Party
 import xml.etree.ElementTree as ET
 import numpy as np
-from numpy import pi
+from numpy import *
 
 # read the xml file
 root = ET.parse('./../etc/data.xml').getroot()
@@ -87,6 +87,89 @@ def writeout(path="./../etc/data.xml"):
     tree = ET.ElementTree(root)
     tree.write(path)
 
+def get_mu_of_T(material_n, T_c, misc_data=None):
+    '''
+    get_mu_of_T(material_n, T_c, misc_data=None
+    
+    Uses functions from various data sources in order to calculate continuously
+    the viscosity data of various compounds and mixtures from the current temperature.
+    
+    Parameters
+    ----------
+    
+    material_n      (string)            The name of the material to calculate the viscosity for.
+                                        Can also be a definition of a mixture e.g. 'glycerol+water'
+                                        the '+' character is necessary, and all mixture definitions
+                                        must follow the same formula.
+    
+    T_c             (float/iterable)    The temperature(s) in celsius used to calculate the
+                                        viscosity of the material.
+    
+    misc_data       (float/string)      For mixtures, there is often required to be extra information
+                                        to calculate the viscosity - such as the composition.
+                                        This can be set here depending on the function requirements.
+    
+    Returns
+    -------
+    
+    mu_out          (float)             The viscosity of the specified material/mixture
+    
+    References
+    ----------
+    
+    [Cheng 2008]    "Formula for the Viscosity of a Glycerol-Water Mixture",
+                    Nian-Sheng Cheng, Ind. Eng. Chem. Res. 2008, 47, 3285-3288
+    '''
+    
+    materials_dict = {
+    
+        "glycerol":0,
+        
+        "water":1,
+        
+        "glycerol+water":2
+        
+        }
+    
+    function_index = 0
+    
+    try:
+        function_index = materials_dict[material_n]
+    except:
+        raise Exception("Material not known! Did you spell it correctly?")
+    
+    # Alternative T units
+    T_K = T_c + 273.15                  # Tabs, Kelvin
+    T_F = T_c * (9.0/5.0) + 32.0        # Trel, Fahrenheit
+    T_R = T_F + 459.67                  # Tabs, Rankine
+    
+    mu_out = 0.0
+    
+    if function_index == 0:
+        # Material is glycerol
+        #
+        # Function is taken from [Cheng 2008]
+        mu_out = ((12100.0 * (e ** (((-1232.0 + T_c) * T_c) / (9900.0 + (70.0 * T_c))))) * 0.001)
+    elif function_index == 1:
+        # Material is water
+        #
+        # Function is taken from [Cheng 2008]
+        mu_out = ((1.79 * (e ** (((-1230.0 - T_c) * T_c) / (36100.0 + (360.0 * T_c))))) * 0.001)
+    elif function_index == 2:
+        # Material is aqueous glycerol solution
+        #
+        # Method is taken from [Cheng 2008]
+        a = (0.705 - 0.0017 * T_c)
+        b = ((4.9 + 0.036 * T_c) * (a ** 0.25))
+        mug = ((12100.0 * (e ** (((-1232.0 + T_c) * T_c) / (9900.0 + (70.0 * T_c))))) * 0.001)
+        muw = ((1.79 * (e ** (((-1230.0 - T_c) * T_c) / (36100.0 + (360.0 * T_c))))) * 0.001)
+        cm = float(misc_data)
+        alpha = (1.0 - cm + ((a * b * cm * (1.0 - cm)) / ((a * cm) + (b * (1.0 - cm)))))
+        mu_out = (muw ** alpha) * (mug ** (1.0 - alpha))
+    return mu_out
+    
+    
+
 def get_current(cv):
     '''
     resx.get_current(cr2a, cr2b)
@@ -98,7 +181,7 @@ def get_current(cv):
         crb    (list, float)       List of 5A HECS voltage readings
     
     Returns:
-        cu      (list, float)       List of current values, averaged out from two sensors.
+        cu     (list, float)       List of current values, averaged out from two sensors.
     '''
     cu = ((cv - 2.5) / 0.185) # current = (signal - (2.5v offset)) * (0.185 v/A sensitivity)
     return cu

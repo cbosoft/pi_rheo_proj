@@ -101,18 +101,21 @@ class motor(object):
         td.start_new_thread(self.thermometer, tuple())
 
     def opt_f_r(self, channel_r):
-        if channel_r == 16:
-            channel = 0
-        elif channel_r == 20:
-            channel = 1
-        else:
-            channel = 2
+        try:
+            if channel_r == 16:
+                channel = 0
+            elif channel_r == 20:
+                channel = 1
+            else:
+                channel = 2
 
-        r = bool(gpio.input(self.opt_pins[channel]))            
-        if r:
-            self.opt_rise(channel)
-        else:
-            self.opt_fall(channel)
+            r = bool(gpio.input(self.opt_pins[channel]))            
+            if r:
+                self.opt_rise(channel)
+            else:
+                self.opt_fall(channel)
+        except RuntimeError:
+            pass # Runtime errors can occur if the GPIO events are triggered mid GPIO.Cleanup() call
     
     def setup_gpio(self):
         if self.gpio_ready: return

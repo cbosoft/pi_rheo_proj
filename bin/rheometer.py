@@ -26,6 +26,10 @@ from glob import glob
 import platform
 from enum import Enum as enum
 
+import os
+__, console_width = os.popen('stty size', 'r').read().split()
+draw_width = int(console_width) - 2
+
 ## Third party
 print "\t3rd Party Packages..."
 import numpy as np
@@ -68,7 +72,7 @@ class inputs(enum):
     string_ = 3
 
 def CAE(Exception):
-    '''Terrible practice, but handy for easily cancelling out of a deep nest'''
+    '''Handy for easily cancelling out of a deep nest'''
     pass
 
 ######################################################################################################################## DISPLAY
@@ -84,27 +88,27 @@ def display(blurb, options, selected=0, input_type=inputs.enum_):
     if mot.ldc: mode_string = "!! MOTOR ON !!"
     if debug: mode_string = "!! DEBUG !!"
         
-    stdscr.addstr(3, 1,  r"                                 _        _                                     ")
-    stdscr.addstr(4, 1,  r"                      _ __ _ __ (_)  _ __| |__   ___  ___                       ")
-    stdscr.addstr(5, 1,  r"                     | '__| '_ \| | | '__| '_ \ / _ \/ _ \                      ")
-    stdscr.addstr(6, 1,  r"                     | |  | |_) | |_| |  | | | |  __/ (_) |                     ")
-    stdscr.addstr(7, 1,  r"                     |_|  | .__/|_(_)_|  |_| |_|\___|\___/                      ")
-    stdscr.addstr(8, 1,  r"                          |_|  Raspberry Pi Rheometer v{}                    ".format(version))
-    stdscr.addstr(9, 1,  r"                                                                                ")
-    stdscr.addstr(10, 1,  r"{}".format(mode_string.center(80)))
+    stdscr.addstr(3, 1,  r"            _        _                ".center(draw_width))
+    stdscr.addstr(4, 1,  r" _ __ _ __ (_)  _ __| |__   ___  ___  ".center(draw_width))
+    stdscr.addstr(5, 1,  r"| '__| '_ \| | | '__| '_ \ / _ \/ _ \ ".center(draw_width))
+    stdscr.addstr(6, 1,  r"| |  | |_) | |_| |  | | | |  __/ (_) |".center(draw_width))
+    stdscr.addstr(7, 1,  r"|_|  | .__/|_(_)_|  |_| |_|\___|\___/ ".center(draw_width))
+    stdscr.addstr(8, 1,  r"     |_| Raspberry Pi Rheometer v{}".format(version).center(draw_width))
+    stdscr.addstr(9, 1,  r"".center(draw_width))
+    stdscr.addstr(10, 1,  r"{}".format(mode_string.center(draw_width)))
 
     blurbheight = 12
 
     # Display Blurb
     for i in range(0, len(blurb)):
-        stdscr.addstr(blurbheight + i, 1, blurb[i].center(80))
+        stdscr.addstr(blurbheight + i, 1, blurb[i].center(draw_width))
     
     # Show Options
     for i in range(0, len(options)):
         if (selected == i and input_type == inputs.enum_):
-            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80), curses.A_STANDOUT)
+            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i][:draw_width].center(draw_width), curses.A_STANDOUT)
         else:
-            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i].center(80))
+            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i][:draw_width].center(draw_width))
 
     # Get Input
     stdscr.addstr(0,0, "")
@@ -113,8 +117,8 @@ def display(blurb, options, selected=0, input_type=inputs.enum_):
         res = stdscr.getch()
     elif input_type == inputs.string_:
         curses.echo()
-        stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 10, "".center(60, "."))
-        res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 10, 60)
+        stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 10, "".center(draw_width - 20, "."))
+        res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 10, (draw_width - 20))
     else:
         res = 10
 
@@ -398,22 +402,34 @@ def menu(initsel=0):
                             "Fill the cylinder with a reference fluid up to the \"15ml min\" line.",
                             "Then raise the platform so that the liquid level raises to the \"15ml max\" line.",
                             "",
-                            "Enter the viscosity of the fluid: (Pa.s)"                                
+                            "Enter the nominal viscosity (in Pa.s), or enter the name of the fluid, OR enter a",
+                            "fluid mixture followed by the composition (weight%)",
+                            "",
+                            "e.g. '0.01'",
+                            "or 'glycerol'",
+                            "or 'glycerol+water@0.45' the characters used here are important! Do not deviate."
                         ]
                 options = [" "]
                     
                 str_nom_visc = display(blurb, options, input_type=inputs.string_)
                 try:
-                    ref_viscs.append(float(str_nom_visc))
+                    ref_viscs.append(float(str_nom_visc))       # assumes is float of nominal viscosity...
                     inp_k = True
                 except:
-                    inp_k = False
+                    try:
+                        resx.get_mu_of_T(str_nom_visc, 25.0)    #   ... or name of species...
+                    except:
+                        try:
+                            parts = str_nom_visc.split("@")
+                            resx.get_mu_of_T(parts[0], 25.0, parts[1])
+                        except:
+                            inp_k = False
             inp_k = False
 
             while not inp_k:
                 blurb = [   "Motor Calibration: fluid {}".format(count),
                             "",
-                            "What fluid is it?"                                
+                            "Enter a name to distinguish this log from the rest:"
                         ]
                 options = [" "]
                     
@@ -422,7 +438,7 @@ def menu(initsel=0):
                             "",
                             "\"{}\"?".format(str_ref_nam)
                         ]
-                options = ["That is correct", "Oops! Typo"]
+                options = ["Continue", "Re-enter"]
                     
                 rep = display(blurb, options, input_type=inputs.enum_)
                 if rep == 0:
@@ -481,7 +497,14 @@ def mot_cal(ref_logs):
         __, st, __, __, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag = read_logf(ref_logs[i])
         
         # mcal_[name]_[viscosity]_pas_[date+time].csv
-        viscosity = float(ref_logs[i].split('_')[2])
+        try:
+            viscosity = float(ref_logs[i].split('_')[2]) # if is any of the 'smart' options, this will not work
+        except:
+            try:
+                viscosity = resx.get_mu_of_T(ref_logs[i].split('_')[2], T) # will not work if is mixture
+            except:
+                parts = ref_logs[i].split('_')[2].split("@")
+                viscosity = resx.get_mu_of_T(parts[0], T, parts[1]) # will not work if is wrong
         
         I_MS = resx.get_current(cra)
         I_CO = resx.get_current_coil(Vms)
