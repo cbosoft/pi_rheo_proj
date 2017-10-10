@@ -31,13 +31,13 @@ import resx
 #   calculate viscosity (other method?)
 #   add new data to log file
 
-log_files = sorted(glob("./../logs/rh*.csv"))
+log_files = sorted(glob("./../logs/tmc*.csv"))
 
 #log_files = ["./../bin/test.csv"] * 1
 
 for ln in log_files:
     print "processing {}".format(ln)
-    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, __, __, tag = read_logf(ln)
+    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, Tc, Vpz, Vms, __, __, tag = read_logf(ln)
     
     # Energy balance method calculation
     omega   = list()
@@ -60,7 +60,7 @@ for ln in log_files:
     ################################################################################
     # Energy balance. ##############################################################
     
-    efficiency = 0.8
+    efficiency = 0.8 ## total guess. Not even slightly correct.
     tau       = (efficiency * current * voltage) / omega  
     mu_energy_balance_method = tau / gamma_dot
     
@@ -68,7 +68,8 @@ for ln in log_files:
     # Current relation. ############################################################
     
     current_coil = resx.get_current_coil(voltage)
-    tau = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+    T = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+    tau    = resx.get_stress(T, 15)
     mu_current_relation = tau / gamma_dot
     
     ################################################################################
@@ -80,7 +81,7 @@ for ln in log_files:
         line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
                 t[i], f_spd0[i], r_spd0[i], f_spd1[i], r_spd1[i], #5
                 f_spd2[i], r_spd2[i], cra[i], crb[i], #4
-                T[i], Vpz[i], voltage[i], gamma_dot[i], tau[i], #5
+                Tc[i], Vpz[i], voltage[i], gamma_dot[i], tau[i], #5
                 mu_energy_balance_method[i], mu_current_relation[i]) #2
         logf.write(line)
     logf.close()

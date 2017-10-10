@@ -71,9 +71,12 @@ class inputs(enum):
     enum_   = 2
     string_ = 3
 
-def CAE(Exception):
+class CAE(Exception):
     '''Handy for easily cancelling out of a deep nest'''
     pass
+    
+    def __str__(self):
+        return "Cancelled"
 
 ######################################################################################################################## DISPLAY
 def display(blurb, options, selected=0, input_type=inputs.enum_):
@@ -390,12 +393,14 @@ def menu(initsel=0):
         ref_nams  = list()
         
         cal_len = 120
+        cal_strain = 125
             
         finished = False
         count = 1
             
         while not finished:
             inp_k = False
+            ex_inf = ""
             while not inp_k:
                 blurb = [   "Motor Calibration: fluid {}".format(count),
                             "",
@@ -404,7 +409,7 @@ def menu(initsel=0):
                             "",
                             "Enter the nominal viscosity (in Pa.s), or enter the name of the fluid, OR enter a",
                             "fluid mixture followed by the composition (weight%)",
-                            "",
+                            ex_inf,
                             "e.g. '0.01'",
                             "or 'glycerol'",
                             "or 'glycerol+water@0.45' the characters used here are important! Do not deviate."
@@ -416,13 +421,20 @@ def menu(initsel=0):
                     ref_viscs.append(float(str_nom_visc))       # assumes is float of nominal viscosity...
                     inp_k = True
                 except:
+                    ex_inf = "Viscosity must be a number!"
                     try:
                         resx.get_mu_of_T(str_nom_visc, 25.0)    #   ... or name of species...
+                        ref_viscs.append(str_nom_visc)
+                        inp_k = True
                     except:
+                        ex_inf = "Make sure you type the name correctly!"
                         try:
                             parts = str_nom_visc.split("@")
                             resx.get_mu_of_T(parts[0], 25.0, parts[1])
+                            ref_viscs.append(str_nom_visc)
+                            inp_k = True
                         except:
+                            ex_inf = "Are you even trying to type correctly?"
                             inp_k = False
             inp_k = False
 
@@ -447,15 +459,17 @@ def menu(initsel=0):
                 
             blurb = [   "Motor Calibration: fluid {}".format(count),
                         "",
-                        "Now the fluid will be run for {} minutes at a strain rate of ~125 (s^-1).".format(float(cal_len) / 60.0),
+                        "Now the fluid will be sheared for {} minutes at a strain of ~{} (s^-1).".format(float(cal_len) / 60.0, cal_strain),
                     ]
             options = [ "Continue", "Cancel" ]
                 
             res = display(blurb, options)
                 
-            if res == 1: x = 1 + "t"
-            ref_log = "./../logs/mcal_{}_{}_pas_{}.csv".format(ref_nams[-1], ref_viscs[-1], time.strftime("%d.%m.%y-%H%M", time.gmtime()))
-            run_test("newt_ref", cal_len, 125, title="Reference {} Test".format(count), ln_override=ref_log)
+            if res == 1: raise CAE
+            
+            ref_log = "./../logs/mcal_{}_{}_{}.csv".format(ref_nams[-1], ref_viscs[-1], time.strftime("%d.%m.%y-%H%M", time.gmtime()))
+            
+            run_test("newt_ref", cal_len, 125, title="Reference {} Test: {}".format(count, ref_nams[-1]), ln_override=ref_log)
             ref_logs.append(ref_log)
                 
             count += 1
@@ -496,14 +510,15 @@ def mot_cal(ref_logs):
         display(blurb, list(), input_type=inputs.none_)
         __, st, __, __, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag = read_logf(ref_logs[i])
         
-        # mcal_[name]_[viscosity]_pas_[date+time].csv
+        # mcal_[name]_[viscosity]_[date+time].csv
+        v_term = ref_logs[i].split('_')[2]
         try:
-            viscosity = float(ref_logs[i].split('_')[2]) # if is any of the 'smart' options, this will not work
+            viscosity = float(v_term) # if is any of the 'smart' options, this will not work
         except:
             try:
-                viscosity = resx.get_mu_of_T(ref_logs[i].split('_')[2], T) # will not work if is mixture
+                viscosity = resx.get_mu_of_T(v_term, T) # will not work if is mixture
             except:
-                parts = ref_logs[i].split('_')[2].split("@")
+                parts = v_term.split("@")
                 viscosity = resx.get_mu_of_T(parts[0], T, parts[1]) # will not work if is wrong
         
         I_MS = resx.get_current(cra)
@@ -721,7 +736,7 @@ def calculate_viscosity(ln):
     
     Once calculated, this is then added to the log file.
     '''
-    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, __, __, tag = read_logf(ln)
+    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, Tc, Vpz, Vms, __, __, tag = read_logf(ln)
     
     # Energy balance method calculation
     omega   = list()
@@ -760,7 +775,7 @@ def calculate_viscosity(ln):
     # Updating log. ################################################################
     
     logf = open(ln, "w")
-    logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,T,Vpz,Vms,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
+    logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,Tc,Vpz,Vms,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
     for i in range(0, len(t)):
         line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
                 t[i], f_spd0[i], r_spd0[i], f_spd1[i], r_spd1[i], #5
