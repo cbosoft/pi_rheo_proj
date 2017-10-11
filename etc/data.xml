@@ -35,8 +35,8 @@
         <coeff2>0.600046810511</coeff2>
     </calibration>
     <calibration name="IcoVms">
-        <coeff1>0.0299574615053</coeff1>
-        <coeff2>0.230492043487</coeff2>
+        <coeff1>0.0280734583121</coeff1>
+        <coeff2>0.294851000394</coeff2>
     </calibration>
     <calibration name="TIemf">
         <coeff1>0.001949</coeff1>
