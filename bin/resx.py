@@ -81,8 +81,8 @@ def writeout(path="./../etc/data.xml"):
     root[8][1].text = str(cal_5AHES[1])
     root[9][0].text = str(cal_IcoVms[0])
     root[9][1].text = str(cal_IcoVms[1])
-    root[10][0].text = str(cal_TauIemf[0])
-    root[10][1].text = str(cal_TauIemf[1])
+    root[10][0].text = str(cal_TIemf[0])
+    root[10][1].text = str(cal_TIemf[1])
     
     tree = ET.ElementTree(root)
     tree.write(path)

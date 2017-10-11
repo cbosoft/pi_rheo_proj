@@ -118,7 +118,7 @@ def read_logf(log_n):
     cra       =   np.array(datf['cra'], np.float64)
     crb       =   np.array(datf['crb'], np.float64)
     Vms       =   np.array(datf['Vms'], np.float64)
-    T         =   np.array(datf['T'], np.float64)
+    T         =   np.array(datf['Tc'], np.float64)
     
     try:
         Vpz       =   np.array(datf['Vpz'], np.float64)
