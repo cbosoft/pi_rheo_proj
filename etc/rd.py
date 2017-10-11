@@ -2,6 +2,8 @@ from glob import glob
 from sys import path
 
 import numpy as np
+from matplotlib import use as mpluse
+mpluse('Agg')
 import matplotlib.pyplot as plt
 
 path.append("./../bin/")
@@ -17,7 +19,7 @@ T_MSs  = list()
 aliemfs = list()
 altms = list()
 
-ref_logs = glob("./../logs/mcal*calcd.csv")
+ref_logs = glob("./../logs/mcal*11.10*.csv")
 
 for i in range(0, len(ref_logs)):
     print "Calculating...",
@@ -69,6 +71,7 @@ ax = f.add_subplot(111)
 ax.plot(aliemfs, altms, "x")
 ax.plot(I_EMFs, T_MSs, "o")
 ax.plot(I_EMFs, fit)
-plt.show()
-#print "New fit:"
-#print "\tT = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])
+#plt.show()
+plt.savefig("trd.png")
+print "New fit:"
+print "\tT = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])
