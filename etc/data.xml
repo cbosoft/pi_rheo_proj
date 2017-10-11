@@ -20,7 +20,7 @@
         <units>m</units>
     </geometry>
     <misc name="version">
-        <ver>0.1.7</ver>
+        <ver>0.1.8</ver>
     </misc>
     <calibration name="dynamo">
         <coeff1>300.295311038</coeff1>
@@ -38,7 +38,7 @@
         <coeff1>0.0299574615053</coeff1>
         <coeff2>0.230492043487</coeff2>
     </calibration>
-    <calibration name="TauIemf">
+    <calibration name="TIemf">
         <coeff1>0.001949</coeff1>
         <coeff2>3.445e-06</coeff2>
     </calibration>

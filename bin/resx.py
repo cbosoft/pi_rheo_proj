@@ -45,7 +45,7 @@ cal_5AHES = parse_root("5AHES", "calibration")
 
 cal_IcoVms = parse_root("IcoVms", "calibration")
 cal_TsVms = parse_root("TsVms", "calibration")
-cal_TauIemf = parse_root("TauIemf", "calibration")
+cal_TIemf = parse_root("TIemf", "calibration")
 
 calc_supply_voltage = [0.066, 2.422]
 
@@ -185,23 +185,6 @@ def get_current(cv):
     '''
     cu = ((cv - 2.5) / 0.185) # current = (signal - (2.5v offset)) * (0.185 v/A sensitivity)
     return cu
-
-def get_speed_rads(dr):
-    '''
-    resx.get_speed_rads(dr)
-    
-    Given readings from a dynamo, uses calibration data stored in data.xml to calculate the rotational speed in
-    radians per second of the motor.
-    
-    Parameters:
-        dr      (list, float)       List of dynamo voltage readings.
-    
-    Returns:
-        v_rads  (list, float)       List of speeds in rad/s.
-    '''
-    v_rpm = get_speed_rpm(dr)
-    v_rads = v_rpm * np.pi / 30 # rpm is 2pi per 60s =~ 1/10 rad/s
-    return v_rads
 
 def get_strain(spd_omega):
     '''
