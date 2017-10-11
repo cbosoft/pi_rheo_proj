@@ -57,7 +57,7 @@ class motor(object):
     debug = False
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 log_interval=0.001, tuning=(1.8, 2.845, 0.0)):
+                 log_interval=0.01, tuning=(1.8, 2.845, 0.0)):
         '''
         object = motor.motor(**kwargs)
         
@@ -104,6 +104,7 @@ class motor(object):
         try:
             if channel_r == 16:
                 channel = 0
+
             elif channel_r == 20:
                 channel = 1
             else:
