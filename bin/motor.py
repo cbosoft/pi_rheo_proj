@@ -131,10 +131,10 @@ class motor(object):
         self.pwm_er.start(0.0)
         
         # Setup optical encoder pins
-        self.opt_pins   = [16, 20, 21]
+        self.opt_pins   = [21, 20]
         self.f_thens    = [time.time()] * len(self.opt_pins)
         self.r_thens    = [time.time()] * len(self.opt_pins)
-        self.rps        = [4.0] * 3#[16.0, 8.0, 4.0]
+        self.rps        = [4.0] * len(self.opt_pins)#[16.0, 8.0, 4.0]
         self.f_speeds   = [0.0, 0.0, 0.0]
         self.r_speeds   = [0.0, 0.0, 0.0]
         self.f_misses   = [0, 0, 0]
