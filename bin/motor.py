@@ -53,11 +53,11 @@ class motor(object):
     # Logging
     poll_running = False  # is the speed currently being polled?
     poll_logging = True  # Will log every (i_poll_rate)s if this is True
-    i_poll_rate = 0.01
     this_log_name = ""
+    debug = False
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 i_poll_rate=0.01, tuning=(1.8, 2.845, 0.0)):
+                 log_interval=0.001, tuning=(1.8, 2.845, 0.0)):
         '''
         object = motor.motor(**kwargs)
         
@@ -88,7 +88,7 @@ class motor(object):
         # Set sensor variables
         self.aconv = ac(cs_pin=1, vref=adc_vref)
         self.therm = ts(therm_sn)
-        self.i_poll_rate = i_poll_rate
+        self.log_interval = log_interval
         self.volts = [0.0] * 8
         self.thermo_running = True
         self.temperature_c = 0.0
@@ -214,7 +214,7 @@ class motor(object):
             self.logf = open(self.this_log_name, "w")
             self.logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,pv,T,Vpz,Vms\n")
 
-    def start_poll(self, name="./../logs/log.csv", controlled=False):
+    def start_poll(self, name="./../logs/log.csv", controlled=False, debug_=False):
         '''
         motor.start_poll(**kwargs)
         
@@ -226,6 +226,7 @@ class motor(object):
                                                 and time of run. Default is 'DATETIME'
             controlled      (bool)              Indicates whether the control thread should be started or not.
         '''
+        self.debug = debug_
         self.setup_gpio()
         if controlled: self.start_control()
 
@@ -310,14 +311,16 @@ class motor(object):
             # Read sensors
             self.volts = self.read_sensors()
             
-            if (self.poll_logging):
+            if (self.poll_logging and not self.debug):
                 #                   t    f_spd16  r_spd16 f_spd8  r_spd8  f_spd4  r_spd4    cra    crb     dc      T     Vpz  Vms
                 self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
                 #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4            cra           crb            dc           T                  Vpz              Vms
                     t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * resx.vmsmult)))
-            
+            elif (self.debug):
+                self.logf.write(("{:.6f}, 80, 80, 80, 80, 80, 80, 3, 0, 50, 15, 2, 3 \n").format(t))
+                    
             # delay for x seconds
-            time.sleep(self.i_poll_rate)
+            time.sleep(self.log_interval)
         self.clean_exit()
 
     def set_dc(self, value):

@@ -26,9 +26,12 @@ from glob import glob
 import platform
 from enum import Enum as enum
 
+## WHILE WE'RE HERE...
+## Get size of console and set limits to display
 import os
-__, console_width = os.popen('stty size', 'r').read().split()
+console_height, console_width = os.popen('stty size', 'r').read().split()
 draw_width = int(console_width) - 2
+draw_height = int(console_height) - 2
 
 ## Third party
 print "\t3rd Party Packages..."
@@ -87,31 +90,41 @@ def display(blurb, options, selected=0, input_type=inputs.enum_):
     stdscr.border(0)
 
     # RPi-R header
-    mode_string = "MOTOR OFF"
-    if mot.ldc: mode_string = "!! MOTOR ON !!"
-    if debug: mode_string = "!! DEBUG !!"
-        
-    stdscr.addstr(3, 1,  r"            _        _                ".center(draw_width))
-    stdscr.addstr(4, 1,  r" _ __ _ __ (_)  _ __| |__   ___  ___  ".center(draw_width))
-    stdscr.addstr(5, 1,  r"| '__| '_ \| | | '__| '_ \ / _ \/ _ \ ".center(draw_width))
-    stdscr.addstr(6, 1,  r"| |  | |_) | |_| |  | | | |  __/ (_) |".center(draw_width))
-    stdscr.addstr(7, 1,  r"|_|  | .__/|_(_)_|  |_| |_|\___|\___/ ".center(draw_width))
-    stdscr.addstr(8, 1,  r"     |_| Raspberry Pi Rheometer v{}".format(version).center(draw_width))
-    stdscr.addstr(9, 1,  r"".center(draw_width))
-    stdscr.addstr(10, 1,  r"{}".format(mode_string.center(draw_width)))
+    mode_string = "[motor off]"
+    if mot.ldc: mode_string = "[MOTOR ON]"
+    if debug: mode_string = "[DEBUG]"
+    
+    blurbheight = 0
+    
+    if draw_height > 30:
+        stdscr.addstr(3, 1,  r"            _        _                ".center(draw_width))
+        stdscr.addstr(4, 1,  r" _ __ _ __ (_)  _ __| |__   ___  ___  ".center(draw_width))
+        stdscr.addstr(5, 1,  r"| '__| '_ \| | | '__| '_ \ / _ \/ _ \ ".center(draw_width))
+        stdscr.addstr(6, 1,  r"| |  | |_) | |_| |  | | | |  __/ (_) |".center(draw_width))
+        stdscr.addstr(7, 1,  r"|_|  | .__/|_(_)_|  |_| |_|\___|\___/ ".center(draw_width))
+        stdscr.addstr(8, 1,  r"     |_| Raspberry Pi Rheometer v{}".format(version).center(draw_width))
+        stdscr.addstr(9, 1,  r"".center(draw_width))
+        stdscr.addstr(10, 1,  r"{}".format(mode_string.center(draw_width)))
 
-    blurbheight = 12
-
+        blurbheight = 12
+    else:
+        stdscr.addstr(4, 1,  "Raspberry Pi Rheometer v{}".format(version).center(draw_width))
+        stdscr.addstr(6, 1,  r"{}".format(mode_string.center(draw_width)))
+        blurbheight = 8
     # Display Blurb
+    blurboff = 0
     for i in range(0, len(blurb)):
-        stdscr.addstr(blurbheight + i, 1, blurb[i].center(draw_width))
+        if (len(blurb[i]) > 0) or draw_height > 30:
+            stdscr.addstr(blurbheight + i - blurboff, 1, blurb[i][:draw_width].center(draw_width))
+        else:
+            blurboff += 1
     
     # Show Options
     for i in range(0, len(options)):
         if (selected == i and input_type == inputs.enum_):
-            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i][:draw_width].center(draw_width), curses.A_STANDOUT)
+            stdscr.addstr(blurbheight + len(blurb) - blurboff + i + 1, 1, options[i][:draw_width].center(draw_width), curses.A_STANDOUT)
         else:
-            stdscr.addstr(blurbheight + len(blurb) + i + 1, 1, options[i][:draw_width].center(draw_width))
+            stdscr.addstr(blurbheight + len(blurb) - blurboff + i + 1, 1, options[i][:draw_width].center(draw_width))
 
     # Get Input
     stdscr.addstr(0,0, "")
@@ -120,8 +133,8 @@ def display(blurb, options, selected=0, input_type=inputs.enum_):
         res = stdscr.getch()
     elif input_type == inputs.string_:
         curses.echo()
-        stdscr.addstr(blurbheight + len(blurb) + len(options) + 2, 10, "".center(draw_width - 20, "."))
-        res = stdscr.getstr(blurbheight + len(blurb) + len(options) + 2, 10, (draw_width - 20))
+        stdscr.addstr(blurbheight + len(blurb) - blurboff + len(options) + 2, 10, "".center(draw_width - 20, "."))
+        res = stdscr.getstr(blurbheight + len(blurb) - blurboff + len(options) + 2, 10, (draw_width - 20))
     else:
         res = 10
 
@@ -168,11 +181,6 @@ def menu(initsel=0):
     res = display(blurb, options)
     
     if res == 0: ####################################################################################################### RUN TEST: 0
-        # Run sample
-        
-        # Get settings
-        
-        # Run length
         inp_k = False
         extra_info = " "
         
@@ -283,7 +291,7 @@ def menu(initsel=0):
         options = ["Continue", "Quit"]
         res = display(blurb, options)
         
-        if res == 1: return 1
+        if res == 1: raise CAE
         
         ln = run_test(tag, length, gd_expr)
         
@@ -307,27 +315,38 @@ def menu(initsel=0):
 
         if not res:
             cur_log = "./../logs/ccal_{}.csv".format(time.strftime("%d.%m.%y-%H%M", time.gmtime()))
-            if not debug: mot.start_poll(name=cur_log, controlled=False)
+            mot.start_poll(name=cur_log, controlled=False, debug_=debug)
             for i in range(0, len_ccal):
                 dc = (100.0 / (len_ccal - 1)) * i
                 mot.set_dc(dc)
                 width = 40
+                
+                # Calculate Progress Percentage
                 perc = int(math.ceil((i / float(len_ccal)) * width))
                 neg_perc = int(math.floor(((float(len_ccal) - i) / len_ccal) * width))
+                
+                # Calculate speed data
                 fspd = np.average(mot.f_speeds)
                 rspd = np.average(mot.r_speeds)
                 aspd = (fspd + rspd) * 0.5
                 aspd_rads = aspd * 2.0 * np.pi / 60.0
+                
+                # Get motor supply voltage
                 vms = mot.volts[7] * resx.vmsmult
                 if vms == 0: vms = 10**-10
+                
+                # Calculate viscosity from sensor data
                 gd = resx.get_strain(aspd_rads)
                 if gd == 0: gd = 10**-10
                 ico = resx.get_current_coil(vms)
                 ims = resx.get_current(mot.volts[2])
                 iemf = ims - ico
-                tau = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
+                T = resx.cal_TIemf[0] * iemf + resx.cal_TIemf[1]
+                tau = resx.get_stress(T, 15)
                 if tau < 0: tau = 0.0
                 mu = tau / gd
+                
+                # Display!
                 blurb = [
                         "Current Calibration",
                         "",
@@ -421,20 +440,18 @@ def menu(initsel=0):
                     ref_viscs.append(float(str_nom_visc))       # assumes is float of nominal viscosity...
                     inp_k = True
                 except:
-                    ex_inf = "Viscosity must be a number!"
                     try:
                         resx.get_mu_of_T(str_nom_visc, 25.0)    #   ... or name of species...
                         ref_viscs.append(str_nom_visc)
                         inp_k = True
                     except:
-                        ex_inf = "Make sure you type the name correctly!"
                         try:
                             parts = str_nom_visc.split("@")
                             resx.get_mu_of_T(parts[0], 25.0, parts[1])
                             ref_viscs.append(str_nom_visc)
                             inp_k = True
                         except:
-                            ex_inf = "Are you even trying to type correctly?"
+                            ex_inf = "Couldn't understand... Did you spell it correctly?"
                             inp_k = False
             inp_k = False
 
@@ -519,7 +536,8 @@ def mot_cal(ref_logs):
                 viscosity = resx.get_mu_of_T(v_term, T) # will not work if is mixture
             except:
                 parts = v_term.split("@")
-                viscosity = resx.get_mu_of_T(parts[0], T, parts[1]) # will not work if is wrong
+                viscosity = resx.get_mu_of_T(parts[0], T, parts[1]) # will not work if something has gone wrong
+                                                                    # errors should have been caught earlier
         
         I_MS = resx.get_current(cra)
         I_CO = resx.get_current_coil(Vms)
@@ -533,23 +551,23 @@ def mot_cal(ref_logs):
         torque = resx.get_torque(stress, 15)
         T_MSs.append(torque)
             
-    __, f_eqn, mot_cal = plot_fit(I_EMFs, T_MSs, 1, x_name="Iemf", y_name="Tau", outp="./../plots/cal_mot.png")
+    __, f_eqn, mot_cal = plot_fit(I_EMFs, T_MSs, 1, x_name="Iemf", y_name="T", outp="./../plots/cal_mot.png")
         
     blurb = ["Motor Calibration",
              "",
              "Complete! Plot saved as \"./../plots/cal_mot.png\"",
              "",
              "Previous fit:",
-             "\tTau = Iemf * {} + {}".format(resx.cal_TauIemf[0], resx.cal_TauIemf[1]),
+             "\tT = Iemf * {} + {}".format(resx.cal_TIemf[0], resx.cal_TIemf[1]),
              "",
              "New fit:",
-             "\tTau = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])]
+             "\tT = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])]
     options = ["Save results", "Discard"]
             
     res = display(blurb, options)
             
     if res == 0:
-        resx.cal_TauIemf = mot_cal
+        resx.cal_TIemf = mot_cal
         resx.writeout()
     
 ######################################################################################################################## run_test()
@@ -585,7 +603,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
     set_strain_rate(gd_val)
     time.sleep(3)
 
-    if not debug: mot.start_poll(name=ln, controlled=True)
+    mot.start_poll(name=ln, controlled=True, debug_=debug)
     
     for i in range(0, length):
         gd_expr = str(gd_expr)
@@ -610,7 +628,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         ico = resx.get_current_coil(vms)
         ims = resx.get_current(mot.volts[2])
         iemf = ims - ico
-        T = resx.cal_TauIemf[0] * iemf + resx.cal_TauIemf[1]
+        T = resx.cal_TIemf[0] * iemf + resx.cal_TIemf[1]
         tau = resx.get_stress(T, 15)
         if tau < 0: tau = 0.01
         mu = tau / gd
@@ -641,10 +659,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
     options = [" "]
     display(blurb, options, input_type=inputs.none_)
     
-    if debug:
-        time.sleep(1)
-    else:
-        calculate_viscosity(ln)
+    calculate_viscosity(ln)
     
     blurb = [
             title,
@@ -767,7 +782,7 @@ def calculate_viscosity(ln):
     # Current relation. ############################################################
     
     current_coil = resx.get_current_coil(voltage)
-    T = resx.cal_TauIemf[0] * (current - current_coil) + resx.cal_TauIemf[1]
+    T = resx.cal_TIemf[0] * (current - current_coil) + resx.cal_TIemf[1]
     tau    = resx.get_stress(T, 15)
     mu_current_relation = tau / gamma_dot
     
@@ -796,13 +811,13 @@ def main(s):
             pass
 
 # if debug: no logging
-if debug:
+if False:#debug:
     mparams={'poll_logging':False}
 else:
     mparams={'poll_logging':True}
 
 
-mot = motor(**mparams)
+mot = motor()#**mparams)
 stdscr = 0
 
 curses.wrapper(main)

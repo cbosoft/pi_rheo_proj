@@ -77,7 +77,7 @@ class MCP3008(object):
             data        (integer)       10-bit value representing the voltage level on the channel specified.
         '''
         global debug
-        if debug: return
+        if debug: return 0
         
         self.open()
         #indat = self.bus.xfer2([1, 8 + channel << 4, 0])
@@ -106,7 +106,7 @@ class MCP3008(object):
             volts       (float)         The voltage level on the channel specified.
         '''
         global debug
-        if debug: return
+        if debug: return 0
         
         dat = self.read_data(channel)
         volts = (float(dat) / 1023.0) * self.vref
