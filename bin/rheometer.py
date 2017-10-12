@@ -341,7 +341,7 @@ def menu(initsel=0):
                 ico = resx.get_current_coil(vms)
                 ims = resx.get_current(mot.volts[2])
                 iemf = ims - ico
-                T = resx.cal_TIemf[0] * iemf + resx.cal_TIemf[1]
+                T = resx.T_of_Iemf(iemf)
                 tau = resx.get_stress(T, 15)
                 if tau < 0: tau = 0.0
                 mu = tau / gd
@@ -551,7 +551,7 @@ def mot_cal(ref_logs):
         torque = resx.get_torque(stress, 15)
         T_MSs.append(torque)
             
-    __, f_eqn, mot_cal = plot_fit(I_EMFs, T_MSs, 1, x_name="Iemf", y_name="T", outp="./../plots/cal_mot.png")
+    __, f_eqn, mot_cal = plot_fit(I_EMFs, np.log(T_MSs), 1, x_name="Iemf", y_name="T", outp="./../plots/cal_mot.png")
         
     blurb = ["Motor Calibration",
              "",
@@ -628,7 +628,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         ico = resx.get_current_coil(vms)
         ims = resx.get_current(mot.volts[2])
         iemf = ims - ico
-        T = resx.cal_TIemf[0] * iemf + resx.cal_TIemf[1]
+        T = resx.T_of_Iemf(iemf)
         tau = resx.get_stress(T, 15)
         if tau < 0: tau = 0.01
         mu = tau / gd
@@ -782,8 +782,9 @@ def calculate_viscosity(ln):
     # Current relation. ############################################################
     
     current_coil = resx.get_current_coil(voltage)
-    T = resx.cal_TIemf[0] * (current - current_coil) + resx.cal_TIemf[1]
-    tau    = resx.get_stress(T, 15)
+    iemf         = current - current_coil
+    T            = T_of_Iemf(iemf)
+    tau          = resx.get_stress(T, 15)
     mu_current_relation = tau / gamma_dot
     
     ################################################################################

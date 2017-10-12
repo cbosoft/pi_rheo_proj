@@ -14,8 +14,8 @@ import math
 # 3rd Party
 import numpy as np
 from scipy.optimize import curve_fit
-from matplotlib import use as mpluse
-mpluse('Agg')  # for plotting from commandline (with no xserver or anything)
+#from matplotlib import use as mpluse
+#mpluse('Agg')  # for plotting from commandline (with no xserver or anything)
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -118,7 +118,11 @@ def read_logf(log_n):
     cra       =   np.array(datf['cra'], np.float64)
     crb       =   np.array(datf['crb'], np.float64)
     Vms       =   np.array(datf['Vms'], np.float64)
-    T         =   np.array(datf['Tc'], np.float64)
+    T = list()
+    try:
+        T         =   np.array(datf['Tc'], np.float64)
+    except KeyError:
+        T         =   np.array(datf['T'], np.float64)
     
     try:
         Vpz       =   np.array(datf['Vpz'], np.float64)
