@@ -240,7 +240,7 @@ def get_torque(stress, fill_volume_ml):
     A_small = (pi * (icor ** 2)) # in m^2
     A_big   = (pi * (ocir ** 2)) # in m^2
     A_middle_m2 = A_big - A_small
-    fill_volume_m3 = fill_volume_ml * (10.0 ** (-9.0)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
+    fill_volume_m3 = fill_volume_ml * (10.0 ** (-6.0)) # 1000 ml in a l, 1 000 l in a m3: 10^6ml in a m3
     H = fill_volume_m3 / A_middle_m2
     T = stress * (2 * A_small * H)
     #T = (stress) / (pi * 2 * H)
@@ -250,9 +250,14 @@ def get_stress(T, fill_volume_ml):
     A_small = (pi * (icor ** 2)) # in m^2
     A_big   = (pi * (ocir ** 2)) # in m^2
     A_middle_m2 = A_big - A_small
-    fill_volume_m3 = fill_volume_ml * (10.0 ** (-9.0)) # 1000 ml in a l, 1 000 000 l in a m3: 10^9ml in a m3
+    fill_volume_m3 = fill_volume_ml * (10.0 ** (-6.0)) # 1000 ml in a l, 1 000 l in a m3: 10^6ml in a m3
     H = fill_volume_m3 / A_middle_m2
     stress = T / (2 * A_small * H)
     return stress
+    
+def T_of_Iemf(Iemf):
+    #T = np.e ** (np.array(Iemf, np.float64) * cal_TIemf[0] + cal_TIemf[1])
+    T = np.array(Iemf, np.float64) * cal_TIemf[0] + cal_TIemf[1]
+    return T
     
 if __name__ == "__main__": print __doc__
