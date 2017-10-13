@@ -30,7 +30,7 @@ import numpy as np
 from adc import MCP3008 as ac
 from control import pid_controller as pid
 from tempsens import ds18b20 as ts
-import resx
+import dproc
 
 class motor(object):
     '''
@@ -273,7 +273,7 @@ class motor(object):
             self.speed = av_speed
             av_speed = (2 * np.pi * av_speed) / 60.0
             self.speed_rads = av_speed
-            control_action = self.pidc.get_control_action(resx.get_strain(av_speed))
+            control_action = self.pidc.get_control_action(dproc.get_strain(av_speed))
             #control_action = self.pidc.get_control_action(av_speed)
             if control_action > 100.0: control_action = 100.0
             if control_action < 0.0: control_action = 0
@@ -316,7 +316,7 @@ class motor(object):
                 #                   t    f_spd16  r_spd16 f_spd8  r_spd8  f_spd4  r_spd4    cra    crb     dc      T     Vpz  Vms
                 self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
                 #   t       f_spd16          r_spd16          f_spd8           r_spd8           f_spd4           r_spd4            cra           crb            dc           T                  Vpz              Vms
-                    t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * resx.vmsmult)))
+                    t, self.f_speeds[0], self.r_speeds[0], self.f_speeds[1], self.r_speeds[1], self.f_speeds[2], self.r_speeds[2], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * dproc.vmsmult)))
             elif (self.debug):
                 self.logf.write(("{:.6f}, 80, 80, 80, 80, 80, 80, 3, 0, 50, 15, 2, 3 \n").format(t))
                     
