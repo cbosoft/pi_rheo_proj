@@ -49,11 +49,11 @@ except:
     
 ## RPi-Rheo packages
 print "\tRPi-Rheo Packages"
-import resx
 from filter import filter as filt_r
-from plothelp import fit_line
-from plothelp import plot_fit
-from plothelp import read_logf
+import dproc
+from dproc import fit_line
+from dproc import plot_fit
+from dproc import read_logf
 from motor import motor
 
 def linux_distribution():
@@ -67,7 +67,7 @@ try:
 except:
     debug = True
 
-version = resx.version
+version = dproc.version
 
 class inputs(enum):
     none_   = 1
@@ -332,17 +332,17 @@ def menu(initsel=0):
                 aspd_rads = aspd * 2.0 * np.pi / 60.0
                 
                 # Get motor supply voltage
-                vms = mot.volts[7] * resx.vmsmult
+                vms = mot.volts[7] * dproc.vmsmult
                 if vms == 0: vms = 10**-10
                 
                 # Calculate viscosity from sensor data
-                gd = resx.get_strain(aspd_rads)
+                gd = dproc.get_strain(aspd_rads)
                 if gd == 0: gd = 10**-10
-                ico = resx.get_current_coil(vms)
-                ims = resx.get_current(mot.volts[2])
+                ico = dproc.get_current_coil(vms)
+                ims = dproc.get_current(mot.volts[2])
                 iemf = ims - ico
-                T = resx.T_of_Iemf(iemf)
-                tau = resx.get_stress(T, 15)
+                T = dproc.T_of_Iemf(iemf)
+                tau = dproc.get_stress(T, 15)
                 if tau < 0: tau = 0.0
                 mu = tau / gd
                 
@@ -366,7 +366,7 @@ def menu(initsel=0):
             __, st, __, __, __, __, __, __, cra, __, __, __, Vms, __, __, __ = read_logf(cur_log)
             Vms = filt_r(st, Vms)
             cra = filt_r(st, cra)
-            Ims = resx.get_current(cra)
+            Ims = dproc.get_current(cra)
             blurb = [
                         "Current Calibration",
                         "",
@@ -380,7 +380,7 @@ def menu(initsel=0):
              "Complete! Plot saved as \"./../plots/cal_cur.png\"",
              "",
              "Previous fit:",
-             "\tIco = Vms * {} + {}".format(resx.cal_IcoVms[0], resx.cal_IcoVms[1]),
+             "\tIco = Vms * {} + {}".format(dproc.cal_IcoVms[0], dproc.cal_IcoVms[1]),
              "",
              "New fit:",
              "\tIco = Vms * {} + {}".format(coeffs[0], coeffs[1])]
@@ -389,8 +389,8 @@ def menu(initsel=0):
             res = display(blurb, options)
             
             if res == 0:
-                resx.cal_IcoVms = coeffs
-                resx.writeout()
+                dproc.cal_IcoVms = coeffs
+                dproc.writeout()
             
         ### Part 2: Motor Calibration ###
         blurb = [   "Motor Calibration",
@@ -441,13 +441,13 @@ def menu(initsel=0):
                     inp_k = True
                 except:
                     try:
-                        resx.get_mu_of_T(str_nom_visc, 25.0)    #   ... or name of species...
+                        dproc.get_mu_of_T(str_nom_visc, 25.0)    #   ... or name of species...
                         ref_viscs.append(str_nom_visc)
                         inp_k = True
                     except:
                         try:
                             parts = str_nom_visc.split("@")
-                            resx.get_mu_of_T(parts[0], 25.0, parts[1])
+                            dproc.get_mu_of_T(parts[0], 25.0, parts[1])
                             ref_viscs.append(str_nom_visc)
                             inp_k = True
                         except:
@@ -533,14 +533,14 @@ def mot_cal(ref_logs):
             viscosity = float(v_term) # if is any of the 'smart' options, this will not work
         except:
             try:
-                viscosity = resx.get_mu_of_T(v_term, T) # will not work if is mixture
+                viscosity = dproc.get_mu_of_T(v_term, T) # will not work if is mixture
             except:
                 parts = v_term.split("@")
-                viscosity = resx.get_mu_of_T(parts[0], T, parts[1]) # will not work if something has gone wrong
+                viscosity = dproc.get_mu_of_T(parts[0], T, parts[1]) # will not work if something has gone wrong
                                                                     # errors should have been caught earlier
         
-        I_MS = resx.get_current(cra)
-        I_CO = resx.get_current_coil(Vms)
+        I_MS = dproc.get_current(cra)
+        I_CO = dproc.get_current_coil(Vms)
         I_EMF = [0.0] * len(I_MS)
         display(["{}  {}  {}".format(len(I_MS), len(I_CO), len(I_EMF))], [], input_type=inputs.none_)
         for j in range(0, len(I_MS)):
@@ -548,7 +548,7 @@ def mot_cal(ref_logs):
         I_EMFs.append(np.average(I_EMF))
                 
         stress = viscosity * np.average(gamma_dot) # pa = pa.s * (1/s)
-        torque = resx.get_torque(stress, 15)
+        torque = dproc.get_torque(stress, 15)
         T_MSs.append(torque)
             
     __, f_eqn, mot_cal = plot_fit(I_EMFs, np.log(T_MSs), 1, x_name="Iemf", y_name="T", outp="./../plots/cal_mot.png")
@@ -558,7 +558,7 @@ def mot_cal(ref_logs):
              "Complete! Plot saved as \"./../plots/cal_mot.png\"",
              "",
              "Previous fit:",
-             "\tT = Iemf * {} + {}".format(resx.cal_TIemf[0], resx.cal_TIemf[1]),
+             "\tT = Iemf * {} + {}".format(dproc.cal_TIemf[0], dproc.cal_TIemf[1]),
              "",
              "New fit:",
              "\tT = Iemf * {} + {}".format(mot_cal[0], mot_cal[1])]
@@ -567,8 +567,8 @@ def mot_cal(ref_logs):
     res = display(blurb, options)
             
     if res == 0:
-        resx.cal_TIemf = mot_cal
-        resx.writeout()
+        dproc.cal_TIemf = mot_cal
+        dproc.writeout()
     
 ######################################################################################################################## run_test()
 def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_test", ln_override=None):
@@ -591,7 +591,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
                         "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
                         "{}{}    {}{}".format("Vms:".center(19), "-- V".center(19), "omega:".center(19), "-- rad/s".center(19)),
                         "{}{}    {}{}".format("Ims:".center(19), "-- A".center(19), "gamma dot:".center(19), "-- (s^-1)".center(19)),
-                        "{}{}    {}{}".format("Iemf:".center(19), "-- A".center(19), "tau:".center(19), "-- Pa".center(19)),
+                        "{}{}    {}{}".format("".center(19), "".center(19), "tau:".center(19), "-- Pa".center(19)),
                         "{}{}    {}{}".format("PWM DC:".center(19), "-- %".center(19), "mu:".center(19), "-- Pa.s".center(19)),
                         "",
                         "",
@@ -613,33 +613,27 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         gd_val = eval(str(sp.solve(expr, gd)[0]))
         set_strain_rate(gd_val)
         
+        ## Progress bar
         width = 40
         perc = int(math.ceil((i / float(length)) * width))
         neg_perc = int(math.floor(((float(length) - i) / length) * width))
+        
+        ## Status
         fspd = np.average(mot.f_speeds)
         rspd = np.average(mot.r_speeds)
         aspd = (fspd + rspd) * 0.5
         aspd_rads = (aspd * 2 * np.pi) / 60.0
         dc   = mot.ldc
-        vms  = mot.volts[7] * resx.vmsmult
-        if vms == 0: vms = 10**-10
-        gd = resx.get_strain(aspd_rads)
-        if gd == 0: gd = 10**-10
-        ico = resx.get_current_coil(vms)
-        ims = resx.get_current(mot.volts[2])
-        iemf = ims - ico
-        T = resx.T_of_Iemf(iemf)
-        tau = resx.get_stress(T, 15)
-        if tau < 0: tau = 0.01
-        mu = tau / gd
-        tau = T
+        vms  = mot.volts[7] * dproc.vmsmult
+        ims  = dproc.get_current(mot.volts[2])
+        gd, __, tau, mu = dproc.calc_mu(1, vms, ims, 15, aspd_rads, dwdt_override=0)
         blurb = [
                 title,
                 "",
                 "{}    {}".format("Electronics".center(38), "Mechanics".center(38)),
                 "{}{}    {}{}".format("Vms:".center(19), "{:.3f} V".format(vms).center(19), "omega:".center(19), "{:.3f} rad/s".format(aspd_rads).center(19)),
                 "{}{}    {}{}".format("Ims:".center(19), "{:.3f} A".format(ims).center(19), "gamma dot:".center(19), "{:.3f} (s^-1)".format(gd).center(19)),
-                "{}{}    {}{}".format("Iemf:".center(19), "{:.3f} A".format(iemf).center(19), "tau:".center(19), "{} Pa".format(tau).center(19)),
+                "{}{}    {}{}".format("".center(19), "".center(19), "tau:".center(19), "{} Pa".format(tau).center(19)),
                 "{}{}    {}{}".format("PWM DC:".center(19), "{:.3f} %".format(dc).center(19), "mu:".center(19), "{:.2E} Pa.s".format(mu).center(19)),
                 "",
                 "{}s to go...".format(length - i).center(80),
@@ -704,100 +698,14 @@ def calculate_viscosity(ln):
     
     Parameters:
         ln          path to logfile to edit
-    
-    Overview
-    --------
-    The calculation is performed using two methods. The first stems from an energy balance, but
-    seems to not give great results. The second comes from simple analysis of the inner workings
-    of the motor, and gives somewhat accurate results. Additional columns added to log: gamma_dot
-    (strain rate, in inverse seconds), tau (shear stress, in pascal-seconds), mu_en_bal (viscosity 
-    calculated using the energy balance method), and mu_current_relation (viscosity calculated using
-    the second method).
-    
-    Strain Rate
-    -----------
-    Directly related to the rotational speed of the cylinder, assuming no wall-slip
-
-        gamma_dot = omega * (inner_radius / (outer_radius - inner_radius))
-    
-    Shear Stress, Method 1: Energy Balance
-    ------------------------
-    Simply taking an energy balance over the motor yields an equation giving the torque
-    output as a function of the input power (current x voltage), the efficiency, and the
-    rotational speed.
-    
-        power = omega * tau = efficiency * current * voltage 
-       .: tau = (efficiency * current * voltage) / omega
-    
-    Shear Stress, Method 2: Current relation
-    --------------------------
-    Torque (tau) is a function of current only. Some current is used purely by the
-    resistance in the coil. Most of the current is used creating the EMF which drives
-    The motor. Let these currents be termed Ico for the current used uselessly in the
-    coils and Iemf for the useful EMF producing current. Ims is the total current 
-    supplied to the motor.
-    
-        Ims = Ico + Iemf  --> Iemf = Ims - Ico
-        tau = Kti * Iemf
-    
-     .: tau = Kti * (Ims - Ico)
-     
-     Viscosity
-     ---------
-     Knowing the shear stress and the strain rate, the viscosity can be calculated using newtons law of 
-     viscosity:
-     
-        mu = tau / gamma_dot
-    
-    Once calculated, this is then added to the log file.
     '''
-    t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, Tc, Vpz, Vms, __, __, tag = read_logf(ln)
+    __, st, __, omega_rads, __, __, __, __, Ims, __, __, __, Vms, __, __, __ = read_logf(ln, dia=True)
+    gamma_dot, T, tau, mu = dproc.calc_mu(st, Vms, Ims, 15, omega_rads)
     
-    # Energy balance method calculation
-    omega   = list()
-    for i in range(0, len(f_spd1)):
-         omega.append((f_spd0[i] + r_spd0[i] + f_spd1[i] + r_spd1[i] + f_spd2[i] + r_spd2[i]) / 6.0)
-    omega   = np.array(omega, np.float64)
-    omega   = (omega * 2.0 * np.pi) / 60.0
-
-    current = resx.get_current(cra)
-    
-    voltage = filt_r(st, Vms)
-    omega  = filt_r(st, omega)
-    current  = filt_r(st, current)
-    
-    ################################################################################
-    # Strain rate. #################################################################
-    
-    gamma_dot = resx.get_strain(omega)
-    
-    ################################################################################
-    # Energy balance. ##############################################################
-    
-    efficiency = 0.8
-    tau       = (efficiency * current * voltage) / omega  
-    mu_energy_balance_method = tau / gamma_dot
-    
-    ################################################################################
-    # Current relation. ############################################################
-    
-    current_coil = resx.get_current_coil(voltage)
-    iemf         = current - current_coil
-    T            = T_of_Iemf(iemf)
-    tau          = resx.get_stress(T, 15)
-    mu_current_relation = tau / gamma_dot
-    
-    ################################################################################
-    # Updating log. ################################################################
-    
-    logf = open(ln, "w")
-    logf.write("t,f_spd0,r_spd0,f_spd1,r_spd1,f_spd2,r_spd2,cra,crb,Tc,Vpz,Vms,gamma_dot,tau,mu_en_bal,mu_current_relation\n")
-    for i in range(0, len(t)):
-        line = "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}\n".format(
-                t[i], f_spd0[i], r_spd0[i], f_spd1[i], r_spd1[i], #5
-                f_spd2[i], r_spd2[i], cra[i], crb[i], #4
-                T[i], Vpz[i], voltage[i], gamma_dot[i], tau[i], #5
-                mu_energy_balance_method[i], mu_current_relation[i]) #2
+    logf = open("{}_results.csv".format(ln[:-4]), "w")
+    logf.write("st,omega_rads,Ims,Vms,gamma_dot,T,tau,mu\n")
+    for i in range(0, len(st)):
+        line = "{},{},{},{},{},{},{},{}\n".format(st[i]. omega_rads[i],Ims[i],Vms[i],gamma_dot[i],T[i],tau[i],mu[i])
         logf.write(line)
     logf.close()
 
