@@ -22,8 +22,12 @@ import xml.etree.ElementTree as ET
 import numpy as np
 from numpy import *
 from scipy.optimize import curve_fit
-#from matplotlib import use as mpluse
-#mpluse('Agg')  # for plotting from commandline (with no xserver or anything)
+try:
+    import spidev # will error if not on rpi
+    from matplotlib import use as mpluse
+    mpluse('Agg')  # for plotting from commandline (with no xserver or anything)
+except:
+    pass # not on rpi, don't need to use (!xserver) as gui backend
 import matplotlib.pyplot as plt
 import pandas as pd
 
