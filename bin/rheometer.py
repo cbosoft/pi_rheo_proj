@@ -724,3 +724,4 @@ mot = motor()#**mparams)
 stdscr = 0
 
 curses.wrapper(main)
+mot.clean_exit()

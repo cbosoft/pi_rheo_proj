@@ -116,28 +116,34 @@ class motor(object):
         
         # Setup optical encoder pins
         self.opt_pins = [21, 20]
-        self.thens    = [time.time()] * (2 * len(self.opt_pins))
+        self.thens    = [time.time()] * (len(self.opt_pins) * 2)
         self.rps      = [4.0] * len(self.opt_pins)
+        self.rps.extend(self.rps)
         self.speeds   = [0.0] * (len(self.opt_pins) * 2)
-        self.misses   = [0] * len(self.opt_pins)
+        self.misses   = [0] * (len(self.opt_pins) * 2)
         self.t_misses = 10 # how many "incorrect" values to ignore before accepting
-        
+        self.opt_dict = dict()
+
         for p in self.opt_pins:
+            self.opt_dict[p] = len(self.opt_dict)
             gpio.setup(p, gpio.IN, pull_up_down=gpio.PUD_UP)
             gpio.add_event_detect(p, gpio.BOTH, callback=self.opt_fr)
         gpio.setwarnings(False)
         self.gpio_ready = True
 
     def opt_fr(self, channel):
+        ch_idx = self.opt_dict[channel]
+        if gpio.input(channel): ch_idx += len(self.opt_pins)
         now = time.time()
-        dt = now - self.thens[channel]
-        prov_spd = (60.0) / (dt * self.rps[channel]) # speed in rpm
-        if ((prov_spd < (2 * self.speeds[channel])) or (self.misses[channel] > self.t_misses)):
-            self.speeds[channel] = prov_spd
-            self.misses[channel] = 0
+        dt = now - self.thens[ch_idx]
+        prov_spd = (60.0) / (dt * self.rps[ch_idx]) # speed in rpm
+        if ((prov_spd < (2 * self.speeds[ch_idx])) or (self.misses[ch_idx] > self.t_misses)):
+            self.speeds[ch_idx] = prov_spd
+            self.misses[ch_idx] = 0
         else:
-            self.misses[channel] += 1
-        self.thens[channel] = now
+            self.misses[ch_idx] += 1
+        self.thens[ch_idx] = now
+        #print "ch: ", channel, "idx:", ch_idx
     
     def get_speed(self):
         return np.average(self.speeds)
@@ -225,9 +231,8 @@ class motor(object):
         This will repeat until motor.control_stopped becomes True.
         '''
         while not self.control_stopped:
-            av_speed = (np.average(self.r_speeds) + np.average(self.f_speeds)) / 2
-            self.speed = av_speed
-            av_speed = (2 * np.pi * av_speed) / 60.0
+            self.speed = self.get_speed()
+            av_speed = (2 * np.pi * self.speed) / 60.0
             self.speed_rads = av_speed
             control_action = self.pidc.get_control_action(dproc.get_strain(av_speed))
             #control_action = self.pidc.get_control_action(av_speed)
@@ -267,11 +272,14 @@ class motor(object):
             
             # Read sensors
             self.volts = self.read_sensors()
+            stw = list(self.speeds)
+            
+            if len(stw) < 6: stw.extend([3.14] * (6 - len(stw)))
             
             if (self.poll_logging and not self.debug):
                 #                   t       spd0   spd1    spd2    spd3    spd4    spd5    cra    adc0     dc      T     Vpz  Vms
                 self.logf.write(("{:.6f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {:.3f}, {}, {:.3f} \n").format(
-                    t, self.speeds[0], self.speeds[1], self.speeds[2], self.speeds[3], self.speeds[4], self.speeds[5], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * dproc.vmsmult)))
+                    t, stw[0], stw[1], stw[2], stw[3], stw[4], stw[5], self.volts[2], self.volts[1], self.ldc, self.temperature_c, self.volts[4], (self.volts[7] * dproc.vmsmult)))
             elif (self.debug):
                 self.logf.write(("{:.6f}, 80, 80, 80, 80, 80, 80, 3, 0, 50, 15, 2, 3 \n").format(t))
                     
