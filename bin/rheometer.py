@@ -26,7 +26,6 @@ from glob import glob
 import platform
 from enum import Enum as enum
 
-## WHILE WE'RE HERE...
 ## Get size of console and set limits to display
 import os
 console_height, console_width = os.popen('stty size', 'r').read().split()
@@ -75,7 +74,7 @@ class inputs(enum):
     string_ = 3
 
 class CAE(Exception):
-    '''Handy for easily cancelling out of a deep nest'''
+    '''For easily cancelling out of a deep nest'''
     pass
     
     def __str__(self):
@@ -86,6 +85,9 @@ def display(blurb, options, selected=0, input_type=inputs.enum_):
     global stdscr
     global debug
     global mot
+    console_height, console_width = os.popen('stty size', 'r').read().split()
+    draw_width = int(console_width) - 2
+    draw_height = int(console_height) - 2
     stdscr.clear()
     stdscr.border(0)
 
@@ -298,7 +300,7 @@ def menu(initsel=0):
         blurb = ["Run sample - complete", "", "output log saved as {}".format(ln)]
         options = ["Continue"]
         res = display(blurb, options)
-    elif res == 1: ##################################################################################################### RECAL: 1
+    elif res == 1: ##################################################################################################### RECAL: 1 -- REMOVE? UNNECESSARY?
         # Recalibrate
         ### Part 1: Current Calibration ###
         len_ccal = 300
@@ -326,9 +328,7 @@ def menu(initsel=0):
                 neg_perc = int(math.floor(((float(len_ccal) - i) / len_ccal) * width))
                 
                 # Calculate speed data
-                fspd = np.average(mot.f_speeds)
-                rspd = np.average(mot.r_speeds)
-                aspd = (fspd + rspd) * 0.5
+                aspd = mot.get_speed()
                 aspd_rads = aspd * 2.0 * np.pi / 60.0
                 
                 # Get motor supply voltage
@@ -407,11 +407,11 @@ def menu(initsel=0):
             
         if res == 1: raise CAE ## Cancellations are exceptional
           
-        ref_logs  = list()
-        ref_viscs = list()
-        ref_nams  = list()
+        ref_logs   = list()
+        ref_viscs  = list()
+        ref_nams   = list()
         
-        cal_len = 120
+        cal_len    = 120
         cal_strain = 125
             
         finished = False
@@ -507,7 +507,7 @@ def menu(initsel=0):
         return 4
     return 1
 
-######################################################################################################################## mot_cal()
+######################################################################################################################## mot_cal() -- REMOVE? UNNECESSARY
 def mot_cal(ref_logs):
     global mot
     blurb = [ "Motor Calibration",
@@ -525,7 +525,7 @@ def mot_cal(ref_logs):
                   "    {}".format(ref_logs[i]) ]
 
         display(blurb, list(), input_type=inputs.none_)
-        __, st, __, __, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, T, Vpz, Vms, gamma_dot, tau, tag = read_logf(ref_logs[i])
+        __, st, spd0, spd1, spd2, spd3, spd4, spd5, Vcr, adc0, T, Vpz, Vms, gamma_dot, tau, __ = read_logf(ref_logs[i])
         
         # mcal_[name]_[viscosity]_[date+time].csv
         v_term = ref_logs[i].split('_')[2]
@@ -539,7 +539,7 @@ def mot_cal(ref_logs):
                 viscosity = dproc.get_mu_of_T(parts[0], T, parts[1]) # will not work if something has gone wrong
                                                                     # errors should have been caught earlier
         
-        I_MS = dproc.get_current(cra)
+        I_MS = dproc.get_current(Vcr)
         I_CO = dproc.get_current_coil(Vms)
         I_EMF = [0.0] * len(I_MS)
         display(["{}  {}  {}".format(len(I_MS), len(I_CO), len(I_EMF))], [], input_type=inputs.none_)
@@ -619,9 +619,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
         neg_perc = int(math.floor(((float(length) - i) / length) * width))
         
         ## Status
-        fspd = np.average(mot.f_speeds)
-        rspd = np.average(mot.r_speeds)
-        aspd = (fspd + rspd) * 0.5
+        aspd = mot.get_speed()
         aspd_rads = (aspd * 2 * np.pi) / 60.0
         dc   = mot.ldc
         vms  = mot.volts[7] * dproc.vmsmult
@@ -669,12 +667,7 @@ def run_test(tag, length, gd_expr, title="Rheometry Test", ln_prefix="rheometry_
 def set_strain_rate(value):
     global mot
     if mot.control_stopped:
-        #desired_speed = value * (resx.ocir - resx.icor) / resx.icor  # in rads
-        #desired_speed = desired_speed * 60 / (2 * np.pi)  # in rpms
-        #set_pv = int((desired_speed - resx.cal_Vnl[1]) / resx.cal_Vnl[0])
-        #set_vo = (set_pv * 0.066) + 2.422
-        #set_dc = set_vo / (3.33 * 4)
-        mot.set_dc(value / 20)
+        mot.set_dc(value / 20) # very very roughly
     else:
         mot.pidc.set_point = value
 
@@ -700,7 +693,8 @@ def calculate_viscosity(ln):
         ln          path to logfile to edit
     '''
     __, st, __, omega_rads, __, __, __, __, Ims, __, __, __, Vms, __, __, __ = read_logf(ln, dia=True)
-    gamma_dot, T, tau, mu = dproc.calc_mu(st, Vms, Ims, 15, omega_rads)
+    v_fill_ml = 15
+    gamma_dot, T, tau, mu = dproc.calc_mu(st, Vms, Ims, v_fill_ml, omega_rads)
     
     logf = open("{}_results.csv".format(ln[:-4]), "w")
     logf.write("st,omega_rads,Ims,Vms,gamma_dot,T,tau,mu\n")

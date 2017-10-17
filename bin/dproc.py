@@ -352,14 +352,14 @@ def read_logf(log_n, strip_outliers=False, strip_0speed=False, filter_readings=F
     datf = pd.read_csv(log_n)
     
     t         =   np.array(datf['t'], np.float64)
-    f_spd0    =   np.array(datf['f_spd0'], np.float64)
-    r_spd0    =   np.array(datf['r_spd0'], np.float64)
-    f_spd1    =   np.array(datf['f_spd1'], np.float64)
-    r_spd1    =   np.array(datf['r_spd1'], np.float64)
-    f_spd2    =   np.array(datf['f_spd2'], np.float64)
-    r_spd2    =   np.array(datf['r_spd2'], np.float64)
-    cra       =   np.array(datf['cra'], np.float64)
-    crb       =   np.array(datf['crb'], np.float64)
+    spd0      =   np.array(datf['spd0'], np.float64)
+    spd1      =   np.array(datf['spd1'], np.float64)
+    spd2      =   np.array(datf['spd2'], np.float64)
+    spd3      =   np.array(datf['spd3'], np.float64)
+    spd4      =   np.array(datf['spd4'], np.float64)
+    spd5      =   np.array(datf['spd5'], np.float64)
+    Vcr       =   np.array(datf['Vcr'], np.float64)
+    adc0      =   np.array(datf['adc0'], np.float64)
     Vms       =   np.array(datf['Vms'], np.float64)
     Tc        =   np.array(datf['Tc'], np.float64)
     Vpz       =   np.array(datf['Vpz'], np.float64)
@@ -374,6 +374,7 @@ def read_logf(log_n, strip_outliers=False, strip_0speed=False, filter_readings=F
     st = t - t[0]
     
     if strip_outliers:
+        # do nothing at the moment, but will remove data points that are out of scope or whatever
         pass
     if strip_0speed:
             i_off = 0
@@ -413,7 +414,7 @@ def read_logf(log_n, strip_outliers=False, strip_0speed=False, filter_readings=F
         cra = (cra - 2.5) / 0.185
     if len(f_spd0) <= 9: raise LogTooShortError
     
-    return t, st, f_spd0, r_spd0, f_spd1, r_spd1, f_spd2, r_spd2, cra, crb, Tc, Vpz, Vms, gamma_dot, tau, "na"
+    return t, st, spd0, spd1, spd2, spd3, spd4, spd5, Vcr, adc0, Tc, Vpz, Vms, gamma_dot, tau, "na"
     
 
 def get_significant_minimums(y, sens=10):
