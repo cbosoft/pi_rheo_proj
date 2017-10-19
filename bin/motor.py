@@ -57,7 +57,7 @@ class motor(object):
     debug = False
 
     def __init__(self, startnow=False, adc_vref=3.3, poll_logging=True, therm_sn="28-0316875e09ff",
-                 log_interval=0.01, tuning=(1.8, 2.845, 0.0), opt_pins=[16, 20, 21]):
+                 log_interval=0.01, tuning=(1.8, 2.845, 0.0), opt_pins=[21]):
         '''
         object = motor.motor(**kwargs)
         
@@ -115,7 +115,6 @@ class motor(object):
         self.pwm_er.start(0.0)
         
         # Setup optical encoder pins
-        self.opt_pins = [21, 20]
         self.thens    = [time.time()] * (len(self.opt_pins) * 2)
         self.rps      = [4.0] * len(self.opt_pins)
         self.rps.extend(self.rps)

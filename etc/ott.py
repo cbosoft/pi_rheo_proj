@@ -23,7 +23,7 @@ volts = list()
 try:
     while (True):
         for i in range(0, 9):
-            dc = 10 #+ (i * 10)
+            dc = 25 #+ (i * 10)
             m.set_dc(dc)
             sleep(0.25)
             s = m.speeds
