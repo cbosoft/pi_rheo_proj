@@ -9,8 +9,6 @@ to calibrations and the geometry of the cylinders.
 
 Also has a few functions that allow the easy use of the calibrations ("get_supply_voltage(pv)" 
 for example)
-
-Author: Chris Boyle (christopher.boyle.101@strath.ac.uk)
 '''
 
 # System
@@ -34,39 +32,41 @@ import pandas as pd
 # RPi-R
 from filter import filter
 
+######################################################################################################################## XML FUNCTIONS
+def writeout(path="./../etc/data.xml"):
+    '''
+    writeout(**kwargs)
+    
+    Writes the contents of a data file.
+    
+    **kwargs:
+        path        (string)        Path to data.xml. Default is './../etc/data.xml'
+    '''
+    nuroot = ET.Element("all-data")
+    # update xml tree
+    
+    # for every k/v pair in data, add node to xml
+    for k, v in data.iteritems():
+        nuroot.insert(1, ET.Element(k, {"value":str(v)}))
 
-# read the xml file
-root = ET.parse('./../etc/data.xml').getroot()
+    #nuroot.write(path)
+    tree = ET.ElementTree(nuroot)
+    tree.write(path)
 
-def parse_root(name, type):
+def readin():
     global root
+    root = ET.parse('./../etc/data.xml').getroot()
+    #root = ET.parse('./test.xml').getroot()
+
+    data = dict()
+    
     for child in root:
-        # can be geometry or calibration...
-        if child.tag == type and type == "geometry":
-            if child.attrib["name"] == name:
-                return float(child[0].text)
-        elif child.tag == type and type == "calibration":
-            if child.attrib["name"] == name:
-                return [float(child[0].text), float(child[1].text)]
-        elif child.tag == type and type == "misc":
-            if child.attrib["name"] == name:
-                return child[0].text
+        data[child.tag] = float(child.attrib["value"])
 
-######################################################################################################################## XML VARS
-icor = parse_root("icor", "geometry")
-ich = parse_root("ich", "geometry")
-ocor = parse_root("ocor", "geometry")
-ocir = parse_root("ocir", "geometry")
-och = parse_root("och", "geometry")
+    return data
 
-cal_dynamo = parse_root("dynamo", "calibration")
-cal_5AHES = parse_root("5AHES", "calibration")
-
-cal_IcoVms = parse_root("IcoVms", "calibration")
-cal_TsVms = parse_root("TsVms", "calibration")
-cal_TIemf = parse_root("TIemf", "calibration")
-
-version = parse_root("version", "misc")
+root = ""
+data = readin()
 
 ######################################################################################################################## GLOBALS/runtime
 vmsmult = 4.0 # due to voltage divider taking motor supply voltage down to a level the ADC can read
@@ -103,38 +103,6 @@ m_cyl_b = rho_nylon * (icor ** 2) * ich
 m_cyl_t = rho_nylon * 2 * (0.01 ** 3)
 m_cyl = m_cyl_b + m_cyl_t
 
-######################################################################################################################## XML FUNCTIONS
-def writeout(path="./../etc/data.xml"):
-    '''
-    writeout(**kwargs)
-    
-    Writes the contents of a data file.
-    
-    **kwargs:
-        path        (string)        Path to data.xml. Default is './../etc/data.xml'
-    '''
-    global root
-    # update xml tree
-    
-    # geometries
-    root[0][0].text = str(icor)
-    root[1][0].text = str(ich)
-    root[2][0].text = str(ocor)
-    root[3][0].text = str(ocir)
-    root[4][0].text = str(och)
-    root[5][0].text = version
-    # calibrations
-    root[6][0].text = str(cal_dynamo[0])
-    root[6][1].text = str(cal_dynamo[1])
-    root[8][0].text = str(cal_5AHES[0])
-    root[8][1].text = str(cal_5AHES[1])
-    root[9][0].text = str(cal_IcoVms[0])
-    root[9][1].text = str(cal_IcoVms[1])
-    root[10][0].text = str(cal_TIemf[0])
-    root[10][1].text = str(cal_TIemf[1])
-    
-    tree = ET.ElementTree(root)
-    tree.write(path)
 
 ######################################################################################################################## VISCOSITY CALCULATION STUFF
 def get_mu_of_T(material_n, T_c, misc_data=None):
@@ -224,25 +192,28 @@ def get_current(cv):
 
 def get_strain(omega_rads):
     '''
-    get_strain(omega)
+    get_strain(omega_rads)
 
-    Parameters:
-        dr      (list, float)       [List of] dynamo voltage readings.
-    
-    Returns:
-        gd      (list, float)       [List of] strains in inverse seconds.
+    Using the couette cell geometry, converts the angular speed of the inner cylinder to
+    the strain experienced by the fluid.
     '''
-    gd = omega_rads * (icor / (ocir - icor)) 
-    return gd
+    strain_invs = omega_rads * (data["icor"] / (data["ocir"] - data["icor"])) 
+    return strain_invs
 
-def get_stress(T, fill_volume_ml):
-    A_small = (pi * (icor ** 2)) # in m^2
-    A_big   = (pi * (ocir ** 2)) # in m^2
-    A_middle_m2 = A_big - A_small
-    fill_volume_m3 = fill_volume_ml * (10.0 ** (-6.0)) # 1000 ml in a l, 1 000 l in a m3: 10^6ml in a m3
-    H = fill_volume_m3 / A_middle_m2
-    stress = T / (2 * A_small * H)
-    return stress
+def get_stress(torque_Nm, fill_volume_ml):
+    '''
+    get_stress(torque_Nm, fill_volume_ml)
+    
+    Given the torque and the fill volume, calculates the 
+    corresponding stress experienced by the fluid.
+    '''
+    A_small_m2 = (pi * (data["icor"] ** 2)) # in m^2
+    A_big_m2   = (pi * (data["ocir"] ** 2)) # in m^2
+    A_middle_m2 = A_big_m2 - A_small_m2 # Calculating the annular area
+    fill_volume_m3 = fill_volume_ml * (10.0 ** (-6.0))
+    height_m = fill_volume_m3 / A_middle_m2
+    stress_pa = torque_Nm / (2 * A_small_m2 * height_m)
+    return stress_pa
 
 def calc_mu(st, Vms_V, Ims_A, fill_volume_m3, omega_rads, dwdt_override=None):
     gamma_dot = get_strain(omega_rads)
@@ -287,12 +258,12 @@ def fit_line(x, y, dg, x_name="x", y_name="y"):
     
     **kwargs:
         x_name  (string)            Symbol to use for the 'x' series, will be used to create 
-                                    a string representation of the resulting polynomial. Default is x
+                                    a string representation of the resulting polynomial. Default is x.
         y_name  (string)            Symbol to use for the 'y' series, will be used to create 
-                                    a string representation of the resulting polynomial. Default is y
+                                    a string representation of the resulting polynomial. Default is y.
     
     Returns:
-        fit     (???)               No idea to be honest. I wrote this function almost six months ago.
+        fit     (???)               Provides the corresponding values of the fit line to the given x coords.
         fit_eqn (string)            A clean representation of the polynomial fit. Intended to be inserted
                                     into a matplotlib plot as part of the legend or some such. 
                                     Uses 'LaTeX' formatting.
