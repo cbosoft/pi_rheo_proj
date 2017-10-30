@@ -99,7 +99,7 @@ kv = np.average([kv_noload, kv_stall])
 
 ## Get mass of inner cylinder
 rho_nylon = 1150.0 # kg/m3
-m_cyl_b = rho_nylon * (icor ** 2) * ich
+m_cyl_b = rho_nylon * (data['icor'] ** 2) * data['ich']
 m_cyl_t = rho_nylon * 2 * (0.01 ** 3)
 m_cyl = m_cyl_b + m_cyl_t
 
